@@ -8,6 +8,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { SplitPane } from '@/components/SplitPane';
 import { SearchDrawer } from '@/components/SearchDrawer';
 import { SettingsDialog } from '@/components/SettingsDialog';
+import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { useAppStore } from '@/stores/useAppStore';
 import { useEffect } from 'react';
 
@@ -43,6 +44,9 @@ function App() {
 
       {/* 設定ダイアログ */}
       <SettingsDialog />
+
+      {/* PWAインストールプロンプト */}
+      <PwaInstallPrompt />
     </div>
   );
 }
