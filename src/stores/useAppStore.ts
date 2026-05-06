@@ -68,6 +68,7 @@ interface AppState {
   wordWrap: boolean;
   showIndentGuides: boolean;
   fontSize: number;
+  lineHeight: number;
 
   // アクション
   setPat: (pat: string | null) => void;
@@ -91,6 +92,7 @@ interface AppState {
   setWordWrap: (wrap: boolean) => void;
   setShowIndentGuides: (show: boolean) => void;
   setFontSize: (size: number) => void;
+  setLineHeight: (height: number) => void;
 }
 
 // ========================================
@@ -129,6 +131,7 @@ export const useAppStore = create<AppState>()(
       wordWrap: true,
       showIndentGuides: true,
       fontSize: 14,
+      lineHeight: 1.5,
 
       // === アクション ===
 
@@ -430,6 +433,7 @@ export const useAppStore = create<AppState>()(
       setWordWrap: (wordWrap) => set({ wordWrap }),
       setShowIndentGuides: (showIndentGuides) => set({ showIndentGuides }),
       setFontSize: (fontSize) => set({ fontSize }),
+      setLineHeight: (lineHeight) => set({ lineHeight }),
 
       navigateBack: () => {
         const { navigationHistory, navigationIndex } = get();
@@ -504,6 +508,7 @@ export const useAppStore = create<AppState>()(
         wordWrap: state.wordWrap,
         showIndentGuides: state.showIndentGuides,
         fontSize: state.fontSize,
+        lineHeight: state.lineHeight,
       }),
     } as any
   )

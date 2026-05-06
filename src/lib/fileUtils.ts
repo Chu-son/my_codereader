@@ -9,9 +9,17 @@ import {
   File,
   FileImage,
   Braces,
-  Hash,
   Cog,
   BookOpen,
+  Terminal,
+  Database,
+  Archive,
+  Film,
+  Music,
+  Globe,
+  Palette,
+  Box,
+  Binary,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -125,7 +133,9 @@ export function getFileIcon(filePath: string): LucideIcon {
   if (name === 'package.json' || name === 'tsconfig.json') return FileJson;
   if (name === 'readme.md' || name === 'readme') return BookOpen;
   if (name.startsWith('.') || name.includes('config')) return Cog;
-  if (name === 'makefile' || name === 'dockerfile') return Cog;
+  if (name === 'makefile' || name === 'dockerfile') return Terminal;
+  if (name.includes('license')) return BookOpen;
+  if (name === 'package.json' || name === 'package-lock.json') return Box;
 
   if (!ext) return File;
 
@@ -149,6 +159,9 @@ export function getFileIcon(filePath: string): LucideIcon {
     yaml: Braces,
     yml: Braces,
     toml: Braces,
+    sql: Database,
+    db: Database,
+    sqlite: Database,
 
     // Text / Doc
     md: BookOpen,
@@ -157,9 +170,10 @@ export function getFileIcon(filePath: string): LucideIcon {
     csv: FileText,
 
     // Web
-    html: Hash,
-    css: Hash,
-    scss: Hash,
+    html: Globe,
+    css: Palette,
+    scss: Palette,
+    less: Palette,
 
     // Image
     png: FileImage,
@@ -169,9 +183,29 @@ export function getFileIcon(filePath: string): LucideIcon {
     svg: FileImage,
     webp: FileImage,
 
+    // Media
+    mp4: Film,
+    mov: Film,
+    webm: Film,
+    mp3: Music,
+    wav: Music,
+    flac: Music,
+
     // Shell
-    sh: FileCode,
-    bash: FileCode,
+    sh: Terminal,
+    bash: Terminal,
+    zsh: Terminal,
+
+    // Archive
+    zip: Archive,
+    tar: Archive,
+    gz: Archive,
+    '7z': Archive,
+
+    // Binary
+    exe: Binary,
+    dll: Binary,
+    bin: Binary,
   };
 
   return iconMap[ext] ?? File;
