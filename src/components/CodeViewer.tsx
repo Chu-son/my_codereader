@@ -58,6 +58,7 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
     wordWrap,
     showIndentGuides,
     fontSize,
+    lineHeight,
     updateScrollPos,
     searchInRepo,
   } = useAppStore();
@@ -79,9 +80,11 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
         EditorView.theme({
           '&': {
             fontSize: `${fontSize}px`,
+            lineHeight: lineHeight.toString(),
           },
           '.cm-scroller': {
             fontFamily: 'var(--font-mono)',
+            lineHeight: lineHeight.toString(),
           },
         })
       );
@@ -108,7 +111,7 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
       );
       return ext;
     },
-    [wordWrap, showIndentGuides, fontSize, searchInRepo]
+    [wordWrap, showIndentGuides, fontSize, lineHeight, searchInRepo]
   );
 
   const extensions = useMemo(
@@ -143,7 +146,13 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
   }, [handleScroll]);
 
   return (
-    <div className="h-full overflow-hidden relative">
+    <div 
+      className="h-full overflow-hidden relative"
+      style={{ 
+        '--font-size-code': `${fontSize}px`, 
+        '--line-height-code': lineHeight 
+      } as React.CSSProperties}
+    >
       <CodeMirror
         value={content}
         theme={vscodeDark}

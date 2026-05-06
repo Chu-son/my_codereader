@@ -40,6 +40,15 @@ export default defineConfig({
             purpose: 'any maskable',
           },
         ],
+        share_target: {
+          action: '/my_codereader/',
+          method: 'GET',
+          params: {
+            title: 'title',
+            text: 'text',
+            url: 'url',
+          },
+        },
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],

@@ -3,7 +3,7 @@
 // ========================================
 
 import { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, Shield, Trash2, Type, WrapText, AlignLeft } from 'lucide-react';
+import { X, Eye, EyeOff, Shield, Trash2, Type, WrapText, AlignLeft, RotateCcw } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { fetchRateLimit } from '@/lib/github';
 
@@ -14,11 +14,13 @@ export function SettingsDialog() {
     wordWrap,
     showIndentGuides,
     fontSize,
+    lineHeight,
     setSettingsOpen,
     setPat,
     setWordWrap,
     setShowIndentGuides,
     setFontSize,
+    setLineHeight,
   } = useAppStore();
 
   const [localPat, setLocalPat] = useState(pat ?? '');
@@ -101,11 +103,23 @@ export function SettingsDialog() {
         <div className="p-5 space-y-8">
           {/* エディタ設定 セクション */}
           <section>
-            <div className="flex items-center gap-2 mb-4">
-              <Type size={16} className="text-[var(--accent-blue)]" />
-              <h3 className="text-sm font-medium text-[var(--text-primary)]">
-                エディタ設定
-              </h3>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Type size={16} className="text-[var(--accent-blue)]" />
+                <h3 className="text-sm font-medium text-[var(--text-primary)]">
+                  エディタ設定
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setFontSize(14);
+                  setLineHeight(1.5);
+                }}
+                className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium rounded-md transition-colors hover:bg-[var(--bg-hover)] text-[var(--text-secondary)]"
+              >
+                <RotateCcw size={12} />
+                初期化
+              </button>
             </div>
 
             <div className="space-y-4">
@@ -181,11 +195,32 @@ export function SettingsDialog() {
                 </div>
                 <input
                   type="range"
-                  min="12"
+                  min="6"
                   max="24"
                   step="1"
                   value={fontSize}
                   onChange={(e) => setFontSize(parseInt(e.target.value))}
+                  className="w-full h-1.5 bg-[var(--bg-surface)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-blue)]"
+                />
+              </div>
+
+              {/* 行間サイズ調整 */}
+              <div className="space-y-3 pt-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-[var(--text-primary)]">
+                    行間サイズ
+                  </span>
+                  <span className="text-sm font-mono text-[var(--accent-blue)]">
+                    {lineHeight.toFixed(1)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="1.0"
+                  max="3.0"
+                  step="0.1"
+                  value={lineHeight}
+                  onChange={(e) => setLineHeight(parseFloat(e.target.value))}
                   className="w-full h-1.5 bg-[var(--bg-surface)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-blue)]"
                 />
               </div>
