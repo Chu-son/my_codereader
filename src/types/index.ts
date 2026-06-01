@@ -62,3 +62,20 @@ export interface BranchInfo {
   name: string;
   sha: string;
 }
+
+/** ブックマーク */
+export interface Bookmark {
+  id: string;
+  repo: string;
+  branch: string;
+  path: string;
+  line: number;
+  text: string;
+}
+
+/** ジャンプターゲット */
+export interface JumpTarget {
+  path: string;
+  line: number;
+  timestamp: number;
+}

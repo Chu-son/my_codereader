@@ -4,7 +4,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { TreeNode, OpenedFile, SearchResult, BranchInfo } from '@/types';
+import type { TreeNode, OpenedFile, SearchResult, BranchInfo, Bookmark, JumpTarget } from '@/types';
 import {
   fetchRepoInfo,
   fetchRepoTree,
@@ -57,12 +57,20 @@ interface AppState {
   searchLoading: boolean;
   searchDrawerOpen: boolean;
 
+  // ブックマーク
+  bookmarks: Bookmark[];
+  activeCursorLines: Record<string, number>;
+  jumpTarget: JumpTarget | null;
+
   // 設定ダイアログ
   settingsOpen: boolean;
 
   // ナビゲーション履歴
   navigationHistory: string[];
   navigationIndex: number;
+
+  // 最近開いたリポジトリ
+  recentRepos: string[];
 
   // 設定
   wordWrap: boolean;
@@ -93,6 +101,14 @@ interface AppState {
   setShowIndentGuides: (show: boolean) => void;
   setFontSize: (size: number) => void;
   setLineHeight: (height: number) => void;
+  
+  addBookmark: (bookmark: Bookmark) => void;
+  removeBookmark: (id: string) => void;
+  setActiveCursorLine: (path: string, line: number) => void;
+  setJumpTarget: (target: JumpTarget | null) => void;
+
+  addRecentRepo: (repo: string) => void;
+  removeRecentRepo: (repo: string) => void;
 }
 
 // ========================================
@@ -123,9 +139,13 @@ export const useAppStore = create<AppState>()(
       searchResults: [],
       searchLoading: false,
       searchDrawerOpen: false,
+      bookmarks: [],
+      activeCursorLines: {},
+      jumpTarget: null,
       settingsOpen: false,
       navigationHistory: [],
       navigationIndex: -1,
+      recentRepos: [],
 
       // 設定初期値
       wordWrap: true,
@@ -171,6 +191,9 @@ export const useAppStore = create<AppState>()(
             treeData: tree,
             treeLoading: false,
           });
+
+          // 履歴に追加
+          get().addRecentRepo(`${owner}/${repo}`);
 
           // ブランチ一覧を非同期で取得
           set({ branchesLoading: true });
@@ -499,16 +522,62 @@ export const useAppStore = create<AppState>()(
           });
         }
       },
+
+      addBookmark: (bookmark) => {
+        set((state) => {
+          // 同じリポジトリ・ファイル・行のブックマークが既にあるかチェック
+          const exists = state.bookmarks.some(b => 
+            b.repo === bookmark.repo && 
+            b.path === bookmark.path && 
+            b.line === bookmark.line
+          );
+          if (exists) return state;
+          return { bookmarks: [...state.bookmarks, bookmark] };
+        });
+      },
+
+      removeBookmark: (id) => {
+        set((state) => ({
+          bookmarks: state.bookmarks.filter((b) => b.id !== id),
+        }));
+      },
+
+      setActiveCursorLine: (path, line) => {
+        set((state) => ({
+          activeCursorLines: {
+            ...state.activeCursorLines,
+            [path]: line,
+          },
+        }));
+      },
+
+      setJumpTarget: (target) => {
+        set({ jumpTarget: target });
+      },
+
+      addRecentRepo: (repo) => {
+        set((state) => {
+          const filtered = state.recentRepos.filter((r) => r !== repo);
+          return { recentRepos: [repo, ...filtered].slice(0, 20) };
+        });
+      },
+
+      removeRecentRepo: (repo) => {
+        set((state) => ({
+          recentRepos: state.recentRepos.filter((r) => r !== repo),
+        }));
+      },
     }),
     {
       name: 'codereader-storage',
       partialState: (state: AppState) => ({
         pat: state.pat,
-        currentRepo: state.currentRepo,
+        bookmarks: state.bookmarks,
         wordWrap: state.wordWrap,
         showIndentGuides: state.showIndentGuides,
         fontSize: state.fontSize,
         lineHeight: state.lineHeight,
+        recentRepos: state.recentRepos,
       }),
     } as any
   )

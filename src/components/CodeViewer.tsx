@@ -61,6 +61,9 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
     lineHeight,
     updateScrollPos,
     searchInRepo,
+    setActiveCursorLine,
+    jumpTarget,
+    setJumpTarget,
   } = useAppStore();
   const editorRef = useRef<EditorView | null>(null);
   const [selection, setSelection] = useState<{ text: string; x: number; y: number } | null>(null);
@@ -93,6 +96,10 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
         EditorView.updateListener.of((update) => {
           if (update.selectionSet) {
             const main = update.state.selection.main;
+            const line = update.state.doc.lineAt(main.head).number;
+            // setTimeoutを用いてCodeMirrorの更新サイクル外でReactのStateを更新する
+            setTimeout(() => setActiveCursorLine(filePath, line), 0);
+
             if (!main.empty) {
               const text = update.state.sliceDoc(main.from, main.to).trim();
               if (text && text.length < 100) {
@@ -111,7 +118,7 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
       );
       return ext;
     },
-    [wordWrap, showIndentGuides, fontSize, lineHeight, searchInRepo]
+    [wordWrap, showIndentGuides, fontSize, lineHeight, searchInRepo, filePath, setActiveCursorLine]
   );
 
   const extensions = useMemo(
@@ -144,6 +151,38 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
     scrollDom.addEventListener('scroll', handleScroll, { passive: true });
     return () => scrollDom.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  // ジャンプターゲットの処理
+  useEffect(() => {
+    if (jumpTarget && jumpTarget.path === filePath && editorRef.current) {
+      const view = editorRef.current;
+      const line = Math.min(jumpTarget.line, view.state.doc.lines);
+      const pos = view.state.doc.line(line).from;
+
+      // ジャンプ（画面中央に表示）
+      view.dispatch({
+        effects: EditorView.scrollIntoView(pos, { y: 'center' }),
+        selection: { anchor: pos },
+      });
+
+      // 点滅エフェクト用にDOMを探す
+      requestAnimationFrame(() => {
+        const lineDom = view.dom.querySelector(`.cm-line:nth-child(${line})`) as HTMLElement;
+        if (lineDom) {
+          lineDom.style.transition = 'background-color 0.2s';
+          lineDom.style.backgroundColor = 'var(--accent-blue)';
+          lineDom.style.opacity = '0.5';
+          setTimeout(() => {
+            lineDom.style.backgroundColor = '';
+            lineDom.style.opacity = '';
+          }, 600);
+        }
+      });
+
+      // ジャンプ完了としてターゲットをクリア
+      setJumpTarget(null);
+    }
+  }, [jumpTarget, filePath, setJumpTarget]);
 
   return (
     <div 

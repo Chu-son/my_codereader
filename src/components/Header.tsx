@@ -14,6 +14,8 @@ import {
   Search,
   Loader2,
   ArrowRight,
+  Bookmark,
+  X,
 } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { BranchSelector } from '@/components/BranchSelector';
@@ -35,6 +37,13 @@ export function Header() {
     navigateBack,
     navigateForward,
     clearRepo,
+    activePane1FilePath,
+    activeCursorLines,
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    currentBranch,
+    openedFiles,
   } = useAppStore();
 
   const [repoInput, setRepoInput] = useState('');
@@ -57,6 +66,44 @@ export function Header() {
     clearRepo();
     setRepoInput('');
     setShowRepoInput(true);
+  };
+
+  // ブックマークの状態判定とトグル処理
+  const activePath = activePane1FilePath;
+  const activeLine = activePath ? activeCursorLines[activePath] : null;
+  
+  const currentBookmark = (activePath && activeLine && currentRepo)
+    ? bookmarks.find(b => b.repo === currentRepo && b.path === activePath && b.line === activeLine)
+    : null;
+
+  const handleToggleBookmark = () => {
+    if (!activePath || !activeLine) {
+      alert('ブックマークする行を選択してください');
+      return;
+    }
+    if (!currentRepo || !currentBranch) return;
+
+    if (currentBookmark) {
+      removeBookmark(currentBookmark.id);
+    } else {
+      // 対象行のテキストを少し取得してプレビューにする（該当ファイルのcontentから抽出）
+      const file = openedFiles.find(f => f.path === activePath);
+      let text = '';
+      if (file && file.content) {
+        const lines = file.content.split('\n');
+        text = lines[activeLine - 1]?.trim() || '';
+        if (text.length > 50) text = text.substring(0, 50) + '...';
+      }
+
+      addBookmark({
+        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2),
+        repo: currentRepo,
+        branch: currentBranch,
+        path: activePath,
+        line: activeLine,
+        text,
+      });
+    }
   };
 
   return (
@@ -104,21 +151,36 @@ export function Header() {
       {/* リポジトリ名 or 入力フォーム */}
       <div className="flex-1 min-w-0 mx-2">
         {showRepoInput || !currentRepo ? (
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              id="repo-input"
-              type="text"
-              value={repoInput}
-              onChange={(e) => setRepoInput(e.target.value)}
-              placeholder="owner/repo (例: facebook/react)"
-              className="flex-1 h-8 px-3 text-sm rounded-md border outline-none transition-colors"
-              style={{
-                backgroundColor: 'var(--bg-surface)',
-                borderColor: 'var(--border-primary)',
-                color: 'var(--text-primary)',
-              }}
-              autoFocus
-            />
+          <form onSubmit={handleSubmit} className="flex gap-2 w-full">
+            <div className="relative flex-1">
+              <input
+                id="repo-input"
+                type="text"
+                value={repoInput}
+                onChange={(e) => setRepoInput(e.target.value)}
+                placeholder="owner/repo (例: facebook/react)"
+                className="w-full h-8 pl-3 pr-8 text-sm rounded-md border outline-none transition-colors"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-primary)',
+                  color: 'var(--text-primary)',
+                }}
+                autoFocus
+              />
+              {repoInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRepoInput('');
+                    document.getElementById('repo-input')?.focus();
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
+                  title="クリア"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
             <button
               type="submit"
               disabled={!repoInput.trim() || treeLoading}
@@ -174,6 +236,19 @@ export function Header() {
 
       {/* 右側ボタン群 */}
       <div className="flex items-center gap-0.5">
+        {/* ブックマークボタン */}
+        <button
+          id="bookmark-toggle"
+          onClick={handleToggleBookmark}
+          className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
+          title={currentBookmark ? 'ブックマークを解除' : 'ブックマークを追加'}
+        >
+          <Bookmark
+            size={18}
+            className={currentBookmark ? 'text-[var(--accent-blue)] fill-current' : 'text-[var(--text-secondary)]'}
+          />
+        </button>
+
         {/* 検索ボタン */}
         <button
           id="search-toggle"
