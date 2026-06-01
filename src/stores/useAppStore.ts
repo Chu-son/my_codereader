@@ -69,6 +69,9 @@ interface AppState {
   navigationHistory: string[];
   navigationIndex: number;
 
+  // 最近開いたリポジトリ
+  recentRepos: string[];
+
   // 設定
   wordWrap: boolean;
   showIndentGuides: boolean;
@@ -103,6 +106,9 @@ interface AppState {
   removeBookmark: (id: string) => void;
   setActiveCursorLine: (path: string, line: number) => void;
   setJumpTarget: (target: JumpTarget | null) => void;
+
+  addRecentRepo: (repo: string) => void;
+  removeRecentRepo: (repo: string) => void;
 }
 
 // ========================================
@@ -139,6 +145,7 @@ export const useAppStore = create<AppState>()(
       settingsOpen: false,
       navigationHistory: [],
       navigationIndex: -1,
+      recentRepos: [],
 
       // 設定初期値
       wordWrap: true,
@@ -184,6 +191,9 @@ export const useAppStore = create<AppState>()(
             treeData: tree,
             treeLoading: false,
           });
+
+          // 履歴に追加
+          get().addRecentRepo(`${owner}/${repo}`);
 
           // ブランチ一覧を非同期で取得
           set({ branchesLoading: true });
@@ -544,17 +554,30 @@ export const useAppStore = create<AppState>()(
       setJumpTarget: (target) => {
         set({ jumpTarget: target });
       },
+
+      addRecentRepo: (repo) => {
+        set((state) => {
+          const filtered = state.recentRepos.filter((r) => r !== repo);
+          return { recentRepos: [repo, ...filtered].slice(0, 20) };
+        });
+      },
+
+      removeRecentRepo: (repo) => {
+        set((state) => ({
+          recentRepos: state.recentRepos.filter((r) => r !== repo),
+        }));
+      },
     }),
     {
       name: 'codereader-storage',
       partialState: (state: AppState) => ({
         pat: state.pat,
-        currentRepo: state.currentRepo,
         bookmarks: state.bookmarks,
         wordWrap: state.wordWrap,
         showIndentGuides: state.showIndentGuides,
         fontSize: state.fontSize,
         lineHeight: state.lineHeight,
+        recentRepos: state.recentRepos,
       }),
     } as any
   )

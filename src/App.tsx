@@ -9,6 +9,7 @@ import { SplitPane } from '@/components/SplitPane';
 import { SearchDrawer } from '@/components/SearchDrawer';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
+import { RecentRepos } from '@/components/RecentRepos';
 import { useAppStore } from '@/stores/useAppStore';
 import { useEffect } from 'react';
 
@@ -38,9 +39,9 @@ function App() {
       }
     }
 
-    if (currentRepo) {
-      loadRepository(currentRepo);
-    }
+    // 起動直後は常に履歴画面（RecentRepos）を表示するため、
+    // 状態に残っているかもしれないリポジトリ情報をクリアする
+    useAppStore.getState().clearRepo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -65,7 +66,7 @@ function App() {
 
         {/* メインエリア（分割対応） */}
         <main className="flex-1 overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
-          <SplitPane />
+          {currentRepo ? <SplitPane /> : <RecentRepos />}
         </main>
       </div>
 
