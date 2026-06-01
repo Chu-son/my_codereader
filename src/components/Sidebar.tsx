@@ -4,6 +4,7 @@
 
 import { useAppStore } from '@/stores/useAppStore';
 import { OpenEditors } from '@/components/OpenEditors';
+import { BookmarksList } from '@/components/BookmarksList';
 import { FileTree } from '@/components/FileTree';
 import { FolderGit2 } from 'lucide-react';
 
@@ -40,6 +41,9 @@ export function Sidebar() {
         <div className="border-b shrink-0 max-h-[40%] overflow-y-auto" style={{ borderColor: 'var(--border-primary)' }}>
           <OpenEditors />
         </div>
+
+        {/* ブックマーク セクション */}
+        <BookmarksList />
 
         {/* Explorer セクション */}
         <div 

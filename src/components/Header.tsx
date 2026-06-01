@@ -14,6 +14,7 @@ import {
   Search,
   Loader2,
   ArrowRight,
+  Bookmark,
 } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { BranchSelector } from '@/components/BranchSelector';
@@ -35,6 +36,13 @@ export function Header() {
     navigateBack,
     navigateForward,
     clearRepo,
+    activePane1FilePath,
+    activeCursorLines,
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    currentBranch,
+    openedFiles,
   } = useAppStore();
 
   const [repoInput, setRepoInput] = useState('');
@@ -57,6 +65,44 @@ export function Header() {
     clearRepo();
     setRepoInput('');
     setShowRepoInput(true);
+  };
+
+  // ブックマークの状態判定とトグル処理
+  const activePath = activePane1FilePath;
+  const activeLine = activePath ? activeCursorLines[activePath] : null;
+  
+  const currentBookmark = (activePath && activeLine && currentRepo)
+    ? bookmarks.find(b => b.repo === currentRepo && b.path === activePath && b.line === activeLine)
+    : null;
+
+  const handleToggleBookmark = () => {
+    if (!activePath || !activeLine) {
+      alert('ブックマークする行を選択してください');
+      return;
+    }
+    if (!currentRepo || !currentBranch) return;
+
+    if (currentBookmark) {
+      removeBookmark(currentBookmark.id);
+    } else {
+      // 対象行のテキストを少し取得してプレビューにする（該当ファイルのcontentから抽出）
+      const file = openedFiles.find(f => f.path === activePath);
+      let text = '';
+      if (file && file.content) {
+        const lines = file.content.split('\n');
+        text = lines[activeLine - 1]?.trim() || '';
+        if (text.length > 50) text = text.substring(0, 50) + '...';
+      }
+
+      addBookmark({
+        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2),
+        repo: currentRepo,
+        branch: currentBranch,
+        path: activePath,
+        line: activeLine,
+        text,
+      });
+    }
   };
 
   return (
@@ -174,6 +220,19 @@ export function Header() {
 
       {/* 右側ボタン群 */}
       <div className="flex items-center gap-0.5">
+        {/* ブックマークボタン */}
+        <button
+          id="bookmark-toggle"
+          onClick={handleToggleBookmark}
+          className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
+          title={currentBookmark ? 'ブックマークを解除' : 'ブックマークを追加'}
+        >
+          <Bookmark
+            size={18}
+            className={currentBookmark ? 'text-[var(--accent-blue)] fill-current' : 'text-[var(--text-secondary)]'}
+          />
+        </button>
+
         {/* 検索ボタン */}
         <button
           id="search-toggle"
