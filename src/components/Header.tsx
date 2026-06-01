@@ -15,6 +15,7 @@ import {
   Loader2,
   ArrowRight,
   Bookmark,
+  X,
 } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { BranchSelector } from '@/components/BranchSelector';
@@ -150,21 +151,36 @@ export function Header() {
       {/* リポジトリ名 or 入力フォーム */}
       <div className="flex-1 min-w-0 mx-2">
         {showRepoInput || !currentRepo ? (
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              id="repo-input"
-              type="text"
-              value={repoInput}
-              onChange={(e) => setRepoInput(e.target.value)}
-              placeholder="owner/repo (例: facebook/react)"
-              className="flex-1 h-8 px-3 text-sm rounded-md border outline-none transition-colors"
-              style={{
-                backgroundColor: 'var(--bg-surface)',
-                borderColor: 'var(--border-primary)',
-                color: 'var(--text-primary)',
-              }}
-              autoFocus
-            />
+          <form onSubmit={handleSubmit} className="flex gap-2 w-full">
+            <div className="relative flex-1">
+              <input
+                id="repo-input"
+                type="text"
+                value={repoInput}
+                onChange={(e) => setRepoInput(e.target.value)}
+                placeholder="owner/repo (例: facebook/react)"
+                className="w-full h-8 pl-3 pr-8 text-sm rounded-md border outline-none transition-colors"
+                style={{
+                  backgroundColor: 'var(--bg-surface)',
+                  borderColor: 'var(--border-primary)',
+                  color: 'var(--text-primary)',
+                }}
+                autoFocus
+              />
+              {repoInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRepoInput('');
+                    document.getElementById('repo-input')?.focus();
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
+                  title="クリア"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
             <button
               type="submit"
               disabled={!repoInput.trim() || treeLoading}
