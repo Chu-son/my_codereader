@@ -9,7 +9,7 @@ export interface GitHubTreeItem {
   type: 'blob' | 'tree';
   sha: string;
   size?: number;
-  url: string;
+  url?: string;
 }
 
 /** アプリ内で使用するツリーノード */
