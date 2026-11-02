@@ -2,7 +2,7 @@
 // FileTree Component
 // ========================================
 
-import { useCallback } from 'react';
+import { createElement, useCallback } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react';
 import type { TreeNode } from '@/types';
 import { useAppStore } from '@/stores/useAppStore';
@@ -65,7 +65,7 @@ function FileTreeNode({
   }, [node, onToggle, onFileClick]);
 
   const isDir = node.type === 'tree';
-  const FileIcon = isDir ? (isExpanded ? FolderOpen : Folder) : getFileIcon(node.path);
+  const fileIcon = isDir ? (isExpanded ? FolderOpen : Folder) : getFileIcon(node.path);
 
   const isBinary = !isDir && isBinaryFile(node.path);
 
@@ -106,12 +106,12 @@ function FileTreeNode({
         </span>
 
         {/* ファイル/フォルダアイコン */}
-        <FileIcon
-          size={16}
-          className={`shrink-0 ml-1 ${
+        {createElement(fileIcon, {
+          size: 16,
+          className: `shrink-0 ml-1 ${
             isDir ? 'text-[var(--accent-yellow)]' : 'text-[var(--text-secondary)]'
-          }`}
-        />
+          }`,
+        })}
 
         {/* アイコンとテキストの間の余白 */}
         <div className="w-2.5 shrink-0" />

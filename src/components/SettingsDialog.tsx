@@ -32,24 +32,35 @@ export function SettingsDialog() {
   } | null>(null);
   const [rateLimitLoading, setRateLimitLoading] = useState(false);
 
-  useEffect(() => {
-    if (settingsOpen) {
-      setLocalPat(pat ?? '');
-      checkRateLimit();
+  // ダイアログが開かれた時、または保存済み PAT が変わった時に入力欄を同期する
+  const syncedPat = settingsOpen ? (pat ?? '') : null;
+  const [prevSyncedPat, setPrevSyncedPat] = useState(syncedPat);
+  if (syncedPat !== prevSyncedPat) {
+    setPrevSyncedPat(syncedPat);
+    if (syncedPat !== null) {
+      setLocalPat(syncedPat);
+      setRateLimitLoading(true);
     }
-  }, [settingsOpen, pat]);
+  }
 
-  const checkRateLimit = async () => {
-    setRateLimitLoading(true);
-    try {
-      const result = await fetchRateLimit(pat);
-      setRateLimit(result);
-    } catch {
-      setRateLimit(null);
-    } finally {
-      setRateLimitLoading(false);
-    }
-  };
+  // ダイアログが開かれた時、または PAT が変わった時にレート制限を取得する
+  useEffect(() => {
+    if (!settingsOpen) return;
+    let cancelled = false;
+    fetchRateLimit(pat)
+      .then((result) => {
+        if (!cancelled) setRateLimit(result);
+      })
+      .catch(() => {
+        if (!cancelled) setRateLimit(null);
+      })
+      .finally(() => {
+        if (!cancelled) setRateLimitLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [settingsOpen, pat]);
 
   const handleSavePat = () => {
     setPat(localPat.trim() || null);

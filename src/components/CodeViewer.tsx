@@ -116,15 +116,7 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
       }),
     );
     return ext;
-  }, [
-    wordWrap,
-    showIndentGuides,
-    fontSize,
-    lineHeight,
-    searchInRepo,
-    filePath,
-    setActiveCursorLine,
-  ]);
+  }, [wordWrap, showIndentGuides, fontSize, lineHeight, filePath, setActiveCursorLine]);
 
   const extensions = useMemo(
     () => [...langExtension, ...readOnlyExt],

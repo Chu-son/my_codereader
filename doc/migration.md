@@ -12,7 +12,7 @@
 - [x] `.gitignore` に `.antigravitycli/` を追加する
 - [x] 未使用の `react-router-dom` を削除する
 - [x] テンプレート残骸の `src/assets/hero.png`、`vite.svg` を削除する
-- [ ] **lint の既存エラー 9 件を解消する**（`react-hooks` のルール違反。`BookmarksList` / `FileTree` / `PwaInstallPrompt` / `SearchDrawer` / `SettingsDialog` / `CodeViewer`、および `useAppStore.ts` の `as any`）。解消後、PR の CI で lint を必須にする
+- [x] lint の既存エラーを解消する（`react-hooks` 違反 8 件を修正。`useAppStore.ts` の `as any` は永続化の挙動が変わるため、理由付きの `eslint-disable` で明示し、「4. 不具合修正」で解消する）
 
 ## 2. CI
 

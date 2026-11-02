@@ -4,7 +4,7 @@ import { Bookmark as BookmarkIcon, Trash2, FileCode2 } from 'lucide-react';
 const getBasename = (path: string) => path.split('/').pop() || path;
 
 export function BookmarksList() {
-  const { bookmarks, currentRepo, removeBookmark, openFile, setJumpTarget } = useAppStore();
+  const { bookmarks, currentRepo, removeBookmark, openFile, requestJump } = useAppStore();
 
   if (!currentRepo) return null;
 
@@ -24,7 +24,7 @@ export function BookmarksList() {
 
   const handleBookmarkClick = async (path: string, line: number) => {
     await openFile(path, 1);
-    setJumpTarget({ path, line, timestamp: Date.now() });
+    requestJump(path, line);
   };
 
   return (

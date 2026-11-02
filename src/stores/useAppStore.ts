@@ -102,6 +102,7 @@ interface AppState {
   removeBookmark: (id: string) => void;
   setActiveCursorLine: (path: string, line: number) => void;
   setJumpTarget: (target: JumpTarget | null) => void;
+  requestJump: (path: string, line: number) => void;
 
   addRecentRepo: (repo: string) => void;
   removeRecentRepo: (repo: string) => void;
@@ -549,6 +550,10 @@ export const useAppStore = create<AppState>()(
         }));
       },
 
+      requestJump: (path, line) => {
+        set({ jumpTarget: { path, line, timestamp: Date.now() } });
+      },
+
       setJumpTarget: (target) => {
         set({ jumpTarget: target });
       },
@@ -577,6 +582,9 @@ export const useAppStore = create<AppState>()(
         lineHeight: state.lineHeight,
         recentRepos: state.recentRepos,
       }),
+      // TODO(doc/migration.md 4): partialState は zustand の正しいオプション名 (partialize) ではない。
+      // 永続化の挙動が変わるため、別 PR で partialize + version/migrate に修正する。
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
   ),
 );

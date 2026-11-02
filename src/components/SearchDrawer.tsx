@@ -23,13 +23,20 @@ export function SearchDrawer() {
   const [localQuery, setLocalQuery] = useState(searchQuery);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // ドロワーが開かれた時にクエリを同期 & フォーカス
+  // ドロワーが開かれた時、およびストアのクエリが変わった時にローカルのクエリを同期する
+  const syncedQuery = searchDrawerOpen ? searchQuery : null;
+  const [prevSyncedQuery, setPrevSyncedQuery] = useState(syncedQuery);
+  if (syncedQuery !== prevSyncedQuery) {
+    setPrevSyncedQuery(syncedQuery);
+    if (syncedQuery !== null) setLocalQuery(syncedQuery);
+  }
+
+  // ドロワーが開かれた時にフォーカスする
   useEffect(() => {
-    if (searchDrawerOpen) {
-      setLocalQuery(searchQuery);
-      setTimeout(() => inputRef.current?.focus(), 100);
-    }
-  }, [searchDrawerOpen, searchQuery]);
+    if (!searchDrawerOpen) return;
+    const timer = setTimeout(() => inputRef.current?.focus(), 100);
+    return () => clearTimeout(timer);
+  }, [searchDrawerOpen]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
