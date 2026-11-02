@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 
 interface MarkdownPreviewProps {
@@ -13,7 +14,9 @@ interface MarkdownPreviewProps {
 }
 
 export function MarkdownPreview({ content }: MarkdownPreviewProps) {
-  const { fontSize, lineHeight } = useAppStore();
+  const { fontSize, lineHeight } = useAppStore(
+    useShallow((s) => ({ fontSize: s.fontSize, lineHeight: s.lineHeight })),
+  );
 
   return (
     <div className="h-full overflow-y-auto">

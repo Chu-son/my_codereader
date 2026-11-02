@@ -17,7 +17,7 @@ describe('useAppStore の永続化', () => {
       openedFiles: [{ path: 'a.ts', content: 'body', scrollPos: 0, sha: 's', loading: false }],
       searchResults: [{ path: 'a', lineNumber: 1, lineContent: 'x', matchStart: 0, matchEnd: 1 }],
     });
-    const raw = localStorage.getItem('codereader-storage');
+    const raw = localStorage.getItem('codereader:app');
     expect(raw).not.toBeNull();
     const saved = JSON.parse(raw ?? '{}');
     expect(saved.version).toBe(1);
@@ -40,6 +40,17 @@ describe('useAppStore の永続化', () => {
     expect(s.fontSize).toBe(20);
     expect(s.openedFiles).toEqual([]);
     expect(s.treeData).toEqual([]);
+  });
+
+  it('旧キーは次回の保存で新キーに移り、削除される', async () => {
+    localStorage.setItem(
+      'codereader-storage',
+      JSON.stringify({ state: { fontSize: 20 }, version: 0 }),
+    );
+    await useAppStore.persist.rehydrate();
+    useAppStore.getState().setFontSize(21);
+    expect(localStorage.getItem('codereader-storage')).toBeNull();
+    expect(JSON.parse(localStorage.getItem('codereader:app') ?? '{}').state.fontSize).toBe(21);
   });
 });
 

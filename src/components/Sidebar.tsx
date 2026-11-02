@@ -2,6 +2,7 @@
 // Sidebar Component
 // ========================================
 
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { OpenEditors } from '@/components/OpenEditors';
 import { BookmarksList } from '@/components/BookmarksList';
@@ -9,8 +10,16 @@ import { FileTree } from '@/components/FileTree';
 import { FolderGit2 } from 'lucide-react';
 
 export function Sidebar() {
-  const { sidebarOpen, treeData, treeLoading, treeError, treeTruncated, currentRepo } =
-    useAppStore();
+  const { sidebarOpen, treeData, treeLoading, treeError, treeTruncated, currentRepo } = useAppStore(
+    useShallow((s) => ({
+      sidebarOpen: s.sidebarOpen,
+      treeData: s.treeData,
+      treeLoading: s.treeLoading,
+      treeError: s.treeError,
+      treeTruncated: s.treeTruncated,
+      currentRepo: s.currentRepo,
+    })),
+  );
 
   if (!sidebarOpen) return null;
 

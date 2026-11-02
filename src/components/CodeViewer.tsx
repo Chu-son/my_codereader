@@ -22,6 +22,7 @@ import { json } from '@codemirror/lang-json';
 import { yaml } from '@codemirror/lang-yaml';
 import { markdown } from '@codemirror/lang-markdown';
 
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getLanguageFromPath } from '@/lib/fileUtils';
 
@@ -64,7 +65,19 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
     setActiveCursorLine,
     jumpTarget,
     setJumpTarget,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      wordWrap: s.wordWrap,
+      showIndentGuides: s.showIndentGuides,
+      fontSize: s.fontSize,
+      lineHeight: s.lineHeight,
+      updateScrollPos: s.updateScrollPos,
+      searchInRepo: s.searchInRepo,
+      setActiveCursorLine: s.setActiveCursorLine,
+      jumpTarget: s.jumpTarget,
+      setJumpTarget: s.setJumpTarget,
+    })),
+  );
   const editorRef = useRef<EditorView | null>(null);
   const [selection, setSelection] = useState<{ text: string; x: number; y: number } | null>(null);
 

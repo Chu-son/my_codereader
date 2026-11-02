@@ -15,8 +15,8 @@
 
 | キー | 内容 | 備考 |
 | --- | --- | --- |
-| `codereader-storage` | Zustand の persist（version 1。許可リストのみ保存） | 目標は `codereader:settings` / `codereader:data` へ移行 |
-| `pwa-prompt-dismissed` | インストール案内を閉じたか | 目標は `codereader:pwa-prompt-dismissed` |
+| `codereader:app` | Zustand の persist（version 1。許可リストのみ保存） | 旧キー `codereader-storage` は読み込み後の最初の保存で削除 |
+| `codereader:pwa-prompt-dismissed` | インストール案内を閉じたか | |
 
 PAT の保存先の方針は [conventions/security.md](conventions/security.md)。
 

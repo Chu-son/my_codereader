@@ -1,3 +1,4 @@
+import type { StateStorage } from 'zustand/middleware';
 import type { Bookmark } from '@/types';
 
 /** 永続化する項目（ユーザー設定とユーザーデータのみ。本文・ツリー・検索結果は含めない） */
@@ -79,3 +80,21 @@ export function migratePersistedState(persisted: unknown): PersistedState {
     lineHeight: numberInRange(persisted.lineHeight, 1, 3, d.lineHeight),
   };
 }
+
+export const STORAGE_KEY = 'codereader:app';
+const LEGACY_STORAGE_KEY = 'codereader-storage';
+
+/**
+ * 新キーが無ければ旧キーを読み、保存時に旧キーを削除する。
+ * 旧データは version 0 のため、読み込み時に migrate で許可リストへ絞られる。
+ */
+export const storage: StateStorage = {
+  getItem: (name) =>
+    localStorage.getItem(name) ??
+    (name === STORAGE_KEY ? localStorage.getItem(LEGACY_STORAGE_KEY) : null),
+  setItem: (name, value) => {
+    localStorage.setItem(name, value);
+    if (name === STORAGE_KEY) localStorage.removeItem(LEGACY_STORAGE_KEY);
+  },
+  removeItem: (name) => localStorage.removeItem(name),
+};

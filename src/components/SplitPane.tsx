@@ -4,6 +4,7 @@
 
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { FileTabs } from '@/components/FileTabs';
 import { CodeViewer } from '@/components/CodeViewer';
@@ -16,7 +17,14 @@ interface PaneContentProps {
 }
 
 function PaneContent({ pane }: PaneContentProps) {
-  const { openedFiles, activePane1FilePath, activePane2FilePath, retryFile } = useAppStore();
+  const { openedFiles, activePane1FilePath, activePane2FilePath, retryFile } = useAppStore(
+    useShallow((s) => ({
+      openedFiles: s.openedFiles,
+      activePane1FilePath: s.activePane1FilePath,
+      activePane2FilePath: s.activePane2FilePath,
+      retryFile: s.retryFile,
+    })),
+  );
 
   const activeFilePath = pane === 1 ? activePane1FilePath : activePane2FilePath;
 
@@ -104,7 +112,9 @@ function EmptyState() {
 }
 
 export function SplitPane() {
-  const { isSplitView, splitDirection } = useAppStore();
+  const { isSplitView, splitDirection } = useAppStore(
+    useShallow((s) => ({ isSplitView: s.isSplitView, splitDirection: s.splitDirection })),
+  );
 
   if (!isSplitView) {
     return <PaneContent pane={1} />;
