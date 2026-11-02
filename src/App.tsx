@@ -28,8 +28,9 @@ function App() {
       if (match && match[1]) {
         let repoName = match[1];
         // 末尾の .git やスラッシュ以降を削除
-        repoName = repoName.split('/')[0] + '/' + repoName.split('/')[1].replace(/\.git$/, '');
-        
+        const [owner = '', name = ''] = repoName.split('/');
+        repoName = `${owner}/${name.replace(/\.git$/, '')}`;
+
         loadRepository(repoName);
         
         // URLパラメータをクリアしてクリーンアップ

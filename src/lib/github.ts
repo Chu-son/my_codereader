@@ -85,7 +85,7 @@ function buildTree(items: GitHubTreeItem[]): TreeNode[] {
 
   for (const item of sortedItems) {
     const parts = item.path.split('/');
-    const name = parts[parts.length - 1];
+    const name = parts[parts.length - 1] ?? item.path;
 
     const node: TreeNode = {
       path: item.path,

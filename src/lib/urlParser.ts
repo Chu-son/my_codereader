@@ -2,17 +2,30 @@
 // GitHub URL Parser Utility
 // ========================================
 
+export interface ParsedRepoInput {
+  owner: string;
+  repo: string;
+  branch: string | undefined;
+  filePath: string | undefined;
+}
+
+/** 'owner/repo' 形式の文字列を分解する。形式が不正なら null。 */
+export function splitRepoFullName(fullName: string): { owner: string; repo: string } | null {
+  const [owner, repo] = fullName.split('/');
+  return owner && repo ? { owner, repo } : null;
+}
+
 /**
  * GitHubのURLまたは 'owner/repo' 形式の文字列をパースして
  * リポジトリ情報、ブランチ、ファイルパスを抽出します。
  */
-export function parseRepoInput(input: string) {
+export function parseRepoInput(input: string): ParsedRepoInput | null {
   const trimmed = input.trim();
-  
+
   // 1. owner/repo 形式 (例: vuejs/core)
   const ownerRepoRegex = /^([a-zA-Z0-9-._]+)\/([a-zA-Z0-9-._]+)$/;
   const match = trimmed.match(ownerRepoRegex);
-  if (match) {
+  if (match && match[1] && match[2]) {
     return {
       owner: match[1],
       repo: match[2].replace(/\.git$/, ''),
@@ -29,8 +42,9 @@ export function parseRepoInput(input: string) {
     const pathParts = url.pathname.split('/').filter(Boolean);
     if (pathParts.length < 2) return null;
 
-    const owner = pathParts[0];
-    const repo = pathParts[1].replace(/\.git$/, '');
+    const [owner, rawRepo] = pathParts;
+    if (!owner || !rawRepo) return null;
+    const repo = rawRepo.replace(/\.git$/, '');
     let branch: string | undefined = undefined;
     let filePath: string | undefined = undefined;
 

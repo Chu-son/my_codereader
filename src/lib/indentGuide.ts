@@ -37,7 +37,7 @@ export function indentGuideExtension() {
             const match = text.match(/^([ \t]+)/);
 
             if (match) {
-              const whitespace = match[1];
+              const whitespace = match[1] ?? '';
               let currentPos = line.from;
 
               for (let i = 0; i < whitespace.length; i++) {

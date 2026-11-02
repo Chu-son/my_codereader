@@ -18,7 +18,7 @@ import {
   convertGitHubSearchResults,
 } from '@/lib/searchUtils';
 import { isBinaryFile } from '@/lib/fileUtils';
-import { parseRepoInput } from '@/lib/urlParser';
+import { parseRepoInput, splitRepoFullName } from '@/lib/urlParser';
 
 // ========================================
 // State Interface
@@ -242,9 +242,9 @@ export const useAppStore = create<AppState>()(
           return;
         }
 
-        if (!currentRepo) return;
-
-        const [owner, repo] = currentRepo.split('/');
+        const repoParts = currentRepo && splitRepoFullName(currentRepo);
+        if (!repoParts) return;
+        const { owner, repo } = repoParts;
 
         // ローディング状態のファイルを追加/更新
         const newFile: OpenedFile = {
@@ -426,8 +426,9 @@ export const useAppStore = create<AppState>()(
           if (pat && currentRepo) {
             // 2. GitHub Search Code API使用
             try {
-              const [owner, repo] = currentRepo.split('/');
-              const items = await searchCode(owner, repo, query, pat);
+              const repoParts = splitRepoFullName(currentRepo);
+              if (!repoParts) throw new Error('リポジトリ形式が不正です');
+              const items = await searchCode(repoParts.owner, repoParts.repo, query, pat);
               const apiResults = convertGitHubSearchResults(items);
               results = [...results, ...apiResults];
             } catch (apiError) {
@@ -503,9 +504,9 @@ export const useAppStore = create<AppState>()(
 
       switchBranch: async (branchName: string) => {
         const { currentRepo, pat } = get();
-        if (!currentRepo) return;
-
-        const [owner, repo] = currentRepo.split('/');
+        const repoParts = currentRepo && splitRepoFullName(currentRepo);
+        if (!repoParts) return;
+        const { owner, repo } = repoParts;
         set({ treeLoading: true, treeError: null, openedFiles: [], activePane1FilePath: null, activePane2FilePath: null });
 
         try {

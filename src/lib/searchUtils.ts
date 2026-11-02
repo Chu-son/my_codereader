@@ -66,7 +66,7 @@ export function searchInCachedFiles(
 
     const lines = file.content.split('\n');
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i] ?? '';
       let match: RegExpExecArray | null;
 
       // 各行内の全マッチを検出
@@ -124,7 +124,7 @@ export function convertGitHubSearchResults(
     for (const textMatch of item.text_matches) {
       const lines = textMatch.fragment.split('\n');
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        const line = lines[i] ?? '';
         for (const match of textMatch.matches) {
           if (line.includes(match.text)) {
             const matchStart = line.indexOf(match.text);

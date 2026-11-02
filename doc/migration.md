@@ -4,13 +4,15 @@
 
 ## 1. 基盤
 
-- [ ] Prettier を導入し、`.prettierrc` と `format` スクリプトを追加する
-- [ ] ESLint に `no-explicit-any`、import 順序、`no-console` を追加する
-- [ ] `tsconfig.app.json` に `noUncheckedIndexedAccess` を追加し、発生するエラーを修正する
-- [ ] `.nvmrc` を追加する（CI の Node 20 と揃える）
-- [ ] `.gitignore` に `.antigravitycli/` を追加する
-- [ ] 未使用の `react-router-dom` を削除する
-- [ ] テンプレート残骸の `src/assets/hero.png`、`vite.svg` を削除する
+- [x] Prettier を導入し、`.prettierrc` と `format` / `format:check` スクリプトを追加する
+- [x] ESLint に `eslint-config-prettier` と `no-console` を追加する（`no-explicit-any` は recommended に含まれる）
+- [ ] ESLint に import 順序の規則を追加する
+- [x] `tsconfig.app.json` に `strict` と `noUncheckedIndexedAccess` を追加し、発生した型エラーを修正する（`strict` は従来未設定だった）
+- [x] `.nvmrc`（22）を追加し、`deploy.yml` が参照するようにする
+- [x] `.gitignore` に `.antigravitycli/` を追加する
+- [x] 未使用の `react-router-dom` を削除する
+- [x] テンプレート残骸の `src/assets/hero.png`、`vite.svg` を削除する
+- [ ] **lint の既存エラー 9 件を解消する**（`react-hooks` のルール違反。`BookmarksList` / `FileTree` / `PwaInstallPrompt` / `SearchDrawer` / `SettingsDialog` / `CodeViewer`、および `useAppStore.ts` の `as any`）。解消後、PR の CI で lint を必須にする
 
 ## 2. CI
 
