@@ -1,7 +1,3 @@
-// ========================================
-// Sidebar Component
-// ========================================
-
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { OpenEditors } from '@/features/viewer';
@@ -90,7 +86,7 @@ export function Sidebar() {
               <div
                 className="text-sm p-3 rounded-lg border"
                 style={{
-                  backgroundColor: 'rgba(243, 139, 168, 0.1)',
+                  backgroundColor: 'var(--accent-red-soft)',
                   borderColor: 'var(--accent-red)',
                   color: 'var(--accent-red)',
                 }}

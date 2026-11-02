@@ -1,7 +1,3 @@
-// ========================================
-// Client-side Search Utilities
-// ========================================
-
 import type { SearchResult, OpenedFile, TreeNode } from '@/shared/types';
 
 /**

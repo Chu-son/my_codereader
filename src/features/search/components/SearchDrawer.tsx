@@ -1,7 +1,3 @@
-// ========================================
-// SearchDrawer Component
-// ========================================
-
 import { useState, type FormEvent, useEffect, useRef } from 'react';
 import { Drawer } from 'vaul';
 import { Search, FileCode, Loader2, AlertCircle } from 'lucide-react';

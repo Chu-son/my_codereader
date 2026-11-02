@@ -1,7 +1,3 @@
-// ========================================
-// App — Main Layout
-// ========================================
-
 import './App.css';
 import { Header } from './components/Header';
 import { Sidebar } from '@/features/explorer';
@@ -13,6 +9,7 @@ import { RecentRepos } from '@/features/repository';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { useEffect } from 'react';
+import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 
 function App() {
   const { currentRepo, loadRepository } = useAppStore(
@@ -53,7 +50,7 @@ function App() {
         paddingLeft: 'env(safe-area-inset-left)',
         paddingRight: 'env(safe-area-inset-right)',
         paddingBottom: 'env(safe-area-inset-bottom)',
-        backgroundColor: '#1e1e2e', // ヘッダーの背景色と合わせる
+        backgroundColor: 'var(--app-bg)', // ヘッダーの背景色と合わせる
       }}
     >
       {/* ヘッダー */}
@@ -66,7 +63,9 @@ function App() {
 
         {/* メインエリア（分割対応） */}
         <main className="flex-1 overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
-          {currentRepo ? <SplitPane /> : <RecentRepos />}
+          <ErrorBoundary label="メイン画面">
+            {currentRepo ? <SplitPane /> : <RecentRepos />}
+          </ErrorBoundary>
         </main>
       </div>
 

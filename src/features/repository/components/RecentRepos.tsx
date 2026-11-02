@@ -63,7 +63,7 @@ export function RecentRepos() {
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = 'var(--accent-blue)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-card)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-primary)';
@@ -105,7 +105,7 @@ export function RecentRepos() {
                   className="p-2 rounded-lg transition-colors"
                   style={{
                     color: 'var(--accent-blue)',
-                    backgroundColor: 'rgba(137, 180, 250, 0.1)',
+                    backgroundColor: 'var(--accent-blue-soft)',
                   }}
                 >
                   <ArrowRight size={16} />

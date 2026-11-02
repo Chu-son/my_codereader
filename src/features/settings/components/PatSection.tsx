@@ -81,7 +81,7 @@ export function PatSection() {
           <button
             onClick={handleDelete}
             className="h-9 px-4 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
-            style={{ backgroundColor: 'rgba(243, 139, 168, 0.15)', color: 'var(--accent-red)' }}
+            style={{ backgroundColor: 'var(--accent-red-soft-strong)', color: 'var(--accent-red)' }}
           >
             <Trash2 size={14} />
             削除

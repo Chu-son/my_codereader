@@ -1,7 +1,3 @@
-// ========================================
-// GitHub URL Parser Utility
-// ========================================
-
 export interface ParsedRepoInput {
   owner: string;
   repo: string;

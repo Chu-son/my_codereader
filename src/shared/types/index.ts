@@ -1,7 +1,3 @@
-// ========================================
-// Type Definitions
-// ========================================
-
 /** GitHub API のツリーノード */
 export interface GitHubTreeItem {
   path: string;

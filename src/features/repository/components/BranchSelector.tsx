@@ -1,7 +1,3 @@
-// ========================================
-// BranchSelector Component
-// ========================================
-
 import { useState, useRef, useEffect } from 'react';
 import { GitBranch, Check, ChevronDown, Loader2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';

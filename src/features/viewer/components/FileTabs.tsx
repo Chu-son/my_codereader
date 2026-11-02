@@ -1,7 +1,3 @@
-// ========================================
-// FileTabs Component
-// ========================================
-
 import { useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';

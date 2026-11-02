@@ -1,7 +1,3 @@
-// ========================================
-// SplitPane Component
-// ========================================
-
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import { useShallow } from 'zustand/react/shallow';
@@ -50,7 +46,7 @@ function PaneContent({ pane }: PaneContentProps) {
               <div className="flex flex-col items-center gap-4 text-center px-8 max-w-md">
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: 'rgba(243, 139, 168, 0.1)' }}
+                  style={{ backgroundColor: 'var(--accent-red-soft)' }}
                 >
                   <AlertCircle size={32} className="text-[var(--accent-red)]" />
                 </div>

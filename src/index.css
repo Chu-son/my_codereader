@@ -30,6 +30,13 @@
   --accent-red: #f38ba8;
   --accent-purple: #cba6f7;
   --accent-teal: #94e2d5;
+  --accent-red-soft: rgba(243, 139, 168, 0.1);
+  --accent-red-soft-strong: rgba(243, 139, 168, 0.15);
+  --accent-blue-soft: rgba(137, 180, 250, 0.1);
+
+  /* Misc */
+  --app-bg: #1e1e2e;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
 
   /* Tab */
   --tab-active-bg: #1e1e2e;

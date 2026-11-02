@@ -1,7 +1,3 @@
-// ========================================
-// OpenEditors Component
-// ========================================
-
 import { X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';

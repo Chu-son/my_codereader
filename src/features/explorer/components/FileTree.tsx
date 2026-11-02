@@ -1,7 +1,3 @@
-// ========================================
-// FileTree Component
-// ========================================
-
 import { createElement, useCallback } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react';
 import type { TreeNode } from '@/shared/types';
