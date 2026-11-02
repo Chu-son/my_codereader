@@ -5,22 +5,31 @@ import { useAppStore } from '@/stores/useAppStore';
 import { STRINGS } from '@/shared/constants/strings';
 
 export function PatSection() {
-  const { pat, settingsOpen, setPat } = useAppStore(
-    useShallow((s) => ({ pat: s.pat, settingsOpen: s.settingsOpen, setPat: s.setPat })),
+  const { pat, patRemembered, settingsOpen, setPat } = useAppStore(
+    useShallow((s) => ({
+      pat: s.pat,
+      patRemembered: s.patRemembered,
+      settingsOpen: s.settingsOpen,
+      setPat: s.setPat,
+    })),
   );
 
   const [localPat, setLocalPat] = useState(pat ?? '');
   const [showPat, setShowPat] = useState(false);
+  const [remember, setRemember] = useState(patRemembered);
 
   // ダイアログが開かれた時、または保存済み PAT が変わった時に入力欄を同期する
   const syncedPat = settingsOpen ? (pat ?? '') : null;
   const [prevSyncedPat, setPrevSyncedPat] = useState(syncedPat);
   if (syncedPat !== prevSyncedPat) {
     setPrevSyncedPat(syncedPat);
-    if (syncedPat !== null) setLocalPat(syncedPat);
+    if (syncedPat !== null) {
+      setLocalPat(syncedPat);
+      setRemember(patRemembered);
+    }
   }
 
-  const handleSave = () => setPat(localPat.trim() || null);
+  const handleSave = () => setPat(localPat.trim() || null, remember);
 
   const handleDelete = () => {
     setPat(null);
@@ -68,6 +77,19 @@ export function PatSection() {
           )}
         </button>
       </div>
+
+      <label className="flex items-start gap-2 mb-3 text-xs text-[var(--text-secondary)]">
+        <input
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+          className="mt-0.5"
+        />
+        <span>
+          {STRINGS.settings.patRemember}
+          <span className="block text-[var(--text-muted)]">{STRINGS.settings.patRememberRisk}</span>
+        </span>
+      </label>
 
       <div className="flex gap-2">
         <button

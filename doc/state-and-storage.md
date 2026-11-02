@@ -4,19 +4,20 @@
 
 ## 状態の分類
 
-| 分類 | 項目 | 永続化 |
-| --- | --- | --- |
-| ユーザー設定 | `pat`, `wordWrap`, `showIndentGuides`, `fontSize`(6〜24, 既定 14), `lineHeight`(1.0〜3.0, 既定 1.5) | する |
-| ユーザーデータ | `bookmarks`, `recentRepos`（最新 20 件・重複排除） | する |
-| サーバー由来 | `treeData`, `branches`, `openedFiles`（本文を含む）, `searchResults` | しない |
-| 一時 UI 状態 | `expandedDirs`, `isSplitView`, `splitDirection`, `sidebarOpen`, `searchDrawerOpen`, `settingsOpen`, `navigationHistory`, `jumpTarget`, `activeCursorLines` | しない |
+| 分類           | 項目                                                                                                                                                       | 永続化 |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| ユーザー設定   | `pat`（既定は sessionStorage のみ）, `patRemembered`, `wordWrap`, `showIndentGuides`, `fontSize`(6〜24, 既定 14), `lineHeight`(1.0〜3.0, 既定 1.5)         | する   |
+| ユーザーデータ | `bookmarks`, `recentRepos`（最新 20 件・重複排除）                                                                                                         | する   |
+| サーバー由来   | `treeData`, `branches`, `openedFiles`（本文を含む）, `searchResults`                                                                                       | しない |
+| 一時 UI 状態   | `expandedDirs`, `isSplitView`, `splitDirection`, `sidebarOpen`, `searchDrawerOpen`, `settingsOpen`, `navigationHistory`, `jumpTarget`, `activeCursorLines` | しない |
 
 ## localStorage / sessionStorage
 
-| キー | 内容 | 備考 |
-| --- | --- | --- |
-| `codereader:app` | Zustand の persist（version 1。許可リストのみ保存） | 旧キー `codereader-storage` は読み込み後の最初の保存で削除 |
-| `codereader:pwa-prompt-dismissed` | インストール案内を閉じたか | |
+| キー                               | 内容                                                                                                 | 備考                                                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `codereader:app`                   | Zustand の persist（version 2。許可リストのみ保存。`patRemembered` が true のときだけ `pat` を含む） | 旧キー `codereader-storage` は読み込み後の最初の保存で削除 |
+| `codereader:pat`（sessionStorage） | 「保存する」を選ばなかった PAT                                                                       | タブを閉じると消える                                       |
+| `codereader:pwa-prompt-dismissed`  | インストール案内を閉じたか                                                                           |                                                            |
 
 PAT の保存先の方針は [conventions/security.md](conventions/security.md)。
 
