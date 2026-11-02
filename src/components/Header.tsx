@@ -71,10 +71,13 @@ export function Header() {
   // ブックマークの状態判定とトグル処理
   const activePath = activePane1FilePath;
   const activeLine = activePath ? activeCursorLines[activePath] : null;
-  
-  const currentBookmark = (activePath && activeLine && currentRepo)
-    ? bookmarks.find(b => b.repo === currentRepo && b.path === activePath && b.line === activeLine)
-    : null;
+
+  const currentBookmark =
+    activePath && activeLine && currentRepo
+      ? bookmarks.find(
+          (b) => b.repo === currentRepo && b.path === activePath && b.line === activeLine,
+        )
+      : null;
 
   const handleToggleBookmark = () => {
     if (!activePath || !activeLine) {
@@ -87,7 +90,7 @@ export function Header() {
       removeBookmark(currentBookmark.id);
     } else {
       // 対象行のテキストを少し取得してプレビューにする（該当ファイルのcontentから抽出）
-      const file = openedFiles.find(f => f.path === activePath);
+      const file = openedFiles.find((f) => f.path === activePath);
       let text = '';
       if (file && file.content) {
         const lines = file.content.split('\n');
@@ -96,7 +99,10 @@ export function Header() {
       }
 
       addBookmark({
-        id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2),
+        id:
+          typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : Date.now().toString(36) + Math.random().toString(36).substr(2),
         repo: currentRepo,
         branch: currentBranch,
         path: activePath,
@@ -211,15 +217,9 @@ export function Header() {
             )}
           </form>
         ) : (
-          <div
-            id="repo-display-container"
-            className="flex items-center gap-1 h-8 max-w-full"
-          >
+          <div id="repo-display-container" className="flex items-center gap-1 h-8 max-w-full">
             {treeLoading && (
-              <Loader2
-                size={14}
-                className="animate-spin text-[var(--accent-blue)]"
-              />
+              <Loader2 size={14} className="animate-spin text-[var(--accent-blue)]" />
             )}
             <button
               id="repo-name-btn"
@@ -245,7 +245,11 @@ export function Header() {
         >
           <Bookmark
             size={18}
-            className={currentBookmark ? 'text-[var(--accent-blue)] fill-current' : 'text-[var(--text-secondary)]'}
+            className={
+              currentBookmark
+                ? 'text-[var(--accent-blue)] fill-current'
+                : 'text-[var(--text-secondary)]'
+            }
           />
         </button>
 

@@ -28,10 +28,11 @@ function App() {
       if (match && match[1]) {
         let repoName = match[1];
         // 末尾の .git やスラッシュ以降を削除
-        repoName = repoName.split('/')[0] + '/' + repoName.split('/')[1].replace(/\.git$/, '');
-        
+        const [owner = '', name = ''] = repoName.split('/');
+        repoName = `${owner}/${name.replace(/\.git$/, '')}`;
+
         loadRepository(repoName);
-        
+
         // URLパラメータをクリアしてクリーンアップ
         const newUrl = window.location.origin + window.location.pathname;
         window.history.replaceState({}, document.title, newUrl);
@@ -46,14 +47,14 @@ function App() {
   }, []);
 
   return (
-    <div 
+    <div
       className="flex flex-col h-full overflow-hidden"
       style={{
         paddingTop: 'env(safe-area-inset-top)',
         paddingLeft: 'env(safe-area-inset-left)',
         paddingRight: 'env(safe-area-inset-right)',
         paddingBottom: 'env(safe-area-inset-bottom)',
-        backgroundColor: '#1e1e2e' // ヘッダーの背景色と合わせる
+        backgroundColor: '#1e1e2e', // ヘッダーの背景色と合わせる
       }}
     >
       {/* ヘッダー */}

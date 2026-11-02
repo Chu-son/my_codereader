@@ -22,8 +22,7 @@ function getHeaders(pat?: string | null): HeadersInit {
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const errorBody = await response.json().catch(() => ({}));
-    const message =
-      errorBody.message || `GitHub API error: ${response.status}`;
+    const message = errorBody.message || `GitHub API error: ${response.status}`;
     throw new Error(message);
   }
   return response.json();
@@ -33,7 +32,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export async function fetchRepoInfo(
   owner: string,
   repo: string,
-  pat?: string | null
+  pat?: string | null,
 ): Promise<RepoInfo> {
   const response = await fetch(`${API_BASE}/repos/${owner}/${repo}`, {
     headers: getHeaders(pat),
@@ -58,11 +57,11 @@ export async function fetchRepoTree(
   owner: string,
   repo: string,
   branch: string,
-  pat?: string | null
+  pat?: string | null,
 ): Promise<TreeNode[]> {
   const response = await fetch(
     `${API_BASE}/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`,
-    { headers: getHeaders(pat) }
+    { headers: getHeaders(pat) },
   );
   const data = await handleResponse<{
     tree: GitHubTreeItem[];
@@ -85,7 +84,7 @@ function buildTree(items: GitHubTreeItem[]): TreeNode[] {
 
   for (const item of sortedItems) {
     const parts = item.path.split('/');
-    const name = parts[parts.length - 1];
+    const name = parts[parts.length - 1] ?? item.path;
 
     const node: TreeNode = {
       path: item.path,
@@ -121,7 +120,7 @@ export async function fetchFileContent(
   repo: string,
   path: string,
   ref?: string | null,
-  pat?: string | null
+  pat?: string | null,
 ): Promise<{ content: string; sha: string }> {
   const url = new URL(`${API_BASE}/repos/${owner}/${repo}/contents/${path}`);
   if (ref) url.searchParams.set('ref', ref);
@@ -158,7 +157,7 @@ export async function searchCode(
   owner: string,
   repo: string,
   query: string,
-  pat: string
+  pat: string,
 ): Promise<
   {
     path: string;
@@ -169,15 +168,12 @@ export async function searchCode(
   }[]
 > {
   const q = encodeURIComponent(`${query} repo:${owner}/${repo}`);
-  const response = await fetch(
-    `${API_BASE}/search/code?q=${q}&per_page=30`,
-    {
-      headers: {
-        ...getHeaders(pat),
-        Accept: 'application/vnd.github.text-match+json',
-      },
-    }
-  );
+  const response = await fetch(`${API_BASE}/search/code?q=${q}&per_page=30`, {
+    headers: {
+      ...getHeaders(pat),
+      Accept: 'application/vnd.github.text-match+json',
+    },
+  });
   const data = await handleResponse<{
     items: {
       path: string;
@@ -192,9 +188,7 @@ export async function searchCode(
 }
 
 /** レートリミット情報を取得 */
-export async function fetchRateLimit(
-  pat?: string | null
-): Promise<{
+export async function fetchRateLimit(pat?: string | null): Promise<{
   remaining: number;
   limit: number;
   reset: number;
@@ -212,7 +206,7 @@ export async function fetchRateLimit(
 export async function fetchBranches(
   owner: string,
   repo: string,
-  pat?: string | null
+  pat?: string | null,
 ): Promise<{ name: string; sha: string }[]> {
   const response = await fetch(`${API_BASE}/repos/${owner}/${repo}/branches?per_page=100`, {
     headers: getHeaders(pat),

@@ -32,24 +32,35 @@ export function SettingsDialog() {
   } | null>(null);
   const [rateLimitLoading, setRateLimitLoading] = useState(false);
 
-  useEffect(() => {
-    if (settingsOpen) {
-      setLocalPat(pat ?? '');
-      checkRateLimit();
+  // ダイアログが開かれた時、または保存済み PAT が変わった時に入力欄を同期する
+  const syncedPat = settingsOpen ? (pat ?? '') : null;
+  const [prevSyncedPat, setPrevSyncedPat] = useState(syncedPat);
+  if (syncedPat !== prevSyncedPat) {
+    setPrevSyncedPat(syncedPat);
+    if (syncedPat !== null) {
+      setLocalPat(syncedPat);
+      setRateLimitLoading(true);
     }
-  }, [settingsOpen, pat]);
+  }
 
-  const checkRateLimit = async () => {
-    setRateLimitLoading(true);
-    try {
-      const result = await fetchRateLimit(pat);
-      setRateLimit(result);
-    } catch {
-      setRateLimit(null);
-    } finally {
-      setRateLimitLoading(false);
-    }
-  };
+  // ダイアログが開かれた時、または PAT が変わった時にレート制限を取得する
+  useEffect(() => {
+    if (!settingsOpen) return;
+    let cancelled = false;
+    fetchRateLimit(pat)
+      .then((result) => {
+        if (!cancelled) setRateLimit(result);
+      })
+      .catch(() => {
+        if (!cancelled) setRateLimit(null);
+      })
+      .finally(() => {
+        if (!cancelled) setRateLimitLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [settingsOpen, pat]);
 
   const handleSavePat = () => {
     setPat(localPat.trim() || null);
@@ -89,9 +100,7 @@ export function SettingsDialog() {
             zIndex: 1,
           }}
         >
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            設定
-          </h2>
+          <h2 className="text-base font-semibold text-[var(--text-primary)]">設定</h2>
           <button
             onClick={() => setSettingsOpen(false)}
             className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
@@ -106,9 +115,7 @@ export function SettingsDialog() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Type size={16} className="text-[var(--accent-blue)]" />
-                <h3 className="text-sm font-medium text-[var(--text-primary)]">
-                  エディタ設定
-                </h3>
+                <h3 className="text-sm font-medium text-[var(--text-primary)]">エディタ設定</h3>
               </div>
               <button
                 onClick={() => {
@@ -128,9 +135,7 @@ export function SettingsDialog() {
                 <div className="flex items-center gap-3">
                   <WrapText size={18} className="text-[var(--text-muted)]" />
                   <div>
-                    <div className="text-sm text-[var(--text-primary)]">
-                      文字列の折り返し
-                    </div>
+                    <div className="text-sm text-[var(--text-primary)]">文字列の折り返し</div>
                     <div className="text-xs text-[var(--text-muted)]">
                       画面端でテキストを折り返す
                     </div>
@@ -140,9 +145,7 @@ export function SettingsDialog() {
                   onClick={() => setWordWrap(!wordWrap)}
                   className={`w-12 h-6 rounded-full transition-colors relative`}
                   style={{
-                    backgroundColor: wordWrap
-                      ? 'var(--accent-blue)'
-                      : 'var(--bg-surface)',
+                    backgroundColor: wordWrap ? 'var(--accent-blue)' : 'var(--bg-surface)',
                   }}
                 >
                   <div
@@ -158,9 +161,7 @@ export function SettingsDialog() {
                 <div className="flex items-center gap-3">
                   <AlignLeft size={18} className="text-[var(--text-muted)]" />
                   <div>
-                    <div className="text-sm text-[var(--text-primary)]">
-                      インデントガイド
-                    </div>
+                    <div className="text-sm text-[var(--text-primary)]">インデントガイド</div>
                     <div className="text-xs text-[var(--text-muted)]">
                       インデント（スペース）を可視化
                     </div>
@@ -170,9 +171,7 @@ export function SettingsDialog() {
                   onClick={() => setShowIndentGuides(!showIndentGuides)}
                   className={`w-12 h-6 rounded-full transition-colors relative`}
                   style={{
-                    backgroundColor: showIndentGuides
-                      ? 'var(--accent-blue)'
-                      : 'var(--bg-surface)',
+                    backgroundColor: showIndentGuides ? 'var(--accent-blue)' : 'var(--bg-surface)',
                   }}
                 >
                   <div
@@ -186,12 +185,8 @@ export function SettingsDialog() {
               {/* フォントサイズ調整 */}
               <div className="space-y-3 pt-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-[var(--text-primary)]">
-                    フォントサイズ
-                  </span>
-                  <span className="text-sm font-mono text-[var(--accent-blue)]">
-                    {fontSize}px
-                  </span>
+                  <span className="text-sm text-[var(--text-primary)]">フォントサイズ</span>
+                  <span className="text-sm font-mono text-[var(--accent-blue)]">{fontSize}px</span>
                 </div>
                 <input
                   type="range"
@@ -207,9 +202,7 @@ export function SettingsDialog() {
               {/* 行間サイズ調整 */}
               <div className="space-y-3 pt-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-[var(--text-primary)]">
-                    行間サイズ
-                  </span>
+                  <span className="text-sm text-[var(--text-primary)]">行間サイズ</span>
                   <span className="text-sm font-mono text-[var(--accent-blue)]">
                     {lineHeight.toFixed(1)}
                   </span>
@@ -228,10 +221,7 @@ export function SettingsDialog() {
           </section>
 
           {/* PAT セクション */}
-          <section
-            className="border-t pt-6"
-            style={{ borderColor: 'var(--border-primary)' }}
-          >
+          <section className="border-t pt-6" style={{ borderColor: 'var(--border-primary)' }}>
             <div className="flex items-center gap-2 mb-3">
               <Shield size={16} className="text-[var(--accent-blue)]" />
               <h3 className="text-sm font-medium text-[var(--text-primary)]">
@@ -302,10 +292,7 @@ export function SettingsDialog() {
           </section>
 
           {/* レートリミット表示 */}
-          <div
-            className="border-t pt-4"
-            style={{ borderColor: 'var(--border-primary)' }}
-          >
+          <div className="border-t pt-4" style={{ borderColor: 'var(--border-primary)' }}>
             <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3">
               API レートリミット
             </h3>
@@ -329,7 +316,8 @@ export function SettingsDialog() {
                     {rateLimit.remaining} / {rateLimit.limit}
                   </span>
                 </div>
-                <div className="w-full h-2 rounded-full overflow-hidden"
+                <div
+                  className="w-full h-2 rounded-full overflow-hidden"
                   style={{ backgroundColor: 'var(--bg-surface)' }}
                 >
                   <div
@@ -337,15 +325,12 @@ export function SettingsDialog() {
                     style={{
                       width: `${(rateLimit.remaining / rateLimit.limit) * 100}%`,
                       backgroundColor:
-                        rateLimit.remaining < 10
-                          ? 'var(--accent-red)'
-                          : 'var(--accent-green)',
+                        rateLimit.remaining < 10 ? 'var(--accent-red)' : 'var(--accent-green)',
                     }}
                   />
                 </div>
                 <div className="text-xs text-[var(--text-muted)]">
-                  リセット:{' '}
-                  {new Date(rateLimit.reset * 1000).toLocaleTimeString('ja-JP')}
+                  リセット: {new Date(rateLimit.reset * 1000).toLocaleTimeString('ja-JP')}
                 </div>
               </div>
             ) : (

@@ -4,7 +4,7 @@ import { Bookmark as BookmarkIcon, Trash2, FileCode2 } from 'lucide-react';
 const getBasename = (path: string) => path.split('/').pop() || path;
 
 export function BookmarksList() {
-  const { bookmarks, currentRepo, removeBookmark, openFile, setJumpTarget } = useAppStore();
+  const { bookmarks, currentRepo, removeBookmark, openFile, requestJump } = useAppStore();
 
   if (!currentRepo) return null;
 
@@ -12,7 +12,10 @@ export function BookmarksList() {
 
   if (repoBookmarks.length === 0) {
     return (
-      <div className="px-4 py-6 flex flex-col items-center gap-2 text-center border-b" style={{ borderColor: 'var(--border-primary)' }}>
+      <div
+        className="px-4 py-6 flex flex-col items-center gap-2 text-center border-b"
+        style={{ borderColor: 'var(--border-primary)' }}
+      >
         <BookmarkIcon size={24} className="text-[var(--text-muted)]" />
         <p className="text-xs text-[var(--text-muted)]">ブックマークはありません</p>
       </div>
@@ -21,11 +24,14 @@ export function BookmarksList() {
 
   const handleBookmarkClick = async (path: string, line: number) => {
     await openFile(path, 1);
-    setJumpTarget({ path, line, timestamp: Date.now() });
+    requestJump(path, line);
   };
 
   return (
-    <div className="border-b shrink-0 max-h-[30%] overflow-y-auto" style={{ borderColor: 'var(--border-primary)' }}>
+    <div
+      className="border-b shrink-0 max-h-[30%] overflow-y-auto"
+      style={{ borderColor: 'var(--border-primary)' }}
+    >
       <div
         className="flex items-center px-3 h-7 text-[11px] font-semibold uppercase tracking-wider sticky top-0 z-10"
         style={{
@@ -48,9 +54,7 @@ export function BookmarksList() {
                 <span className="text-sm font-medium text-[var(--text-primary)] truncate">
                   {getBasename(bookmark.path)}
                 </span>
-                <span className="text-xs text-[var(--text-muted)] shrink-0">
-                  :{bookmark.line}
-                </span>
+                <span className="text-xs text-[var(--text-muted)] shrink-0">:{bookmark.line}</span>
               </div>
               <button
                 className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--accent-red)]"

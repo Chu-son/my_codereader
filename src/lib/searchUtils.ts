@@ -7,12 +7,9 @@ import type { SearchResult, OpenedFile, TreeNode } from '@/types';
 /**
  * ツリー構造からファイル名で検索を行う
  */
-export function searchInTree(
-  query: string,
-  nodes: TreeNode[]
-): SearchResult[] {
+export function searchInTree(query: string, nodes: TreeNode[]): SearchResult[] {
   if (!query.trim()) return [];
-  
+
   const results: SearchResult[] = [];
   const escapedQuery = escapeRegExp(query);
   const regex = new RegExp(escapedQuery, 'gi');
@@ -23,7 +20,7 @@ export function searchInTree(
         const name = node.name;
         let match: RegExpExecArray | null;
         regex.lastIndex = 0;
-        
+
         if ((match = regex.exec(name)) !== null) {
           results.push({
             path: node.path,
@@ -34,11 +31,11 @@ export function searchInTree(
           });
         }
       }
-      
+
       if (node.children.length > 0) {
         traverse(node.children);
       }
-      
+
       if (results.length >= 100) break;
     }
   };
@@ -51,10 +48,7 @@ export function searchInTree(
  * キャッシュ済みのファイルコンテンツ内で文字列検索を行う。
  * PAT未設定時のフォールバック検索として使用。
  */
-export function searchInCachedFiles(
-  query: string,
-  openedFiles: OpenedFile[]
-): SearchResult[] {
+export function searchInCachedFiles(query: string, openedFiles: OpenedFile[]): SearchResult[] {
   if (!query.trim()) return [];
 
   const results: SearchResult[] = [];
@@ -66,7 +60,7 @@ export function searchInCachedFiles(
 
     const lines = file.content.split('\n');
     for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
+      const line = lines[i] ?? '';
       let match: RegExpExecArray | null;
 
       // 各行内の全マッチを検出
@@ -104,7 +98,7 @@ export function convertGitHubSearchResults(
       fragment: string;
       matches: { text: string; indices: [number, number] }[];
     }[];
-  }[]
+  }[],
 ): SearchResult[] {
   const results: SearchResult[] = [];
 
@@ -124,7 +118,7 @@ export function convertGitHubSearchResults(
     for (const textMatch of item.text_matches) {
       const lines = textMatch.fragment.split('\n');
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+        const line = lines[i] ?? '';
         for (const match of textMatch.matches) {
           if (line.includes(match.text)) {
             const matchStart = line.indexOf(match.text);

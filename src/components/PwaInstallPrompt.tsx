@@ -1,31 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Share, PlusSquare } from 'lucide-react';
 
+// iOS の Safari かつ未インストールで、まだ閉じられていない場合のみ案内を表示する
+function shouldShowPrompt(): boolean {
+  const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isStandalone =
+    'standalone' in window.navigator &&
+    (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
+  return isIos && !isStandalone && !localStorage.getItem('pwa-prompt-dismissed');
+}
+
 export function PwaInstallPrompt() {
-  const [showPrompt, setShowPrompt] = useState(false);
-
-  useEffect(() => {
-    // Check if the user is on an iOS device
-    const isIos = () => {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      return /iphone|ipad|ipod/.test(userAgent);
-    };
-
-    // Check if the app is running in standalone mode
-    const isStandalone = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return ('standalone' in window.navigator) && (window.navigator as any).standalone;
-    };
-
-    // If it's iOS and NOT running in standalone mode, show the prompt
-    if (isIos() && !isStandalone()) {
-      // Check local storage to see if the user already dismissed it
-      const hasDismissed = localStorage.getItem('pwa-prompt-dismissed');
-      if (!hasDismissed) {
-        setShowPrompt(true);
-      }
-    }
-  }, []);
+  const [showPrompt, setShowPrompt] = useState(shouldShowPrompt);
 
   const handleDismiss = () => {
     setShowPrompt(false);
@@ -39,10 +25,13 @@ export function PwaInstallPrompt() {
       <div className="flex-1 text-sm flex flex-col gap-1">
         <p className="font-semibold text-zinc-100">アプリとしてインストール</p>
         <p className="text-zinc-400 text-xs flex items-center gap-1 flex-wrap">
-          ブラウザの共有アイコン <Share size={14} className="inline-block" /> から「ホーム画面に追加」<PlusSquare size={14} className="inline-block" /> を選択すると、フルスクリーンで快適に利用できます。
+          ブラウザの共有アイコン <Share size={14} className="inline-block" />{' '}
+          から「ホーム画面に追加」
+          <PlusSquare size={14} className="inline-block" />{' '}
+          を選択すると、フルスクリーンで快適に利用できます。
         </p>
       </div>
-      <button 
+      <button
         onClick={handleDismiss}
         className="p-1.5 hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-zinc-100 transition-colors shrink-0"
         aria-label="閉じる"

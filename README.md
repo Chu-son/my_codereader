@@ -17,23 +17,33 @@ iPad（特にiPad mini）でのブラウジングに最適化された、GitHub�
 - **カスタマイズ設定**:
   - 文字列の折り返し/横スクロール切り替え。
   - 階層別のインデントガイド（色分け表示）。
-  - フォントサイズのリアルタイム調整（12px〜24px）。
+  - フォントサイズ（6px〜24px）と行間（1.0〜3.0）のリアルタイム調整。
+- **ブックマーク**: コードの行をブックマークし、一覧から該当行へジャンプ。
+- **最近開いたリポジトリ**: 起動画面から直近のリポジトリ（最大20件）をすぐに開けます。
+- **共有から開く**: PWAの共有先（Share Target）に登録され、GitHubのURLを共有するだけでリポジトリを読み込みます。
+- **ファイルアイコン**: ファイルの種類に応じたアイコン表示。
 - **プレミアム・デザイン**: Catppuccinテーマをベースにした、目に優しいモダンなダークモード。
 
 ## 🚀 使い方
 
 1. `npm install` で依存関係をインストールします。
 2. `npm run dev` で開発サーバーを起動します。
-3. ブラウザでアクセスし、右上の「読込（雲アイコン）」から閲覧したいリポジトリを指定します。
+3. ブラウザで `http://localhost:5173/my_codereader/` にアクセスし、右上の「読込（雲アイコン）」から閲覧したいリポジトリを指定します。
 4. より快適な検索機能を利用するには、設定（歯車アイコン）から GitHub Personal Access Token (PAT) を設定してください。
 
 ## 🛠 技術スタック
 
-- **Frontend**: React, TypeScript, Vite
-- **Styling**: Tailwind CSS
+- **Frontend**: React 19, TypeScript, Vite
+- **Styling**: Tailwind CSS v4
 - **State Management**: Zustand (+ Persistence)
 - **Editor**: CodeMirror 6 (@uiw/react-codemirror)
-- **Components**: Radix UI, Lucide React, Vaul (Drawer), Allotment (Split Pane)
+- **Markdown**: react-markdown, remark-gfm, rehype-highlight
+- **Components**: Lucide React, Vaul (Drawer), Allotment (Split Pane)
+- **PWA**: vite-plugin-pwa
+
+## 📚 ドキュメント
+
+開発者・AIエージェント向けの設計と規約は [AGENTS.md](AGENTS.md) と [doc/](doc/README.md) にまとめています。
 
 ## 📱 デプロイとPWA対応
 

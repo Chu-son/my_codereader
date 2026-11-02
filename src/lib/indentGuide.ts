@@ -1,9 +1,4 @@
-import {
-  Decoration,
-  EditorView,
-  ViewPlugin,
-  ViewUpdate,
-} from '@codemirror/view';
+import { Decoration, EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import type { DecorationSet } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
 import { indentUnit } from '@codemirror/language';
@@ -31,13 +26,13 @@ export function indentGuideExtension() {
         const unit = view.state.facet(indentUnit).length || 2;
 
         for (const { from, to } of view.visibleRanges) {
-          for (let pos = from; pos < to; ) {
+          for (let pos = from; pos < to;) {
             const line = view.state.doc.lineAt(pos);
             const text = line.text;
             const match = text.match(/^([ \t]+)/);
 
             if (match) {
-              const whitespace = match[1];
+              const whitespace = match[1] ?? '';
               let currentPos = line.from;
 
               for (let i = 0; i < whitespace.length; i++) {
@@ -49,7 +44,7 @@ export function indentGuideExtension() {
                 const deco = Decoration.mark({
                   class: `cm-indent-marker cm-indent-level-${colorIndex}`,
                 });
-                
+
                 builder.add(currentPos, currentPos + 1, deco);
                 currentPos += 1;
               }
@@ -62,6 +57,6 @@ export function indentGuideExtension() {
     },
     {
       decorations: (v) => v.decorations,
-    }
+    },
   );
 }

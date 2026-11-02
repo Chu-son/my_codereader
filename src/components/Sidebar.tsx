@@ -9,8 +9,7 @@ import { FileTree } from '@/components/FileTree';
 import { FolderGit2 } from 'lucide-react';
 
 export function Sidebar() {
-  const { sidebarOpen, treeData, treeLoading, treeError, currentRepo } =
-    useAppStore();
+  const { sidebarOpen, treeData, treeLoading, treeError, currentRepo } = useAppStore();
 
   if (!sidebarOpen) return null;
 
@@ -38,7 +37,10 @@ export function Sidebar() {
         }}
       >
         {/* Open Editors セクション */}
-        <div className="border-b shrink-0 max-h-[40%] overflow-y-auto" style={{ borderColor: 'var(--border-primary)' }}>
+        <div
+          className="border-b shrink-0 max-h-[40%] overflow-y-auto"
+          style={{ borderColor: 'var(--border-primary)' }}
+        >
           <OpenEditors />
         </div>
 
@@ -46,11 +48,11 @@ export function Sidebar() {
         <BookmarksList />
 
         {/* Explorer セクション */}
-        <div 
-          className="flex-1 overflow-y-auto scroll-smooth" 
-          style={{ 
+        <div
+          className="flex-1 overflow-y-auto scroll-smooth"
+          style={{
             overscrollBehaviorY: 'none',
-            paddingBottom: 'calc(100px + env(safe-area-inset-bottom))'
+            paddingBottom: 'calc(100px + env(safe-area-inset-bottom))',
           }}
         >
           {/* セクションヘッダー */}
@@ -89,9 +91,7 @@ export function Sidebar() {
           )}
 
           {/* ツリー */}
-          {!treeLoading && !treeError && treeData.length > 0 && (
-            <FileTree nodes={treeData} />
-          )}
+          {!treeLoading && !treeError && treeData.length > 0 && <FileTree nodes={treeData} />}
 
           {/* 空状態 */}
           {!treeLoading && !treeError && treeData.length === 0 && !currentRepo && (
