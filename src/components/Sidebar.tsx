@@ -9,7 +9,8 @@ import { FileTree } from '@/components/FileTree';
 import { FolderGit2 } from 'lucide-react';
 
 export function Sidebar() {
-  const { sidebarOpen, treeData, treeLoading, treeError, currentRepo } = useAppStore();
+  const { sidebarOpen, treeData, treeLoading, treeError, treeTruncated, currentRepo } =
+    useAppStore();
 
   if (!sidebarOpen) return null;
 
@@ -87,6 +88,13 @@ export function Sidebar() {
               >
                 {treeError}
               </div>
+            </div>
+          )}
+
+          {/* 一部のみ取得した旨の通知 */}
+          {treeTruncated && !treeLoading && !treeError && (
+            <div role="status" className="mx-4 my-2 text-xs text-[var(--accent-yellow)]">
+              リポジトリが大きいため、ファイル一覧の一部のみ表示しています。
             </div>
           )}
 
