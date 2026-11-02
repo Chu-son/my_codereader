@@ -1,57 +1,20 @@
-// ========================================
-// CodeViewer Component
-// ========================================
-
-import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView } from '@codemirror/view';
-import { Search } from 'lucide-react';
-import { indentGuideExtension } from '../lib/indentGuide';
-
-// Language imports
-import { javascript } from '@codemirror/lang-javascript';
-import { python } from '@codemirror/lang-python';
-import { java } from '@codemirror/lang-java';
-import { cpp } from '@codemirror/lang-cpp';
-import { go } from '@codemirror/lang-go';
-import { rust } from '@codemirror/lang-rust';
-import { html } from '@codemirror/lang-html';
-import { css } from '@codemirror/lang-css';
-import { json } from '@codemirror/lang-json';
-import { yaml } from '@codemirror/lang-yaml';
-import { markdown } from '@codemirror/lang-markdown';
-
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getLanguageFromPath } from '@/shared/lib/fileUtils';
+import { indentGuideExtension } from '../lib/indentGuide';
+import { getLanguageExtension } from '../lib/languageExtension';
+import { useJumpTarget } from '../hooks/useJumpTarget';
+import { useScrollPosition } from '../hooks/useScrollPosition';
+import { SelectionSearchButton } from './SelectionSearchButton';
 
 interface CodeViewerProps {
   filePath: string;
   content: string;
   scrollPos?: number;
-}
-
-/** 言語名→CodeMirror拡張のマッピング */
-function getLanguageExtension(lang: string | null) {
-  if (!lang) return [];
-  const langMap: Record<string, () => ReturnType<typeof javascript>> = {
-    javascript: () => javascript({ jsx: true, typescript: false }),
-    typescript: () => javascript({ jsx: true, typescript: true }),
-    python: () => python(),
-    java: () => java(),
-    cpp: () => cpp(),
-    go: () => go(),
-    rust: () => rust(),
-    html: () => html(),
-    css: () => css(),
-    json: () => json(),
-    yaml: () => yaml(),
-    markdown: () => markdown(),
-  };
-
-  const factory = langMap[lang];
-  return factory ? [factory()] : [];
 }
 
 export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
@@ -136,63 +99,8 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
     [langExtension, readOnlyExt],
   );
 
-  // スクロール位置の保存
-  const handleScroll = useCallback(() => {
-    if (editorRef.current) {
-      const scrollTop = editorRef.current.scrollDOM.scrollTop;
-      updateScrollPos(filePath, scrollTop);
-    }
-  }, [filePath, updateScrollPos]);
-
-  // スクロール位置の復元
-  useEffect(() => {
-    if (editorRef.current && scrollPos && scrollPos > 0) {
-      requestAnimationFrame(() => {
-        editorRef.current?.scrollDOM.scrollTo({ top: scrollPos });
-      });
-    }
-  }, [filePath, scrollPos]);
-
-  // スクロールイベントのリスナー
-  useEffect(() => {
-    const view = editorRef.current;
-    if (!view) return;
-    const scrollDom = view.scrollDOM;
-    scrollDom.addEventListener('scroll', handleScroll, { passive: true });
-    return () => scrollDom.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-
-  // ジャンプターゲットの処理
-  useEffect(() => {
-    if (jumpTarget && jumpTarget.path === filePath && editorRef.current) {
-      const view = editorRef.current;
-      const line = Math.min(jumpTarget.line, view.state.doc.lines);
-      const pos = view.state.doc.line(line).from;
-
-      // ジャンプ（画面中央に表示）
-      view.dispatch({
-        effects: EditorView.scrollIntoView(pos, { y: 'center' }),
-        selection: { anchor: pos },
-      });
-
-      // 点滅エフェクト用にDOMを探す
-      requestAnimationFrame(() => {
-        const lineDom = view.dom.querySelector(`.cm-line:nth-child(${line})`) as HTMLElement;
-        if (lineDom) {
-          lineDom.style.transition = 'background-color 0.2s';
-          lineDom.style.backgroundColor = 'var(--accent-blue)';
-          lineDom.style.opacity = '0.5';
-          setTimeout(() => {
-            lineDom.style.backgroundColor = '';
-            lineDom.style.opacity = '';
-          }, 600);
-        }
-      });
-
-      // ジャンプ完了としてターゲットをクリア
-      setJumpTarget(null);
-    }
-  }, [jumpTarget, filePath, setJumpTarget]);
+  useScrollPosition(editorRef, filePath, scrollPos, updateScrollPos);
+  useJumpTarget(editorRef, filePath, jumpTarget, setJumpTarget);
 
   return (
     <div
@@ -215,24 +123,15 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
         }}
       />
 
-      {/* 選択テキスト検索ボタン */}
       {selection && (
-        <button
+        <SelectionSearchButton
+          x={selection.x}
+          y={selection.y}
           onClick={() => {
             searchInRepo(selection.text);
             setSelection(null);
           }}
-          className="fixed z-[100] flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-lg animate-fade-in text-white"
-          style={{
-            left: `${selection.x}px`,
-            top: `${selection.y - 45}px`,
-            backgroundColor: 'var(--accent-blue)',
-            transform: 'translateX(-50%)',
-          }}
-        >
-          <Search size={14} />
-          <span className="text-xs font-medium">検索</span>
-        </button>
+        />
       )}
     </div>
   );
