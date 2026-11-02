@@ -12,6 +12,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { RepoSwitcher } from '@/features/repository';
 import { BookmarkToggleButton } from '@/features/bookmarks';
+import { STRINGS } from '@/shared/constants/strings';
 
 const ICON_BUTTON = 'touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]';
 const ICON_COLOR = 'text-[var(--text-secondary)]';
@@ -45,8 +46,8 @@ export function Header() {
     })),
   );
 
-  const sidebarLabel = sidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く';
-  const splitLabel = isSplitView ? '分割方向を切り替え / 分割を解除' : '画面を分割';
+  const sidebarLabel = sidebarOpen ? STRINGS.header.sidebarClose : STRINGS.header.sidebarOpen;
+  const splitLabel = isSplitView ? STRINGS.header.splitToggle : STRINGS.header.splitStart;
 
   return (
     <header
@@ -77,7 +78,7 @@ export function Header() {
         onClick={navigateBack}
         disabled={navigationIndex <= 0}
         className={`${ICON_BUTTON} disabled:opacity-30`}
-        aria-label="戻る"
+        aria-label={STRINGS.header.back}
       >
         <ChevronLeft size={18} className={ICON_COLOR} />
       </button>
@@ -86,7 +87,7 @@ export function Header() {
         onClick={navigateForward}
         disabled={navigationIndex >= navigationHistory.length - 1}
         className={`${ICON_BUTTON} disabled:opacity-30`}
-        aria-label="進む"
+        aria-label={STRINGS.header.forward}
       >
         <ChevronRight size={18} className={ICON_COLOR} />
       </button>
@@ -101,8 +102,8 @@ export function Header() {
           id="search-toggle"
           onClick={() => setSearchDrawerOpen(true)}
           className={ICON_BUTTON}
-          title="検索"
-          aria-label="検索"
+          title={STRINGS.common.search}
+          aria-label={STRINGS.common.search}
         >
           <Search size={18} className={ICON_COLOR} />
         </button>
@@ -119,8 +120,8 @@ export function Header() {
           id="settings-toggle"
           onClick={() => setSettingsOpen(true)}
           className={ICON_BUTTON}
-          title="設定"
-          aria-label="設定"
+          title={STRINGS.common.settings}
+          aria-label={STRINGS.common.settings}
         >
           <Settings size={18} className={ICON_COLOR} />
         </button>

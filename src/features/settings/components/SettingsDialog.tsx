@@ -4,6 +4,7 @@ import { useAppStore } from '@/stores/useAppStore';
 import { EditorSettingsSection } from './EditorSettingsSection';
 import { PatSection } from './PatSection';
 import { RateLimitSection } from './RateLimitSection';
+import { STRINGS } from '@/shared/constants/strings';
 
 export function SettingsDialog() {
   const { settingsOpen, setSettingsOpen } = useAppStore(
@@ -36,11 +37,13 @@ export function SettingsDialog() {
             zIndex: 1,
           }}
         >
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">設定</h2>
+          <h2 className="text-base font-semibold text-[var(--text-primary)]">
+            {STRINGS.common.settings}
+          </h2>
           <button
             onClick={() => setSettingsOpen(false)}
             className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
-            aria-label="閉じる"
+            aria-label={STRINGS.common.close}
           >
             <X size={18} className="text-[var(--text-secondary)]" />
           </button>

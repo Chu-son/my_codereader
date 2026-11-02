@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { GitBranch, Check, ChevronDown, Loader2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
+import { STRINGS } from '@/shared/constants/strings';
 
 export function BranchSelector() {
   const { currentBranch, branches, branchesLoading, switchBranch } = useAppStore(
@@ -40,7 +41,7 @@ export function BranchSelector() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-2.5 h-8 rounded-md transition-colors hover:bg-[var(--bg-hover)] text-xs text-[var(--text-secondary)]"
-        title="ブランチを切り替え"
+        title={STRINGS.repository.switchBranch}
       >
         <GitBranch size={14} className={branchesLoading ? 'animate-pulse' : ''} />
         <span className="font-medium truncate max-w-[120px]">{currentBranch}</span>
@@ -58,7 +59,7 @@ export function BranchSelector() {
         >
           <div className="p-2 border-b" style={{ borderColor: 'var(--border-primary)' }}>
             <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)] px-2">
-              ブランチを切り替え
+              {STRINGS.repository.switchBranch}
             </span>
           </div>
 

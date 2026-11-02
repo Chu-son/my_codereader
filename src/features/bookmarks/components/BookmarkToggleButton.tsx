@@ -1,6 +1,7 @@
 import { Bookmark } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
+import { STRINGS } from '@/shared/constants/strings';
 
 const PREVIEW_MAX_LENGTH = 50;
 
@@ -44,7 +45,7 @@ export function BookmarkToggleButton() {
 
   const handleToggle = () => {
     if (!activePath || !activeLine) {
-      alert('ブックマークする行を選択してください');
+      alert(STRINGS.bookmarks.selectLine);
       return;
     }
     if (!currentRepo || !currentBranch) return;
@@ -68,7 +69,7 @@ export function BookmarkToggleButton() {
     });
   };
 
-  const label = currentBookmark ? 'ブックマークを解除' : 'ブックマークを追加';
+  const label = currentBookmark ? STRINGS.bookmarks.remove : STRINGS.bookmarks.add;
   return (
     <button
       id="bookmark-toggle"

@@ -4,6 +4,7 @@ import { OpenEditors } from '@/features/viewer';
 import { BookmarksList } from '@/features/bookmarks';
 import { FileTree } from './FileTree';
 import { FolderGit2 } from 'lucide-react';
+import { STRINGS } from '@/shared/constants/strings';
 
 export function Sidebar() {
   const { sidebarOpen, treeData, treeLoading, treeError, treeTruncated, currentRepo } = useAppStore(
@@ -69,14 +70,14 @@ export function Sidebar() {
               backgroundColor: 'var(--sidebar-bg)',
             }}
           >
-            エクスプローラー
+            {STRINGS.explorer.title}
           </div>
 
           {/* ローディング */}
           {treeLoading && (
             <div className="px-4 py-8 flex flex-col items-center gap-3">
               <div className="w-6 h-6 border-2 border-[var(--accent-blue)] border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs text-[var(--text-muted)]">読み込み中...</span>
+              <span className="text-xs text-[var(--text-muted)]">{STRINGS.common.loading}</span>
             </div>
           )}
 
@@ -99,7 +100,7 @@ export function Sidebar() {
           {/* 一部のみ取得した旨の通知 */}
           {treeTruncated && !treeLoading && !treeError && (
             <div role="status" className="mx-4 my-2 text-xs text-[var(--accent-yellow)]">
-              リポジトリが大きいため、ファイル一覧の一部のみ表示しています。
+              {STRINGS.explorer.truncated}
             </div>
           )}
 
@@ -111,9 +112,9 @@ export function Sidebar() {
             <div className="px-4 py-12 flex flex-col items-center gap-3 text-center">
               <FolderGit2 size={40} className="text-[var(--text-muted)]" />
               <p className="text-sm text-[var(--text-muted)]">
-                リポジトリを入力して
+                {STRINGS.explorer.emptyLine1}
                 <br />
-                読み込みを開始してください
+                {STRINGS.explorer.emptyLine2}
               </p>
             </div>
           )}

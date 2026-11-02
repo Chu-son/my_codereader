@@ -3,6 +3,7 @@ import { ArrowRight, Loader2, X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { BranchSelector } from './BranchSelector';
+import { STRINGS } from '@/shared/constants/strings';
 
 /** リポジトリ名の表示と、owner/repo の入力フォームを切り替えるヘッダー部品 */
 export function RepoSwitcher() {
@@ -46,8 +47,8 @@ export function RepoSwitcher() {
             type="text"
             value={repoInput}
             onChange={(e) => setRepoInput(e.target.value)}
-            placeholder="owner/repo (例: facebook/react)"
-            aria-label="リポジトリ (owner/repo)"
+            placeholder={STRINGS.repository.inputPlaceholder}
+            aria-label={STRINGS.repository.inputLabel}
             className="w-full h-8 pl-3 pr-8 text-sm rounded-md border outline-none transition-colors"
             style={{
               backgroundColor: 'var(--bg-surface)',
@@ -64,8 +65,8 @@ export function RepoSwitcher() {
                 document.getElementById('repo-input')?.focus();
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
-              title="クリア"
-              aria-label="クリア"
+              title={STRINGS.common.clear}
+              aria-label={STRINGS.common.clear}
             >
               <X size={14} />
             </button>
@@ -76,7 +77,7 @@ export function RepoSwitcher() {
           disabled={!repoInput.trim() || treeLoading}
           className="touch-target rounded-md transition-colors disabled:opacity-40"
           style={{ backgroundColor: 'var(--accent-blue)', color: 'var(--bg-tertiary)' }}
-          aria-label="読み込む"
+          aria-label={STRINGS.repository.load}
         >
           {treeLoading ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={18} />}
         </button>
@@ -87,7 +88,7 @@ export function RepoSwitcher() {
             className="h-8 px-3 text-sm rounded-md transition-colors"
             style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-secondary)' }}
           >
-            キャンセル
+            {STRINGS.common.cancel}
           </button>
         )}
       </form>

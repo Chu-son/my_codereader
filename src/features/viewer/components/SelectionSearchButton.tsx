@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react';
+import { STRINGS } from '@/shared/constants/strings';
 
 interface SelectionSearchButtonProps {
   x: number;
@@ -20,7 +21,7 @@ export function SelectionSearchButton({ x, y, onClick }: SelectionSearchButtonPr
       }}
     >
       <Search size={14} />
-      <span className="text-xs font-medium">検索</span>
+      <span className="text-xs font-medium">{STRINGS.common.search}</span>
     </button>
   );
 }

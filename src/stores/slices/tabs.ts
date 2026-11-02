@@ -5,6 +5,7 @@ import { isBinaryFile } from '@/shared/lib/fileUtils';
 import { splitRepoFullName } from '@/shared/lib/urlParser';
 import { currentRepoSignal } from '../repoController';
 import type { SliceCreator } from '../types';
+import { STRINGS } from '@/shared/constants/strings';
 
 export interface TabsSlice {
   openedFiles: OpenedFile[];
@@ -106,7 +107,7 @@ export const createTabsSlice: SliceCreator<TabsSlice> = (set, get) => ({
       }));
     } catch (error) {
       if (isAbortError(error)) return;
-      const message = toErrorMessage(error, 'ファイルの読み込みに失敗しました');
+      const message = toErrorMessage(error, STRINGS.viewer.fileLoadFailed);
       set((state) => ({
         openedFiles: state.openedFiles.map((f) =>
           f.path === path
