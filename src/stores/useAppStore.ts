@@ -15,6 +15,12 @@ import {
 import { searchInCachedFiles, searchInTree, convertGitHubSearchResults } from '@/lib/searchUtils';
 import { isBinaryFile } from '@/lib/fileUtils';
 import { parseRepoInput, splitRepoFullName } from '@/lib/urlParser';
+import {
+  PERSIST_VERSION,
+  migratePersistedState,
+  partializeState,
+  type PersistedState,
+} from './persistence';
 
 // ========================================
 // State Interface
@@ -113,7 +119,7 @@ interface AppState {
 // ========================================
 
 export const useAppStore = create<AppState>()(
-  persist(
+  persist<AppState, [], [], PersistedState>(
     (set, get) => ({
       // 初期値
       pat: null,
@@ -573,18 +579,9 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'codereader-storage',
-      partialState: (state: AppState) => ({
-        pat: state.pat,
-        bookmarks: state.bookmarks,
-        wordWrap: state.wordWrap,
-        showIndentGuides: state.showIndentGuides,
-        fontSize: state.fontSize,
-        lineHeight: state.lineHeight,
-        recentRepos: state.recentRepos,
-      }),
-      // TODO(doc/migration.md 4): partialState は zustand の正しいオプション名 (partialize) ではない。
-      // 永続化の挙動が変わるため、別 PR で partialize + version/migrate に修正する。
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any,
+      version: PERSIST_VERSION,
+      partialize: partializeState,
+      migrate: migratePersistedState,
+    },
   ),
 );

@@ -30,10 +30,10 @@
 
 ## 4. 不具合修正（優先度高）
 
-- [ ] [useAppStore.ts:573](../src/stores/useAppStore.ts#L573) の `partialState` + `as any` を `partialize` に修正する。現状は永続化の絞り込みが効かず、状態全体（ツリー、ファイル本文、検索結果）が保存されている可能性が高い
-- [ ] `version` / `migrate` を設定し、旧 `codereader-storage` から移行する
-- [ ] 起動時の `clearRepo()`（`App.tsx`）が永続化の不具合への暫定対処でないか確認し、不要なら削除する
-- [ ] 回帰テストを追加する
+- [x] [useAppStore.ts:573](../src/stores/useAppStore.ts#L573) の `partialState` + `as any` を `partialize` に修正する。現状は永続化の絞り込みが効かず、状態全体（ツリー、ファイル本文、検索結果）が保存されている可能性が高い
+- [x] `version` / `migrate` を設定し、旧 `codereader-storage` から移行する
+- [x] 起動時の `clearRepo()`（`App.tsx`）が永続化の不具合への暫定対処でないか確認し、不要なら削除する
+- [x] 回帰テストを追加する
 
 ## 5. API 層
 
