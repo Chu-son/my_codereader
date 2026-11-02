@@ -16,15 +16,9 @@ interface PaneContentProps {
 }
 
 function PaneContent({ pane }: PaneContentProps) {
-  const {
-    openedFiles,
-    activePane1FilePath,
-    activePane2FilePath,
-    retryFile,
-  } = useAppStore();
+  const { openedFiles, activePane1FilePath, activePane2FilePath, retryFile } = useAppStore();
 
-  const activeFilePath =
-    pane === 1 ? activePane1FilePath : activePane2FilePath;
+  const activeFilePath = pane === 1 ? activePane1FilePath : activePane2FilePath;
 
   const activeFile = openedFiles.find((f) => f.path === activeFilePath);
 
@@ -39,13 +33,8 @@ function PaneContent({ pane }: PaneContentProps) {
           activeFile.loading ? (
             <div className="h-full flex items-center justify-center">
               <div className="flex flex-col items-center gap-3">
-                <Loader2
-                  size={24}
-                  className="animate-spin text-[var(--accent-blue)]"
-                />
-                <span className="text-sm text-[var(--text-muted)]">
-                  ファイルを読み込み中...
-                </span>
+                <Loader2 size={24} className="animate-spin text-[var(--accent-blue)]" />
+                <span className="text-sm text-[var(--text-muted)]">ファイルを読み込み中...</span>
               </div>
             </div>
           ) : activeFile.error ? (
@@ -61,9 +50,7 @@ function PaneContent({ pane }: PaneContentProps) {
                   <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">
                     ファイルを読み込めませんでした
                   </h3>
-                  <p className="text-xs text-[var(--text-muted)] mb-4">
-                    {activeFile.error}
-                  </p>
+                  <p className="text-xs text-[var(--text-muted)] mb-4">{activeFile.error}</p>
                   <button
                     onClick={() => retryFile(activeFile.path)}
                     className="h-9 px-4 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 mx-auto"
@@ -106,9 +93,7 @@ function EmptyState() {
           <FileCode size={28} className="text-[var(--text-muted)]" />
         </div>
         <div>
-          <p className="text-sm text-[var(--text-muted)] mb-1">
-            ファイルが選択されていません
-          </p>
+          <p className="text-sm text-[var(--text-muted)] mb-1">ファイルが選択されていません</p>
           <p className="text-xs text-[var(--text-muted)] opacity-60">
             サイドバーのエクスプローラーからファイルを選択してください
           </p>

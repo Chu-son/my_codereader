@@ -44,15 +44,9 @@ export function SearchDrawer() {
   };
 
   return (
-    <Drawer.Root
-      open={searchDrawerOpen}
-      onOpenChange={setSearchDrawerOpen}
-    >
+    <Drawer.Root open={searchDrawerOpen} onOpenChange={setSearchDrawerOpen}>
       <Drawer.Portal>
-        <Drawer.Overlay
-          className="fixed inset-0"
-          style={{ zIndex: 'var(--z-drawer)' }}
-        />
+        <Drawer.Overlay className="fixed inset-0" style={{ zIndex: 'var(--z-drawer)' }} />
         <Drawer.Content
           className="fixed bottom-0 left-0 right-0 flex flex-col rounded-t-2xl outline-none"
           style={{
@@ -101,11 +95,7 @@ export function SearchDrawer() {
                   color: 'var(--bg-tertiary)',
                 }}
               >
-                {searchLoading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  '検索'
-                )}
+                {searchLoading ? <Loader2 size={16} className="animate-spin" /> : '検索'}
               </button>
             </form>
 
@@ -113,9 +103,7 @@ export function SearchDrawer() {
             {!pat && (
               <div className="flex items-center gap-1.5 mt-2 text-xs text-[var(--accent-yellow)]">
                 <AlertCircle size={12} />
-                <span>
-                  PAT未設定: ファイル名と開いているファイルのみ検索可能です
-                </span>
+                <span>PAT未設定: ファイル名と開いているファイルのみ検索可能です</span>
               </div>
             )}
           </div>
@@ -127,15 +115,13 @@ export function SearchDrawer() {
           >
             {searchLoading ? (
               <div className="flex items-center justify-center py-12">
-                <Loader2
-                  size={24}
-                  className="animate-spin text-[var(--accent-blue)]"
-                />
+                <Loader2 size={24} className="animate-spin text-[var(--accent-blue)]" />
               </div>
             ) : searchResults.length > 0 ? (
               <div>
                 {/* 結果件数 */}
-                <div className="px-4 py-2 text-xs text-[var(--text-muted)] sticky top-0"
+                <div
+                  className="px-4 py-2 text-xs text-[var(--text-muted)] sticky top-0"
                   style={{ backgroundColor: 'var(--bg-secondary)' }}
                 >
                   {searchResults.length}件の結果
@@ -147,10 +133,7 @@ export function SearchDrawer() {
                     className="flex items-start gap-3 w-full px-4 py-2.5 text-left transition-colors hover:bg-[var(--bg-hover)]"
                     onClick={() => handleResultClick(result.path)}
                   >
-                    <FileCode
-                      size={16}
-                      className="shrink-0 mt-0.5 text-[var(--text-muted)]"
-                    />
+                    <FileCode size={16} className="shrink-0 mt-0.5 text-[var(--text-muted)]" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-[13px] font-medium text-[var(--accent-blue)] truncate-text">
@@ -180,9 +163,7 @@ export function SearchDrawer() {
             ) : searchQuery && !searchLoading ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Search size={32} className="text-[var(--text-muted)] mb-3" />
-                <p className="text-sm text-[var(--text-muted)]">
-                  結果が見つかりませんでした
-                </p>
+                <p className="text-sm text-[var(--text-muted)]">結果が見つかりませんでした</p>
               </div>
             ) : null}
           </div>

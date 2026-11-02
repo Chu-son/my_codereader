@@ -2,11 +2,11 @@
 // FileTree Component
 // ========================================
 
-import { useCallback } from "react";
-import { ChevronRight, ChevronDown, Folder, FolderOpen } from "lucide-react";
-import type { TreeNode } from "@/types";
-import { useAppStore } from "@/stores/useAppStore";
-import { getFileIcon, isBinaryFile } from "@/lib/fileUtils";
+import { useCallback } from 'react';
+import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react';
+import type { TreeNode } from '@/types';
+import { useAppStore } from '@/stores/useAppStore';
+import { getFileIcon, isBinaryFile } from '@/lib/fileUtils';
 
 interface FileTreeProps {
   nodes: TreeNode[];
@@ -14,8 +14,7 @@ interface FileTreeProps {
 }
 
 export function FileTree({ nodes, depth = 0 }: FileTreeProps) {
-  const { expandedDirs, activePane1FilePath, toggleDir, openFile } =
-    useAppStore();
+  const { expandedDirs, activePane1FilePath, toggleDir, openFile } = useAppStore();
 
   return (
     <div className="select-none">
@@ -56,7 +55,7 @@ function FileTreeNode({
   const showIndentGuides = useAppStore((s) => s.showIndentGuides);
 
   const handleClick = useCallback(() => {
-    if (node.type === "tree") {
+    if (node.type === 'tree') {
       onToggle(node.path);
     } else {
       if (!isBinaryFile(node.path)) {
@@ -65,12 +64,8 @@ function FileTreeNode({
     }
   }, [node, onToggle, onFileClick]);
 
-  const isDir = node.type === "tree";
-  const FileIcon = isDir
-    ? isExpanded
-      ? FolderOpen
-      : Folder
-    : getFileIcon(node.path);
+  const isDir = node.type === 'tree';
+  const FileIcon = isDir ? (isExpanded ? FolderOpen : Folder) : getFileIcon(node.path);
 
   const isBinary = !isDir && isBinaryFile(node.path);
 
@@ -78,8 +73,8 @@ function FileTreeNode({
     <>
       <button
         className={`relative flex items-center w-full text-left py-2 pr-2 transition-colors min-h-[40px] ${
-          isActive ? "bg-[var(--bg-active)]" : "hover:bg-[var(--bg-hover)]"
-        } ${isBinary ? "opacity-40" : ""}`}
+          isActive ? 'bg-[var(--bg-active)]' : 'hover:bg-[var(--bg-hover)]'
+        } ${isBinary ? 'opacity-40' : ''}`}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={handleClick}
         title={node.path}
@@ -93,7 +88,7 @@ function FileTreeNode({
               className="absolute top-0 bottom-0 border-l"
               style={{
                 left: `${i * 16 + 18}px`,
-                borderColor: "var(--border-primary)",
+                borderColor: 'var(--border-primary)',
                 opacity: 0.3,
               }}
             />
@@ -114,9 +109,7 @@ function FileTreeNode({
         <FileIcon
           size={16}
           className={`shrink-0 ml-1 ${
-            isDir
-              ? "text-[var(--accent-yellow)]"
-              : "text-[var(--text-secondary)]"
+            isDir ? 'text-[var(--accent-yellow)]' : 'text-[var(--text-secondary)]'
           }`}
         />
 
@@ -126,9 +119,7 @@ function FileTreeNode({
         {/* ファイル名 */}
         <span
           className={`text-[13px] truncate-text ${
-            isActive
-              ? "text-[var(--text-primary)]"
-              : "text-[var(--text-secondary)]"
+            isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
           }`}
         >
           {node.name}

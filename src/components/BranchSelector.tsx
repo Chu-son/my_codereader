@@ -70,7 +70,13 @@ export function BranchSelector() {
                   onClick={() => handleBranchClick(branch.name)}
                   className="flex items-center justify-between w-full px-3 py-2.5 text-left text-sm transition-colors hover:bg-[var(--bg-hover)]"
                 >
-                  <span className={branch.name === currentBranch ? 'text-[var(--accent-blue)] font-medium' : 'text-[var(--text-primary)]'}>
+                  <span
+                    className={
+                      branch.name === currentBranch
+                        ? 'text-[var(--accent-blue)] font-medium'
+                        : 'text-[var(--text-primary)]'
+                    }
+                  >
                     {branch.name}
                   </span>
                   {branch.name === currentBranch && (

@@ -17,17 +17,14 @@ export function MarkdownPreview({ content }: MarkdownPreviewProps) {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div 
+      <div
         className="markdown-preview max-w-4xl mx-auto"
-        style={{ 
-          fontSize: `${fontSize}px`, 
-          lineHeight: lineHeight 
+        style={{
+          fontSize: `${fontSize}px`,
+          lineHeight: lineHeight,
         }}
       >
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeHighlight]}
-        >
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
           {content}
         </ReactMarkdown>
       </div>

@@ -15,8 +15,7 @@ export function FileTabs({ pane }: FileTabsProps) {
   const { openedFiles, activePane1FilePath, activePane2FilePath, setActiveFile, closeFile } =
     useAppStore();
 
-  const activeFilePath =
-    pane === 1 ? activePane1FilePath : activePane2FilePath;
+  const activeFilePath = pane === 1 ? activePane1FilePath : activePane2FilePath;
 
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -24,7 +23,7 @@ export function FileTabs({ pane }: FileTabsProps) {
   useEffect(() => {
     if (!tabsContainerRef.current || !activeFilePath) return;
     const activeTab = tabsContainerRef.current.querySelector(
-      `[data-tab-path="${CSS.escape(activeFilePath)}"]`
+      `[data-tab-path="${CSS.escape(activeFilePath)}"]`,
     );
     if (activeTab) {
       activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
@@ -59,22 +58,15 @@ export function FileTabs({ pane }: FileTabsProps) {
                 : 'border-t-2 border-t-transparent hover:bg-[var(--bg-hover)]'
             }`}
             style={{
-              backgroundColor: isActive
-                ? 'var(--tab-active-bg)'
-                : undefined,
+              backgroundColor: isActive ? 'var(--tab-active-bg)' : undefined,
               borderRightColor: 'var(--tab-border)',
             }}
             onClick={() => setActiveFile(pane, file.path)}
           >
-            <FileIcon
-              size={14}
-              className="shrink-0 text-[var(--text-secondary)]"
-            />
+            <FileIcon size={14} className="shrink-0 text-[var(--text-secondary)]" />
             <span
               className={`text-[13px] whitespace-nowrap ${
-                isActive
-                  ? 'text-[var(--text-primary)]'
-                  : 'text-[var(--text-muted)]'
+                isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'
               }`}
             >
               {fileName}

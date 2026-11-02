@@ -72,58 +72,63 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
   const langExtension = useMemo(() => getLanguageExtension(language), [language]);
 
   // 読み取り専用 + タッチ向けカスタム設定
-  const readOnlyExt = useMemo(
-    () => {
-      const ext = [EditorView.editable.of(false)];
-      if (wordWrap) ext.push(EditorView.lineWrapping);
-      if (showIndentGuides) ext.push(indentGuideExtension());
+  const readOnlyExt = useMemo(() => {
+    const ext = [EditorView.editable.of(false)];
+    if (wordWrap) ext.push(EditorView.lineWrapping);
+    if (showIndentGuides) ext.push(indentGuideExtension());
 
-      // フォントサイズの設定
-      ext.push(
-        EditorView.theme({
-          '&': {
-            fontSize: `${fontSize}px`,
-            lineHeight: lineHeight.toString(),
-          },
-          '.cm-scroller': {
-            fontFamily: 'var(--font-mono)',
-            lineHeight: lineHeight.toString(),
-          },
-        })
-      );
+    // フォントサイズの設定
+    ext.push(
+      EditorView.theme({
+        '&': {
+          fontSize: `${fontSize}px`,
+          lineHeight: lineHeight.toString(),
+        },
+        '.cm-scroller': {
+          fontFamily: 'var(--font-mono)',
+          lineHeight: lineHeight.toString(),
+        },
+      }),
+    );
 
-      ext.push(
-        EditorView.updateListener.of((update) => {
-          if (update.selectionSet) {
-            const main = update.state.selection.main;
-            const line = update.state.doc.lineAt(main.head).number;
-            // setTimeoutを用いてCodeMirrorの更新サイクル外でReactのStateを更新する
-            setTimeout(() => setActiveCursorLine(filePath, line), 0);
+    ext.push(
+      EditorView.updateListener.of((update) => {
+        if (update.selectionSet) {
+          const main = update.state.selection.main;
+          const line = update.state.doc.lineAt(main.head).number;
+          // setTimeoutを用いてCodeMirrorの更新サイクル外でReactのStateを更新する
+          setTimeout(() => setActiveCursorLine(filePath, line), 0);
 
-            if (!main.empty) {
-              const text = update.state.sliceDoc(main.from, main.to).trim();
-              if (text && text.length < 100) {
-                const coords = update.view.coordsAtPos(main.to);
-                if (coords) {
-                  setSelection({ text, x: coords.left, y: coords.top });
-                }
-              } else {
-                setSelection(null);
+          if (!main.empty) {
+            const text = update.state.sliceDoc(main.from, main.to).trim();
+            if (text && text.length < 100) {
+              const coords = update.view.coordsAtPos(main.to);
+              if (coords) {
+                setSelection({ text, x: coords.left, y: coords.top });
               }
             } else {
               setSelection(null);
             }
+          } else {
+            setSelection(null);
           }
-        })
-      );
-      return ext;
-    },
-    [wordWrap, showIndentGuides, fontSize, lineHeight, searchInRepo, filePath, setActiveCursorLine]
-  );
+        }
+      }),
+    );
+    return ext;
+  }, [
+    wordWrap,
+    showIndentGuides,
+    fontSize,
+    lineHeight,
+    searchInRepo,
+    filePath,
+    setActiveCursorLine,
+  ]);
 
   const extensions = useMemo(
     () => [...langExtension, ...readOnlyExt],
-    [langExtension, readOnlyExt]
+    [langExtension, readOnlyExt],
   );
 
   // スクロール位置の保存
@@ -185,12 +190,14 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
   }, [jumpTarget, filePath, setJumpTarget]);
 
   return (
-    <div 
+    <div
       className="h-full overflow-hidden relative"
-      style={{ 
-        '--font-size-code': `${fontSize}px`, 
-        '--line-height-code': lineHeight 
-      } as React.CSSProperties}
+      style={
+        {
+          '--font-size-code': `${fontSize}px`,
+          '--line-height-code': lineHeight,
+        } as React.CSSProperties
+      }
     >
       <CodeMirror
         value={content}

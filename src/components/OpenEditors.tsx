@@ -7,8 +7,7 @@ import { useAppStore } from '@/stores/useAppStore';
 import { getFileIcon, getFileName } from '@/lib/fileUtils';
 
 export function OpenEditors() {
-  const { openedFiles, activePane1FilePath, setActiveFile, closeFile } =
-    useAppStore();
+  const { openedFiles, activePane1FilePath, setActiveFile, closeFile } = useAppStore();
 
   if (openedFiles.length === 0) return null;
 
@@ -33,9 +32,7 @@ export function OpenEditors() {
             <div
               key={file.path}
               className={`group flex items-center min-h-[40px] px-2 cursor-pointer transition-colors ${
-                isActive
-                  ? 'bg-[var(--bg-active)]'
-                  : 'hover:bg-[var(--bg-hover)]'
+                isActive ? 'bg-[var(--bg-active)]' : 'hover:bg-[var(--bg-hover)]'
               }`}
               onClick={() => setActiveFile(1, file.path)}
               title={file.path}
@@ -52,17 +49,12 @@ export function OpenEditors() {
               </button>
 
               {/* アイコン */}
-              <FileIcon
-                size={14}
-                className="shrink-0 mx-1.5 text-[var(--text-secondary)]"
-              />
+              <FileIcon size={14} className="shrink-0 mx-1.5 text-[var(--text-secondary)]" />
 
               {/* ファイル名 */}
               <span
                 className={`text-[13px] truncate-text ${
-                  isActive
-                    ? 'text-[var(--text-primary)]'
-                    : 'text-[var(--text-secondary)]'
+                  isActive ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
                 }`}
               >
                 {fileName}

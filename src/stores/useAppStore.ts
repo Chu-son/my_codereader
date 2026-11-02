@@ -12,11 +12,7 @@ import {
   searchCode,
   fetchBranches,
 } from '@/lib/github';
-import {
-  searchInCachedFiles,
-  searchInTree,
-  convertGitHubSearchResults,
-} from '@/lib/searchUtils';
+import { searchInCachedFiles, searchInTree, convertGitHubSearchResults } from '@/lib/searchUtils';
 import { isBinaryFile } from '@/lib/fileUtils';
 import { parseRepoInput, splitRepoFullName } from '@/lib/urlParser';
 
@@ -101,7 +97,7 @@ interface AppState {
   setShowIndentGuides: (show: boolean) => void;
   setFontSize: (size: number) => void;
   setLineHeight: (height: number) => void;
-  
+
   addBookmark: (bookmark: Bookmark) => void;
   removeBookmark: (id: string) => void;
   setActiveCursorLine: (path: string, line: number) => void;
@@ -160,7 +156,10 @@ export const useAppStore = create<AppState>()(
       loadRepository: async (repoInput: string) => {
         const parsed = parseRepoInput(repoInput);
         if (!parsed) {
-          set({ treeError: '無効なリポジトリ形式です。owner/repo または GitHubのURLを入力してください。' });
+          set({
+            treeError:
+              '無効なリポジトリ形式です。owner/repo または GitHubのURLを入力してください。',
+          });
           return;
         }
 
@@ -197,11 +196,13 @@ export const useAppStore = create<AppState>()(
 
           // ブランチ一覧を非同期で取得
           set({ branchesLoading: true });
-          fetchBranches(owner, repo, pat).then((branches) => {
-            set({ branches, branchesLoading: false });
-          }).catch(() => {
-            set({ branchesLoading: false });
-          });
+          fetchBranches(owner, repo, pat)
+            .then((branches) => {
+              set({ branches, branchesLoading: false });
+            })
+            .catch(() => {
+              set({ branchesLoading: false });
+            });
 
           // URLにファイルパスが含まれる場合は自動で開く
           if (filePath) {
@@ -211,9 +212,7 @@ export const useAppStore = create<AppState>()(
           set({
             treeLoading: false,
             treeError:
-              error instanceof Error
-                ? error.message
-                : 'リポジトリの読み込みに失敗しました',
+              error instanceof Error ? error.message : 'リポジトリの読み込みに失敗しました',
           });
         }
       },
@@ -260,7 +259,7 @@ export const useAppStore = create<AppState>()(
           const alreadyOpened = state.openedFiles.some((f) => f.path === path);
           const files = alreadyOpened
             ? state.openedFiles.map((f) =>
-                f.path === path ? { ...f, loading: true, error: undefined } : f
+                f.path === path ? { ...f, loading: true, error: undefined } : f,
               )
             : [...state.openedFiles, newFile];
 
@@ -286,11 +285,11 @@ export const useAppStore = create<AppState>()(
             repo,
             path,
             get().currentBranch,
-            pat
+            pat,
           );
           set((state) => ({
             openedFiles: state.openedFiles.map((f) =>
-              f.path === path ? { ...f, content, sha, loading: false } : f
+              f.path === path ? { ...f, content, sha, loading: false } : f,
             ),
           }));
         } catch (error) {
@@ -304,7 +303,7 @@ export const useAppStore = create<AppState>()(
                     loading: false,
                     error: message,
                   }
-                : f
+                : f,
             ),
           }));
         }
@@ -319,9 +318,7 @@ export const useAppStore = create<AppState>()(
 
       closeFile: (path: string) => {
         set((state) => {
-          const newOpenedFiles = state.openedFiles.filter(
-            (f) => f.path !== path
-          );
+          const newOpenedFiles = state.openedFiles.filter((f) => f.path !== path);
 
           let newPane1 = state.activePane1FilePath;
           let newPane2 = state.activePane2FilePath;
@@ -329,15 +326,11 @@ export const useAppStore = create<AppState>()(
           // 閉じたファイルがアクティブだった場合、次のタブに切り替え
           if (state.activePane1FilePath === path) {
             const idx = state.openedFiles.findIndex((f) => f.path === path);
-            newPane1 =
-              newOpenedFiles[Math.min(idx, newOpenedFiles.length - 1)]?.path ??
-              null;
+            newPane1 = newOpenedFiles[Math.min(idx, newOpenedFiles.length - 1)]?.path ?? null;
           }
           if (state.activePane2FilePath === path) {
             const idx = state.openedFiles.findIndex((f) => f.path === path);
-            newPane2 =
-              newOpenedFiles[Math.min(idx, newOpenedFiles.length - 1)]?.path ??
-              null;
+            newPane2 = newOpenedFiles[Math.min(idx, newOpenedFiles.length - 1)]?.path ?? null;
           }
 
           return {
@@ -366,7 +359,7 @@ export const useAppStore = create<AppState>()(
       updateScrollPos: (path: string, pos: number) => {
         set((state) => ({
           openedFiles: state.openedFiles.map((f) =>
-            f.path === path ? { ...f, scrollPos: pos } : f
+            f.path === path ? { ...f, scrollPos: pos } : f,
           ),
         }));
       },
@@ -507,7 +500,13 @@ export const useAppStore = create<AppState>()(
         const repoParts = currentRepo && splitRepoFullName(currentRepo);
         if (!repoParts) return;
         const { owner, repo } = repoParts;
-        set({ treeLoading: true, treeError: null, openedFiles: [], activePane1FilePath: null, activePane2FilePath: null });
+        set({
+          treeLoading: true,
+          treeError: null,
+          openedFiles: [],
+          activePane1FilePath: null,
+          activePane2FilePath: null,
+        });
 
         try {
           const tree = await fetchRepoTree(owner, repo, branchName, pat);
@@ -527,10 +526,8 @@ export const useAppStore = create<AppState>()(
       addBookmark: (bookmark) => {
         set((state) => {
           // 同じリポジトリ・ファイル・行のブックマークが既にあるかチェック
-          const exists = state.bookmarks.some(b => 
-            b.repo === bookmark.repo && 
-            b.path === bookmark.path && 
-            b.line === bookmark.line
+          const exists = state.bookmarks.some(
+            (b) => b.repo === bookmark.repo && b.path === bookmark.path && b.line === bookmark.line,
           );
           if (exists) return state;
           return { bookmarks: [...state.bookmarks, bookmark] };
@@ -580,6 +577,6 @@ export const useAppStore = create<AppState>()(
         lineHeight: state.lineHeight,
         recentRepos: state.recentRepos,
       }),
-    } as any
-  )
+    } as any,
+  ),
 );
