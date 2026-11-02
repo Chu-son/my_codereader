@@ -73,6 +73,7 @@ export function BookmarksList() {
                   removeBookmark(bookmark.id);
                 }}
                 title={STRINGS.bookmarks.delete}
+                aria-label={STRINGS.bookmarks.delete}
               >
                 <Trash2 size={14} />
               </button>

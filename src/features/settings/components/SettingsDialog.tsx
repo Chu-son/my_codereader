@@ -1,15 +1,21 @@
+import { useCallback, useRef } from 'react';
 import { X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { EditorSettingsSection } from './EditorSettingsSection';
 import { PatSection } from './PatSection';
 import { RateLimitSection } from './RateLimitSection';
+import { useFocusTrap } from '@/shared/hooks/useFocusTrap';
 import { STRINGS } from '@/shared/constants/strings';
 
 export function SettingsDialog() {
   const { settingsOpen, setSettingsOpen } = useAppStore(
     useShallow((s) => ({ settingsOpen: s.settingsOpen, setSettingsOpen: s.setSettingsOpen })),
   );
+
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setSettingsOpen(false), [setSettingsOpen]);
+  useFocusTrap(dialogRef, settingsOpen, close);
 
   if (!settingsOpen) return null;
 
@@ -22,6 +28,11 @@ export function SettingsDialog() {
       />
 
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-dialog-title"
+        tabIndex={-1}
         className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[480px] md:max-h-[90vh] rounded-2xl border overflow-y-auto animate-fade-in"
         style={{
           zIndex: 'var(--z-dialog)',
@@ -37,7 +48,10 @@ export function SettingsDialog() {
             zIndex: 1,
           }}
         >
-          <h2 className="text-base font-semibold text-[var(--text-primary)]">
+          <h2
+            id="settings-dialog-title"
+            className="text-base font-semibold text-[var(--text-primary)]"
+          >
             {STRINGS.common.settings}
           </h2>
           <button

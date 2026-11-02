@@ -42,6 +42,8 @@ export function BranchSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-2.5 h-8 rounded-md transition-colors hover:bg-[var(--bg-hover)] text-xs text-[var(--text-secondary)]"
         title={STRINGS.repository.switchBranch}
+        aria-label={STRINGS.repository.switchBranch}
+        aria-expanded={isOpen}
       >
         <GitBranch size={14} className={branchesLoading ? 'animate-pulse' : ''} />
         <span className="font-medium truncate max-w-[120px]">{currentBranch}</span>

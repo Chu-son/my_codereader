@@ -98,6 +98,7 @@ export function RecentRepos() {
                   className="p-2 rounded-lg transition-colors hover:bg-[var(--accent-red)] hover:text-white"
                   style={{ color: 'var(--text-muted)' }}
                   title={STRINGS.repository.removeFromHistory}
+                  aria-label={STRINGS.repository.removeFromHistory}
                 >
                   <Trash2 size={16} />
                 </button>

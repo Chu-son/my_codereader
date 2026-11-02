@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { STRINGS } from '@/shared/constants/strings';
 import { X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
@@ -83,6 +84,7 @@ export function FileTabs({ pane }: FileTabsProps) {
                 e.stopPropagation();
                 closeFile(file.path);
               }}
+              aria-label={STRINGS.viewer.closeFile(file.path)}
               className={`w-7 h-7 flex items-center justify-center rounded transition-opacity ${
                 isActive
                   ? 'opacity-60 hover:opacity-100'

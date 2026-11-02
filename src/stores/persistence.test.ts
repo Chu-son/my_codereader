@@ -19,6 +19,7 @@ describe('migratePersistedState', () => {
     const result = migratePersistedState(old);
     expect(Object.keys(result).sort()).toEqual(Object.keys(DEFAULT_PERSISTED).sort());
     expect(result.pat).toBe('ghp_x');
+    expect(result.patRemembered).toBe(true);
     expect(result.bookmarks).toEqual([bookmark]);
     expect(result.wordWrap).toBe(false);
     expect(result.fontSize).toBe(18);

@@ -61,10 +61,10 @@
 
 ## 8. セキュリティ・a11y・性能
 
-- [ ] PAT の既定保存先を `sessionStorage` にし、「保存する」を選んだ場合のみ `localStorage` にする
-- [ ] Markdown に `rehype-sanitize` を適用する
-- [ ] CSP を設定する
-- [ ] アイコンボタンの `aria-label`、ダイアログのフォーカストラップ、`role` 属性を整備する
+- [x] PAT の既定保存先を `sessionStorage` にし、「保存する」を選んだ場合のみ `localStorage` にする
+- [x] Markdown に `rehype-sanitize` を適用する
+- [x] CSP を設定する
+- [x] アイコンボタンの `aria-label`、ダイアログのフォーカストラップ、`role` 属性を整備する
 - [ ] CodeMirror 言語パックを動的 import にする
 - [ ] 検索・設定・Markdown を `React.lazy` にする
 - [ ] ファイルツリーを仮想化する

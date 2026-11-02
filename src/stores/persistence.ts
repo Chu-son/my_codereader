@@ -4,6 +4,8 @@ import type { Bookmark } from '@/shared/types';
 /** 永続化する項目（ユーザー設定とユーザーデータのみ。本文・ツリー・検索結果は含めない） */
 export interface PersistedState {
   pat: string | null;
+  /** true のときだけ PAT を localStorage に保存する（既定は sessionStorage） */
+  patRemembered: boolean;
   bookmarks: Bookmark[];
   recentRepos: string[];
   wordWrap: boolean;
@@ -13,10 +15,11 @@ export interface PersistedState {
 }
 
 /** 永続化形式のバージョン。形を変えたら上げて migrate を追加する */
-export const PERSIST_VERSION = 1;
+export const PERSIST_VERSION = 2;
 
 export const DEFAULT_PERSISTED: PersistedState = {
   pat: null,
+  patRemembered: false,
   bookmarks: [],
   recentRepos: [],
   wordWrap: true,
@@ -27,7 +30,8 @@ export const DEFAULT_PERSISTED: PersistedState = {
 
 export function partializeState(state: PersistedState): PersistedState {
   return {
-    pat: state.pat,
+    pat: state.patRemembered ? state.pat : null,
+    patRemembered: state.patRemembered,
     bookmarks: state.bookmarks,
     recentRepos: state.recentRepos,
     wordWrap: state.wordWrap,
@@ -65,8 +69,12 @@ function numberInRange(value: unknown, min: number, max: number, fallback: numbe
 export function migratePersistedState(persisted: unknown): PersistedState {
   if (!isRecord(persisted)) return DEFAULT_PERSISTED;
   const d = DEFAULT_PERSISTED;
+  const pat = typeof persisted.pat === 'string' && persisted.pat !== '' ? persisted.pat : null;
   return {
-    pat: typeof persisted.pat === 'string' && persisted.pat !== '' ? persisted.pat : null,
+    pat,
+    // v1 では PAT は常に localStorage にあった。既存ユーザーの挙動を保つため保存済みなら「保存する」扱いにする
+    patRemembered:
+      typeof persisted.patRemembered === 'boolean' ? persisted.patRemembered : pat !== null,
     bookmarks: Array.isArray(persisted.bookmarks) ? persisted.bookmarks.filter(isBookmark) : [],
     recentRepos: Array.isArray(persisted.recentRepos)
       ? persisted.recentRepos.filter((r): r is string => typeof r === 'string').slice(0, 20)
@@ -97,4 +105,15 @@ export const storage: StateStorage = {
     if (name === STORAGE_KEY) localStorage.removeItem(LEGACY_STORAGE_KEY);
   },
   removeItem: (name) => localStorage.removeItem(name),
+};
+
+export const SESSION_PAT_KEY = 'codereader:pat';
+
+/** 「保存しない」PAT はタブを閉じると消える sessionStorage に置く */
+export const sessionPat = {
+  read: (): string | null => sessionStorage.getItem(SESSION_PAT_KEY) || null,
+  write: (pat: string | null) => {
+    if (pat) sessionStorage.setItem(SESSION_PAT_KEY, pat);
+    else sessionStorage.removeItem(SESSION_PAT_KEY);
+  },
 };

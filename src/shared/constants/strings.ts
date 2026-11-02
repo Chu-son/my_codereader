@@ -53,6 +53,7 @@ export const STRINGS = {
     fileLoading: 'ファイルを読み込み中...',
     fileLoadFailedTitle: 'ファイルを読み込めませんでした',
     fileLoadFailed: 'ファイルの読み込みに失敗しました',
+    closeFile: (path: string) => `${path} を閉じる`,
     reload: '再読み込み',
     noFileTitle: 'ファイルが選択されていません',
     noFileHint: 'サイドバーのエクスプローラーからファイルを選択してください',
@@ -80,7 +81,10 @@ export const STRINGS = {
     fontSize: 'フォントサイズ',
     lineHeight: '行間サイズ',
     patDescription:
-      'PATを設定するとAPIレートリミットが60→5000回/時に増加し、コード検索機能も利用できるようになります。 トークンはブラウザのlocalStorageに保存されます。',
+      'PATを設定するとAPIレートリミットが60→5000回/時に増加し、コード検索機能も利用できるようになります。既定ではこのタブを閉じると破棄されます。',
+    patRemember: 'このブラウザに保存する',
+    patRememberRisk:
+      '端末に平文で残ります。共有端末では使わないでください。XSS が起きた場合は漏えいする恐れがあります。',
     patHide: 'トークンを隠す',
     patShow: 'トークンを表示',
     rateLimitTitle: 'API レートリミット',
