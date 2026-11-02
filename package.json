@@ -11,6 +11,7 @@
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "check:bundle": "node scripts/check-bundle-size.mjs",
     "preview": "vite preview"
@@ -51,6 +52,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^5.0.5",
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",

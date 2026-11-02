@@ -12,5 +12,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/shared/lib/**', 'src/stores/**'],
+      exclude: ['src/**/*.test.{ts,tsx}'],
+      // testing.md: lib は行カバレッジ 80% 以上
+      thresholds: { 'src/shared/lib/**': { lines: 80 } },
+    },
   },
 });

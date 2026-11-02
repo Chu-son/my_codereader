@@ -1,8 +1,8 @@
 # アーキテクチャ
 
-目標構成は [conventions/architecture.md](conventions/architecture.md) を参照。ここでは現状の構成とデータフローを記録し、目標との差分は [migration.md](migration.md) で管理する。
+規約は [conventions/architecture.md](conventions/architecture.md)。ここでは構成とデータフローを記録する。
 
-## 現状の構成
+## 構成
 
 ```
 src/

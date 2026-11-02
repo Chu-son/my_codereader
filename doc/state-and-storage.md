@@ -2,7 +2,7 @@
 
 規約は [conventions/state.md](conventions/state.md)。
 
-## 状態の分類（目標）
+## 状態の分類
 
 | 分類 | 項目 | 永続化 |
 | --- | --- | --- |
