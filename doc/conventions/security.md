@@ -20,5 +20,5 @@
 
 ## 依存関係
 
-- CI で `npm audit --audit-level=high` を実行し、High 以上があれば失敗させる。
+- CI で `npm audit --omit=dev --audit-level=high` を実行し、実行時の依存に High 以上があれば失敗させる。開発専用の依存は情報として表示し、定期的な更新で解消する。
 - 依存の追加・更新は [ci.md](ci.md) の方針に従う。

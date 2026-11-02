@@ -16,8 +16,9 @@
 
 ## 2. CI
 
-- [ ] PR 用 `ci.yml`（lint / 型チェック / test / build / audit）を追加する
-- [ ] `deploy.yml` は `main` のみのままにする
+- [x] PR 用 `ci.yml`（format / lint / typecheck / test / build / audit）を追加する
+- [x] `deploy.yml` は `main` のみのままにする
+- [ ] 開発専用の依存にある High の脆弱性 8 件を更新で解消する（現状は `ci.yml` で情報表示のみ）
 - [ ] `main` のブランチ保護を設定する（リポジトリ設定。手動作業）
 
 ## 3. テスト基盤

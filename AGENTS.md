@@ -10,10 +10,13 @@ GitHub CodeReader は、GitHub の公開リポジトリを iPad で快適に読�
 | --- | --- |
 | 開発サーバー | `npm run dev` （URL は `/my_codereader/` 配下） |
 | Lint | `npm run lint` |
+| 型チェック | `npm run typecheck` |
+| テスト | `npm run test` |
+| 整形 | `npm run format` （CI は `format:check`） |
 | 型チェック + ビルド | `npm run build` （`tsc -b && vite build`） |
 | ビルド確認 | `npm run preview` |
 
-変更を完了とする前に `npm run lint` と `npm run build` を必ず通すこと。テスト基盤の導入後は `npm run test` も必須（[doc/conventions/testing.md](doc/conventions/testing.md)）。
+変更を完了とする前に `npm run format:check`・`npm run lint`・`npm run typecheck`・`npm run test`・`npm run build` を必ず通すこと（CI と同じ内容）。
 
 ## ディレクトリ
 
