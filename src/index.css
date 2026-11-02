@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ========================================
    CSS Custom Properties — VSCode Dark Theme
@@ -30,6 +30,13 @@
   --accent-red: #f38ba8;
   --accent-purple: #cba6f7;
   --accent-teal: #94e2d5;
+  --accent-red-soft: rgba(243, 139, 168, 0.1);
+  --accent-red-soft-strong: rgba(243, 139, 168, 0.15);
+  --accent-blue-soft: rgba(137, 180, 250, 0.1);
+
+  /* Misc */
+  --app-bg: #1e1e2e;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.1);
 
   /* Tab */
   --tab-active-bg: #1e1e2e;
@@ -187,10 +194,18 @@ body {
 }
 
 /* インデントレベル別の背景色（スペース自体を着色） */
-.cm-indent-level-1 { background-color: rgba(243, 139, 168, 0.15); } /* 赤（薄く） */
-.cm-indent-level-2 { background-color: rgba(137, 180, 250, 0.15); } /* 青（薄く） */
-.cm-indent-level-3 { background-color: rgba(249, 226, 175, 0.15); } /* 黄（薄く） */
-.cm-indent-level-4 { background-color: rgba(166, 227, 161, 0.15); } /* 緑（薄く） */
+.cm-indent-level-1 {
+  background-color: rgba(243, 139, 168, 0.15);
+} /* 赤（薄く） */
+.cm-indent-level-2 {
+  background-color: rgba(137, 180, 250, 0.15);
+} /* 青（薄く） */
+.cm-indent-level-3 {
+  background-color: rgba(249, 226, 175, 0.15);
+} /* 黄（薄く） */
+.cm-indent-level-4 {
+  background-color: rgba(166, 227, 161, 0.15);
+} /* 緑（薄く） */
 
 /* ========================================
    Vaul Drawer overrides
@@ -351,23 +366,39 @@ body {
    Animations
    ======================================== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInLeft {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 @keyframes slideOutLeft {
-  from { transform: translateX(0); }
-  to { transform: translateX(-100%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .animate-fade-in {

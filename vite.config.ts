@@ -1,13 +1,40 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig, type Plugin } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { VitePWA } from 'vite-plugin-pwa';
+
+// 本番ビルドのみ CSP を埋め込む（dev では HMR のインラインスクリプトが必要なため付けない）
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  // React の style 属性と CodeMirror の動的スタイルのため inline を許可
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: https:",
+  "connect-src 'self' https://api.github.com",
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ');
+
+const cspPlugin = (): Plugin => ({
+  name: 'inject-csp',
+  apply: 'build',
+  transformIndexHtml: (html) =>
+    html.replace(
+      '<meta charset="UTF-8" />',
+      `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${CSP}" />`,
+    ),
+});
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/my_codereader/',
   plugins: [
     react(),
+    cspPlugin(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -54,7 +81,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.github\.com\/.*/i,
+            // PAT 付き（Authorization ヘッダあり）の応答はキャッシュしない
+            urlPattern: ({ url, request }) =>
+              url.origin === 'https://api.github.com' && !request.headers.has('Authorization'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'github-api-cache',
@@ -87,4 +116,4 @@ export default defineConfig({
       '@': '/src',
     },
   },
-})
+});
