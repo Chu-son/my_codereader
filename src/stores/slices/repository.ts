@@ -4,6 +4,7 @@ import { isAbortError, toErrorMessage } from '@/shared/lib/githubError';
 import { parseRepoInput, splitRepoFullName } from '@/shared/lib/urlParser';
 import { renewRepoSignal } from '../repoController';
 import type { SliceCreator } from '../types';
+import { STRINGS } from '@/shared/constants/strings';
 
 export interface RepositorySlice {
   currentRepo: string | null;
@@ -43,7 +44,7 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
     const parsed = parseRepoInput(repoInput);
     if (!parsed) {
       set({
-        treeError: '無効なリポジトリ形式です。owner/repo または GitHubのURLを入力してください。',
+        treeError: STRINGS.repository.invalidFormat,
       });
       return;
     }
@@ -101,7 +102,7 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
       if (isAbortError(error)) return;
       set({
         treeLoading: false,
-        treeError: toErrorMessage(error, 'リポジトリの読み込みに失敗しました'),
+        treeError: toErrorMessage(error, STRINGS.repository.loadFailed),
       });
     }
   },
@@ -156,7 +157,7 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
       if (isAbortError(error)) return;
       set({
         treeLoading: false,
-        treeError: toErrorMessage(error, 'ブランチの切り替えに失敗しました'),
+        treeError: toErrorMessage(error, STRINGS.repository.branchSwitchFailed),
       });
     }
   },

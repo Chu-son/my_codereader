@@ -1,6 +1,7 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { History, FolderGit2, Trash2, ArrowRight } from 'lucide-react';
+import { STRINGS } from '@/shared/constants/strings';
 
 export function RecentRepos() {
   const { recentRepos, loadRepository, removeRecentRepo } = useAppStore(
@@ -24,11 +25,10 @@ export function RecentRepos() {
           <FolderGit2 size={32} className="text-[var(--text-muted)]" />
         </div>
         <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-          My CodeReader にようこそ
+          {STRINGS.repository.welcomeTitle}
         </h2>
         <p className="text-sm max-w-md" style={{ color: 'var(--text-secondary)' }}>
-          ヘッダーの入力欄にGitHubリポジトリ（例:
-          facebook/react）を入力して、ソースコードの閲覧を開始してください。
+          {STRINGS.repository.welcomeBody}
         </p>
       </div>
     );
@@ -46,7 +46,7 @@ export function RecentRepos() {
         >
           <History size={24} className="text-[var(--accent-blue)]" />
           <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-            最近開いたリポジトリ
+            {STRINGS.repository.recent}
           </h2>
         </div>
 
@@ -97,7 +97,7 @@ export function RecentRepos() {
                   }}
                   className="p-2 rounded-lg transition-colors hover:bg-[var(--accent-red)] hover:text-white"
                   style={{ color: 'var(--text-muted)' }}
-                  title="履歴から削除"
+                  title={STRINGS.repository.removeFromHistory}
                 >
                   <Trash2 size={16} />
                 </button>

@@ -4,6 +4,7 @@ import { Search, FileCode, Loader2, AlertCircle } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getFileName } from '@/shared/lib/fileUtils';
+import { STRINGS } from '@/shared/constants/strings';
 
 export function SearchDrawer() {
   const {
@@ -77,7 +78,7 @@ export function SearchDrawer() {
               style={{ backgroundColor: 'var(--border-secondary)' }}
             />
           </div>
-          <Drawer.Title className="sr-only">検索</Drawer.Title>
+          <Drawer.Title className="sr-only">{STRINGS.common.search}</Drawer.Title>
 
           {/* 検索入力 */}
           <div className="px-4 pb-3">
@@ -92,7 +93,7 @@ export function SearchDrawer() {
                   type="text"
                   value={localQuery}
                   onChange={(e) => setLocalQuery(e.target.value)}
-                  placeholder="検索文字列を入力..."
+                  placeholder={STRINGS.search.placeholder}
                   className="w-full h-10 pl-9 pr-3 text-sm rounded-lg border outline-none transition-colors focus:border-[var(--accent-blue)]"
                   style={{
                     backgroundColor: 'var(--bg-surface)',
@@ -110,7 +111,11 @@ export function SearchDrawer() {
                   color: 'var(--bg-tertiary)',
                 }}
               >
-                {searchLoading ? <Loader2 size={16} className="animate-spin" /> : '検索'}
+                {searchLoading ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  STRINGS.common.search
+                )}
               </button>
             </form>
 
@@ -118,7 +123,7 @@ export function SearchDrawer() {
             {!pat && (
               <div className="flex items-center gap-1.5 mt-2 text-xs text-[var(--accent-yellow)]">
                 <AlertCircle size={12} />
-                <span>PAT未設定: ファイル名と開いているファイルのみ検索可能です</span>
+                <span>{STRINGS.search.patMissing}</span>
               </div>
             )}
           </div>
@@ -139,7 +144,7 @@ export function SearchDrawer() {
                   className="px-4 py-2 text-xs text-[var(--text-muted)] sticky top-0"
                   style={{ backgroundColor: 'var(--bg-secondary)' }}
                 >
-                  {searchResults.length}件の結果
+                  {STRINGS.search.resultCount(searchResults.length)}
                 </div>
 
                 {searchResults.map((result, i) => (
@@ -178,7 +183,7 @@ export function SearchDrawer() {
             ) : searchQuery && !searchLoading ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Search size={32} className="text-[var(--text-muted)] mb-3" />
-                <p className="text-sm text-[var(--text-muted)]">結果が見つかりませんでした</p>
+                <p className="text-sm text-[var(--text-muted)]">{STRINGS.search.noResults}</p>
               </div>
             ) : null}
           </div>

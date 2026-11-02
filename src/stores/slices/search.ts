@@ -7,6 +7,7 @@ import {
 } from '@/shared/lib/searchUtils';
 import { splitRepoFullName } from '@/shared/lib/urlParser';
 import type { SliceCreator } from '../types';
+import { STRINGS } from '@/shared/constants/strings';
 
 export interface SearchSlice {
   searchQuery: string;
@@ -32,7 +33,7 @@ export const createSearchSlice: SliceCreator<SearchSlice> = (set, get) => ({
         // 2. GitHub Search Code API使用
         try {
           const repoParts = splitRepoFullName(currentRepo);
-          if (!repoParts) throw new Error('リポジトリ形式が不正です');
+          if (!repoParts) throw new Error(STRINGS.repository.invalidRepoFormat);
           const items = await searchCode(repoParts.owner, repoParts.repo, query, pat);
           results = [...results, ...convertGitHubSearchResults(items)];
         } catch (apiError) {

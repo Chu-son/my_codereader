@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Eye, EyeOff, Shield, Trash2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
+import { STRINGS } from '@/shared/constants/strings';
 
 export function PatSection() {
   const { pat, settingsOpen, setPat } = useAppStore(
@@ -36,8 +37,7 @@ export function PatSection() {
       </div>
 
       <p className="text-xs text-[var(--text-muted)] mb-3 leading-relaxed">
-        PATを設定するとAPIレートリミットが60→5000回/時に増加し、
-        コード検索機能も利用できるようになります。 トークンはブラウザのlocalStorageに保存されます。
+        {STRINGS.settings.patDescription}
       </p>
 
       <div className="relative mb-3">
@@ -59,7 +59,7 @@ export function PatSection() {
           type="button"
           onClick={() => setShowPat(!showPat)}
           className="absolute right-2 top-1/2 -translate-y-1/2 touch-target"
-          aria-label={showPat ? 'トークンを隠す' : 'トークンを表示'}
+          aria-label={showPat ? STRINGS.settings.patHide : STRINGS.settings.patShow}
         >
           {showPat ? (
             <EyeOff size={16} className="text-[var(--text-muted)]" />
@@ -75,7 +75,7 @@ export function PatSection() {
           className="h-9 px-4 text-sm font-medium rounded-lg transition-colors"
           style={{ backgroundColor: 'var(--accent-blue)', color: 'var(--bg-tertiary)' }}
         >
-          保存
+          {STRINGS.common.save}
         </button>
         {pat && (
           <button
@@ -84,7 +84,7 @@ export function PatSection() {
             style={{ backgroundColor: 'var(--accent-red-soft-strong)', color: 'var(--accent-red)' }}
           >
             <Trash2 size={14} />
-            削除
+            {STRINGS.common.delete}
           </button>
         )}
       </div>

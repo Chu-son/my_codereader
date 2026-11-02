@@ -1,6 +1,7 @@
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { Bookmark as BookmarkIcon, Trash2, FileCode2 } from 'lucide-react';
+import { STRINGS } from '@/shared/constants/strings';
 
 const getBasename = (path: string) => path.split('/').pop() || path;
 
@@ -26,7 +27,7 @@ export function BookmarksList() {
         style={{ borderColor: 'var(--border-primary)' }}
       >
         <BookmarkIcon size={24} className="text-[var(--text-muted)]" />
-        <p className="text-xs text-[var(--text-muted)]">ブックマークはありません</p>
+        <p className="text-xs text-[var(--text-muted)]">{STRINGS.bookmarks.empty}</p>
       </div>
     );
   }
@@ -48,7 +49,7 @@ export function BookmarksList() {
           backgroundColor: 'var(--sidebar-bg)',
         }}
       >
-        ブックマーク
+        {STRINGS.bookmarks.title}
       </div>
       <div className="py-1">
         {repoBookmarks.map((bookmark) => (
@@ -71,7 +72,7 @@ export function BookmarksList() {
                   e.stopPropagation();
                   removeBookmark(bookmark.id);
                 }}
-                title="ブックマークを削除"
+                title={STRINGS.bookmarks.delete}
               >
                 <Trash2 size={14} />
               </button>

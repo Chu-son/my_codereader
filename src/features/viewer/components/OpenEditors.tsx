@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getFileIcon, getFileName } from '@/shared/lib/fileUtils';
+import { STRINGS } from '@/shared/constants/strings';
 
 export function OpenEditors() {
   const { openedFiles, activePane1FilePath, setActiveFile, closeFile } = useAppStore(
@@ -22,7 +23,7 @@ export function OpenEditors() {
         className="flex items-center px-3 h-8 text-[11px] font-semibold uppercase tracking-wider"
         style={{ color: 'var(--text-muted)' }}
       >
-        開いているエディタ
+        {STRINGS.viewer.openEditors}
       </div>
 
       {/* ファイルリスト */}

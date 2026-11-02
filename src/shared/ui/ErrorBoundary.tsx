@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { STRINGS } from '@/shared/constants/strings';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -28,14 +29,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return (
       <div role="alert" className="flex flex-col items-center justify-center gap-3 h-full p-6">
         <p className="text-sm text-[var(--text-primary)]">
-          {this.props.label ?? '画面'}の表示中に問題が発生しました
+          {STRINGS.app.boundaryMessage(this.props.label ?? STRINGS.app.boundaryDefault)}
         </p>
         <button
           onClick={() => this.setState({ failed: false })}
           className="h-9 px-4 text-sm font-medium rounded-lg"
           style={{ backgroundColor: 'var(--accent-blue)', color: 'var(--bg-tertiary)' }}
         >
-          再試行
+          {STRINGS.common.retry}
         </button>
       </div>
     );

@@ -10,6 +10,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { useEffect } from 'react';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
+import { STRINGS } from '@/shared/constants/strings';
 
 function App() {
   const { currentRepo, loadRepository } = useAppStore(
@@ -63,7 +64,7 @@ function App() {
 
         {/* メインエリア（分割対応） */}
         <main className="flex-1 overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
-          <ErrorBoundary label="メイン画面">
+          <ErrorBoundary label={STRINGS.app.boundaryMain}>
             {currentRepo ? <SplitPane /> : <RecentRepos />}
           </ErrorBoundary>
         </main>

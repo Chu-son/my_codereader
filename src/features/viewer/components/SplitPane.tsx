@@ -7,6 +7,7 @@ import { CodeViewer } from './CodeViewer';
 import { MarkdownPreview } from './MarkdownPreview';
 import { isMarkdownFile } from '@/shared/lib/fileUtils';
 import { FileCode, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { STRINGS } from '@/shared/constants/strings';
 
 interface PaneContentProps {
   pane: 1 | 2;
@@ -38,7 +39,9 @@ function PaneContent({ pane }: PaneContentProps) {
             <div className="h-full flex items-center justify-center">
               <div className="flex flex-col items-center gap-3">
                 <Loader2 size={24} className="animate-spin text-[var(--accent-blue)]" />
-                <span className="text-sm text-[var(--text-muted)]">ファイルを読み込み中...</span>
+                <span className="text-sm text-[var(--text-muted)]">
+                  {STRINGS.viewer.fileLoading}
+                </span>
               </div>
             </div>
           ) : activeFile.error ? (
@@ -52,7 +55,7 @@ function PaneContent({ pane }: PaneContentProps) {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">
-                    ファイルを読み込めませんでした
+                    {STRINGS.viewer.fileLoadFailedTitle}
                   </h3>
                   <p className="text-xs text-[var(--text-muted)] mb-4">{activeFile.error}</p>
                   <button
@@ -64,7 +67,7 @@ function PaneContent({ pane }: PaneContentProps) {
                     }}
                   >
                     <RefreshCw size={14} />
-                    再読み込み
+                    {STRINGS.viewer.reload}
                   </button>
                 </div>
               </div>
@@ -97,10 +100,8 @@ function EmptyState() {
           <FileCode size={28} className="text-[var(--text-muted)]" />
         </div>
         <div>
-          <p className="text-sm text-[var(--text-muted)] mb-1">ファイルが選択されていません</p>
-          <p className="text-xs text-[var(--text-muted)] opacity-60">
-            サイドバーのエクスプローラーからファイルを選択してください
-          </p>
+          <p className="text-sm text-[var(--text-muted)] mb-1">{STRINGS.viewer.noFileTitle}</p>
+          <p className="text-xs text-[var(--text-muted)] opacity-60">{STRINGS.viewer.noFileHint}</p>
         </div>
       </div>
     </div>

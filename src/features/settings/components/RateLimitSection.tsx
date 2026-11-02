@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAppStore } from '@/stores/useAppStore';
 import { fetchRateLimit } from '@/shared/lib/github';
 import { isAbortError } from '@/shared/lib/githubError';
+import { STRINGS } from '@/shared/constants/strings';
 
 const LOW_REMAINING_THRESHOLD = 10;
 
@@ -41,17 +42,21 @@ export function RateLimitSection() {
 
   return (
     <div className="border-t pt-4" style={{ borderColor: 'var(--border-primary)' }}>
-      <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3">API レートリミット</h3>
+      <h3 className="text-sm font-medium text-[var(--text-primary)] mb-3">
+        {STRINGS.settings.rateLimitTitle}
+      </h3>
 
       {loading ? (
         <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
           <div className="w-3 h-3 border border-[var(--accent-blue)] border-t-transparent rounded-full animate-spin" />
-          確認中...
+          {STRINGS.common.checking}
         </div>
       ) : rateLimit ? (
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-[var(--text-secondary)]">残り</span>
+            <span className="text-[var(--text-secondary)]">
+              {STRINGS.settings.rateLimitRemaining}
+            </span>
             <span
               className={
                 isLow
@@ -75,11 +80,12 @@ export function RateLimitSection() {
             />
           </div>
           <div className="text-xs text-[var(--text-muted)]">
-            リセット: {new Date(rateLimit.reset * 1000).toLocaleTimeString('ja-JP')}
+            {STRINGS.settings.rateLimitReset}:{' '}
+            {new Date(rateLimit.reset * 1000).toLocaleTimeString('ja-JP')}
           </div>
         </div>
       ) : (
-        <p className="text-xs text-[var(--text-muted)]">レートリミット情報を取得できませんでした</p>
+        <p className="text-xs text-[var(--text-muted)]">{STRINGS.settings.rateLimitUnavailable}</p>
       )}
     </div>
   );
