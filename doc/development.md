@@ -15,13 +15,17 @@ npm run dev     # 開発サーバー（--host 付き。LAN 内の iPad からも
 | --- | --- |
 | `npm run dev` | 開発サーバー (`vite --host`) |
 | `npm run build` | `tsc -b` による型チェック後に `vite build` |
+| `npm run typecheck` | 型チェックのみ |
 | `npm run lint` | ESLint |
+| `npm run format` / `format:check` | Prettier による整形 / 検査 |
+| `npm run test` / `test:coverage` | Vitest / カバレッジ付き |
+| `npm run check:bundle` | 初期 JS のバンドル予算を検査（`build` の後） |
 | `npm run preview` | ビルド成果物の確認（PWA / Service Worker の確認はこちら） |
 
 ## 変更後の確認
 
-1. `npm run lint`
-2. `npm run build`（型エラーがあるとデプロイも失敗する）
+1. `npm run format:check`・`npm run lint`・`npm run typecheck`・`npm run test`（CI と同じ内容）
+2. `npm run build` と `npm run check:bundle`（型エラーがあるとデプロイも失敗する）
 3. UI を変えた場合は `npm run dev` で、読込・ファイルを開く・分割表示・検索・ブックマーク・設定を手動確認する。
 4. タッチ操作に関わる変更は、iPad 実機または Safari のレスポンシブデザインモードで確認する。
 
