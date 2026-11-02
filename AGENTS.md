@@ -2,8 +2,6 @@
 
 GitHub CodeReader は、GitHub の公開リポジトリを iPad で快適に読むための PWA です（React 19 / TypeScript / Vite / Zustand / CodeMirror 6 / Tailwind v4）。
 
-> **重要**: `doc/` の規約は「目標状態」です。実装が未追従の箇所は [doc/migration.md](doc/migration.md) に一覧があります。新規コードは必ず規約に従い、既存コードを触るときは規約側に寄せてください。
-
 ## コマンド
 
 | 目的 | コマンド |
@@ -11,12 +9,13 @@ GitHub CodeReader は、GitHub の公開リポジトリを iPad で快適に読�
 | 開発サーバー | `npm run dev` （URL は `/my_codereader/` 配下） |
 | Lint | `npm run lint` |
 | 型チェック | `npm run typecheck` |
-| テスト | `npm run test` |
+| テスト | `npm run test` （カバレッジ付きは `npm run test:coverage`） |
 | 整形 | `npm run format` （CI は `format:check`） |
 | 型チェック + ビルド | `npm run build` （`tsc -b && vite build`） |
+| バンドル予算 | `npm run check:bundle` （`build` の後） |
 | ビルド確認 | `npm run preview` |
 
-変更を完了とする前に `npm run format:check`・`npm run lint`・`npm run typecheck`・`npm run test`・`npm run build` を必ず通すこと（CI と同じ内容）。
+変更を完了とする前に `npm run format:check`・`npm run lint`・`npm run typecheck`・`npm run test`・`npm run build`・`npm run check:bundle` を必ず通すこと（CI と同じ内容）。
 
 ## ディレクトリ
 
@@ -30,7 +29,7 @@ src/
 doc/                  設計・規約（目次: doc/README.md）
 ```
 
-目標構成は [doc/architecture.md](doc/architecture.md) を参照。
+構成の詳細は [doc/architecture.md](doc/architecture.md) を参照。
 
 ## 規約（要約）
 

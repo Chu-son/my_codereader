@@ -32,9 +32,11 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
       - name: Test
-        run: npm run test
+        run: npm run test:coverage
       - name: Build
         run: npm run build
+      - name: Bundle size budget
+        run: npm run check:bundle
       # 実行時の依存の脆弱性は High 以上で失敗させる
       - name: Audit (production)
         run: npm audit --omit=dev --audit-level=high

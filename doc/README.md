@@ -1,14 +1,13 @@
 # ドキュメント目次
 
-このディレクトリは **目標状態** の設計と規約を定義します。現状の実装との差分は [migration.md](migration.md) で管理します。
+このディレクトリは設計と規約を定義します。実装は規約に準拠しています。
 
 ## 設計
 
-- [architecture.md](architecture.md) — 構成・データフロー（目標と現状）
+- [architecture.md](architecture.md) — 構成・データフロー
 - [development.md](development.md) — セットアップ、実行、デプロイ、PWA 確認
 - [github-api.md](github-api.md) — 使用する API、制限、キャッシュ
 - [state-and-storage.md](state-and-storage.md) — 状態管理と永続化
-- [migration.md](migration.md) — 現状と規約の差分、是正チェックリスト
 
 ## 規約 (`conventions/`)
 

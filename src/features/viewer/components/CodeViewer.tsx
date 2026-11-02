@@ -6,7 +6,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getLanguageFromPath } from '@/shared/lib/fileUtils';
 import { indentGuideExtension } from '../lib/indentGuide';
-import { getLanguageExtension } from '../lib/languageExtension';
+import { useLanguageExtension } from '../hooks/useLanguageExtension';
 import { useJumpTarget } from '../hooks/useJumpTarget';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { SelectionSearchButton } from './SelectionSearchButton';
@@ -45,7 +45,7 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
   const [selection, setSelection] = useState<{ text: string; x: number; y: number } | null>(null);
 
   const language = getLanguageFromPath(filePath);
-  const langExtension = useMemo(() => getLanguageExtension(language), [language]);
+  const langExtension = useLanguageExtension(language);
 
   // 読み取り専用 + タッチ向けカスタム設定
   const readOnlyExt = useMemo(() => {

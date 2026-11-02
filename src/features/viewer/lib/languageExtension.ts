@@ -1,32 +1,25 @@
-import { javascript } from '@codemirror/lang-javascript';
-import { python } from '@codemirror/lang-python';
-import { java } from '@codemirror/lang-java';
-import { cpp } from '@codemirror/lang-cpp';
-import { go } from '@codemirror/lang-go';
-import { rust } from '@codemirror/lang-rust';
-import { html } from '@codemirror/lang-html';
-import { css } from '@codemirror/lang-css';
-import { json } from '@codemirror/lang-json';
-import { yaml } from '@codemirror/lang-yaml';
-import { markdown } from '@codemirror/lang-markdown';
+import type { Extension } from '@codemirror/state';
 
-const LANGUAGE_FACTORIES: Record<string, () => ReturnType<typeof javascript>> = {
-  javascript: () => javascript({ jsx: true, typescript: false }),
-  typescript: () => javascript({ jsx: true, typescript: true }),
-  python: () => python(),
-  java: () => java(),
-  cpp: () => cpp(),
-  go: () => go(),
-  rust: () => rust(),
-  html: () => html(),
-  css: () => css(),
-  json: () => json(),
-  yaml: () => yaml(),
-  markdown: () => markdown(),
+/** 言語パックは使われたときだけ読み込む（初期バンドルに含めない） */
+const LANGUAGE_LOADERS: Record<string, () => Promise<Extension>> = {
+  javascript: async () =>
+    (await import('@codemirror/lang-javascript')).javascript({ jsx: true, typescript: false }),
+  typescript: async () =>
+    (await import('@codemirror/lang-javascript')).javascript({ jsx: true, typescript: true }),
+  python: async () => (await import('@codemirror/lang-python')).python(),
+  java: async () => (await import('@codemirror/lang-java')).java(),
+  cpp: async () => (await import('@codemirror/lang-cpp')).cpp(),
+  go: async () => (await import('@codemirror/lang-go')).go(),
+  rust: async () => (await import('@codemirror/lang-rust')).rust(),
+  html: async () => (await import('@codemirror/lang-html')).html(),
+  css: async () => (await import('@codemirror/lang-css')).css(),
+  json: async () => (await import('@codemirror/lang-json')).json(),
+  yaml: async () => (await import('@codemirror/lang-yaml')).yaml(),
+  markdown: async () => (await import('@codemirror/lang-markdown')).markdown(),
 };
 
-/** 言語名から CodeMirror の言語拡張を返す。未対応の言語は空配列 */
-export function getLanguageExtension(lang: string | null) {
-  const factory = lang ? LANGUAGE_FACTORIES[lang] : undefined;
-  return factory ? [factory()] : [];
+/** 言語名から CodeMirror の言語拡張を読み込む。未対応の言語は空配列 */
+export async function loadLanguageExtension(lang: string | null): Promise<Extension[]> {
+  const loader = lang ? LANGUAGE_LOADERS[lang] : undefined;
+  return loader ? [await loader()] : [];
 }
