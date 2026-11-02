@@ -1,25 +1,9 @@
-import { useState } from 'react';
 import { X, Share, PlusSquare } from 'lucide-react';
+import { usePwaPrompt } from '../hooks/usePwaPrompt';
 import { STRINGS } from '@/shared/constants/strings';
 
-const DISMISSED_KEY = 'codereader:pwa-prompt-dismissed';
-
-// iOS の Safari かつ未インストールで、まだ閉じられていない場合のみ案内を表示する
-function shouldShowPrompt(): boolean {
-  const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-  const isStandalone =
-    'standalone' in window.navigator &&
-    (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
-  return isIos && !isStandalone && !localStorage.getItem(DISMISSED_KEY);
-}
-
 export function PwaInstallPrompt() {
-  const [showPrompt, setShowPrompt] = useState(shouldShowPrompt);
-
-  const handleDismiss = () => {
-    setShowPrompt(false);
-    localStorage.setItem(DISMISSED_KEY, 'true');
-  };
+  const { showPrompt, dismiss } = usePwaPrompt();
 
   if (!showPrompt) return null;
 
@@ -34,7 +18,7 @@ export function PwaInstallPrompt() {
         </p>
       </div>
       <button
-        onClick={handleDismiss}
+        onClick={dismiss}
         className="p-1.5 hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-zinc-100 transition-colors shrink-0"
         aria-label={STRINGS.common.close}
       >

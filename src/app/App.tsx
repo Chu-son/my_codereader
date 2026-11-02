@@ -1,12 +1,13 @@
 import './App.css';
 import { Header } from './components/Header';
+import { useShareTarget } from './hooks/useShareTarget';
 import { Sidebar } from '@/features/explorer';
 import { SplitPane } from '@/features/viewer';
 import { PwaInstallPrompt } from '@/features/pwa';
 import { RecentRepos } from '@/features/repository';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 import { STRINGS } from '@/shared/constants/strings';
 
@@ -27,31 +28,7 @@ function App() {
     })),
   );
 
-  // 保存されたリポジトリまたは共有されたURLを初回読み込み
-  useEffect(() => {
-    // クエリパラメータから共有されたURLを取得 (Web Share Target API)
-    const params = new URLSearchParams(window.location.search);
-    const sharedUrl = params.get('url') || params.get('text');
-
-    if (sharedUrl) {
-      // GitHubのURL（https://github.com/owner/repo...）から owner/repo を抽出
-      const match = sharedUrl.match(/github\.com\/([^/]+\/[^/]+)/);
-      if (match && match[1]) {
-        let repoName = match[1];
-        // 末尾の .git やスラッシュ以降を削除
-        const [owner = '', name = ''] = repoName.split('/');
-        repoName = `${owner}/${name.replace(/\.git$/, '')}`;
-
-        loadRepository(repoName);
-
-        // URLパラメータをクリアしてクリーンアップ
-        const newUrl = window.location.origin + window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-        return;
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useShareTarget(loadRepository);
 
   return (
     <div

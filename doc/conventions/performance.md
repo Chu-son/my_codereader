@@ -17,5 +17,5 @@
 ## 通信
 
 - 取得済みのファイル本文はセッション内でキャッシュして再取得しない。
-- 検索入力はデバウンスする。進行中のリクエストは中断する（`AbortController`）。
+- 検索は送信（Enter）で実行する。入力のたびに検索する UI にする場合はデバウンスする。新しい検索を始めたら、進行中のリクエストを中断する（`AbortController`）。結果は上限（`MAX_SEARCH_RESULTS`）で切る。
 - Service Worker は GitHub API の GET を NetworkFirst でキャッシュする。静的資産は precache する。

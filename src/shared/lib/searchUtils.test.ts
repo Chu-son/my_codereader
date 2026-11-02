@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { OpenedFile, TreeNode } from '@/shared/types';
-import { convertGitHubSearchResults, searchInCachedFiles, searchInTree } from './searchUtils';
+import {
+  MAX_SEARCH_RESULTS,
+  convertGitHubSearchResults,
+  searchInCachedFiles,
+  searchInTree,
+} from './searchUtils';
 
 const blob = (path: string): TreeNode => ({
   path,
@@ -40,9 +45,9 @@ describe('searchInTree', () => {
     expect(searchInTree('(', [blob('a(b).ts')])).toHaveLength(1);
   });
 
-  it('結果を 100 件までに制限する', () => {
-    const many = Array.from({ length: 150 }, (_, i) => blob(`f${i}.ts`));
-    expect(searchInTree('f', many)).toHaveLength(100);
+  it('結果を上限までに制限する', () => {
+    const many = Array.from({ length: MAX_SEARCH_RESULTS + 50 }, (_, i) => blob(`f${i}.ts`));
+    expect(searchInTree('f', many)).toHaveLength(MAX_SEARCH_RESULTS);
   });
 });
 

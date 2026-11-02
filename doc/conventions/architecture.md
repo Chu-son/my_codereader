@@ -11,7 +11,6 @@ src/
     <name>/
       components/ 機能固有の UI
       hooks/      機能固有のフック
-      store.ts    機能のスライス
       lib/        機能固有の純粋関数
       index.ts    公開 API
   shared/

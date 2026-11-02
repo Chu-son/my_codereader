@@ -81,7 +81,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.github\.com\/.*/i,
+            // PAT 付き（Authorization ヘッダあり）の応答はキャッシュしない
+            urlPattern: ({ url, request }) =>
+              url.origin === 'https://api.github.com' && !request.headers.has('Authorization'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'github-api-cache',

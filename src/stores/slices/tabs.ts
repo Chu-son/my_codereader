@@ -113,7 +113,6 @@ export const createTabsSlice: SliceCreator<TabsSlice> = (set, get) => ({
           f.path === path
             ? {
                 ...f,
-                content: `// Error loading file: ${message}`,
                 loading: false,
                 error: message,
               }

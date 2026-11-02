@@ -61,7 +61,8 @@ export const STRINGS = {
   search: {
     placeholder: '検索文字列を入力...',
     patMissing: 'PAT未設定: ファイル名と開いているファイルのみ検索可能です',
-    resultCount: (count: number) => `${count}件の結果`,
+    resultCount: (count: number, max: number) =>
+      count >= max ? `${count}件の結果(上限)` : `${count}件の結果`,
     noResults: '結果が見つかりませんでした',
   },
   bookmarks: {

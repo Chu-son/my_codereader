@@ -3,6 +3,9 @@ import type { SearchResult, OpenedFile, TreeNode } from '@/shared/types';
 /**
  * ツリー構造からファイル名で検索を行う
  */
+/** 一度に保持・表示する検索結果の上限（長大なリストで描画が重くなるのを防ぐ） */
+export const MAX_SEARCH_RESULTS = 200;
+
 export function searchInTree(query: string, nodes: TreeNode[]): SearchResult[] {
   if (!query.trim()) return [];
 
@@ -32,7 +35,7 @@ export function searchInTree(query: string, nodes: TreeNode[]): SearchResult[] {
         traverse(node.children);
       }
 
-      if (results.length >= 100) break;
+      if (results.length >= MAX_SEARCH_RESULTS) break;
     }
   };
 
@@ -71,7 +74,7 @@ export function searchInCachedFiles(query: string, openedFiles: OpenedFile[]): S
         });
 
         // 1ファイルから最大50件に制限
-        if (results.length >= 200) return results;
+        if (results.length >= MAX_SEARCH_RESULTS) return results;
       }
     }
   }

@@ -4,6 +4,7 @@ import { Search, FileCode, Loader2, AlertCircle } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getFileName } from '@/shared/lib/fileUtils';
+import { MAX_SEARCH_RESULTS } from '@/shared/lib/searchUtils';
 import { STRINGS } from '@/shared/constants/strings';
 
 export function SearchDrawer() {
@@ -144,7 +145,7 @@ export function SearchDrawer() {
                   className="px-4 py-2 text-xs text-[var(--text-muted)] sticky top-0"
                   style={{ backgroundColor: 'var(--bg-secondary)' }}
                 >
-                  {STRINGS.search.resultCount(searchResults.length)}
+                  {STRINGS.search.resultCount(searchResults.length, MAX_SEARCH_RESULTS)}
                 </div>
 
                 {searchResults.map((result, i) => (

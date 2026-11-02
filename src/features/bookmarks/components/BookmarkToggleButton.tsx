@@ -44,11 +44,7 @@ export function BookmarkToggleButton() {
       : null;
 
   const handleToggle = () => {
-    if (!activePath || !activeLine) {
-      alert(STRINGS.bookmarks.selectLine);
-      return;
-    }
-    if (!currentRepo || !currentBranch) return;
+    if (!activePath || !activeLine || !currentRepo || !currentBranch) return;
 
     if (currentBookmark) {
       removeBookmark(currentBookmark.id);
@@ -69,13 +65,15 @@ export function BookmarkToggleButton() {
     });
   };
 
+  const canToggle = Boolean(activePath && activeLine);
   const label = currentBookmark ? STRINGS.bookmarks.remove : STRINGS.bookmarks.add;
   return (
     <button
       id="bookmark-toggle"
       onClick={handleToggle}
-      className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
-      title={label}
+      className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-40"
+      disabled={!canToggle}
+      title={canToggle ? label : STRINGS.bookmarks.selectLine}
       aria-label={label}
     >
       <Bookmark
