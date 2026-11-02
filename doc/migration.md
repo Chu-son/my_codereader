@@ -22,8 +22,10 @@
 
 ## 3. テスト基盤
 
-- [ ] Vitest / Testing Library / MSW を導入し、`npm run test` を追加する
-- [ ] `urlParser`、`searchUtils`、`fileUtils` のテストを追加する
+- [x] Vitest / Testing Library / MSW を導入し、`npm run test` を追加する
+- [x] `urlParser`、`searchUtils`、`fileUtils`、`github`（MSW）のテストと、`PwaInstallPrompt` のコンポーネントテストを追加する
+- [ ] ストアのスライスと、残りのコンポーネントのテストを追加する
+- [ ] カバレッジ計測（`@vitest/coverage-v8`）を導入する
 
 ## 4. 不具合修正（優先度高）
 
