@@ -1,10 +1,13 @@
+import { lazy, Suspense } from 'react';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { FileTabs } from './FileTabs';
 import { CodeViewer } from './CodeViewer';
-import { MarkdownPreview } from './MarkdownPreview';
+const MarkdownPreview = lazy(() =>
+  import('./MarkdownPreview').then((m) => ({ default: m.MarkdownPreview })),
+);
 import { isMarkdownFile } from '@/shared/lib/fileUtils';
 import { FileCode, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { STRINGS } from '@/shared/constants/strings';
@@ -36,14 +39,7 @@ function PaneContent({ pane }: PaneContentProps) {
       <div className="flex-1 overflow-hidden">
         {activeFile ? (
           activeFile.loading ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 size={24} className="animate-spin text-[var(--accent-blue)]" />
-                <span className="text-sm text-[var(--text-muted)]">
-                  {STRINGS.viewer.fileLoading}
-                </span>
-              </div>
-            </div>
+            <LoadingState />
           ) : activeFile.error ? (
             <div className="h-full flex items-center justify-center">
               <div className="flex flex-col items-center gap-4 text-center px-8 max-w-md">
@@ -73,7 +69,9 @@ function PaneContent({ pane }: PaneContentProps) {
               </div>
             </div>
           ) : isMarkdownFile(activeFile.path) ? (
-            <MarkdownPreview content={activeFile.content} />
+            <Suspense fallback={<LoadingState />}>
+              <MarkdownPreview content={activeFile.content} />
+            </Suspense>
           ) : (
             <CodeViewer
               filePath={activeFile.path}
@@ -126,5 +124,16 @@ export function SplitPane() {
         <PaneContent pane={2} />
       </Allotment.Pane>
     </Allotment>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="h-full flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <Loader2 size={24} className="animate-spin text-[var(--accent-blue)]" />
+        <span className="text-sm text-[var(--text-muted)]">{STRINGS.viewer.fileLoading}</span>
+      </div>
+    </div>
   );
 }

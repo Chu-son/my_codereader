@@ -65,10 +65,10 @@
 - [ ] Markdown に `rehype-sanitize` を適用する
 - [ ] CSP を設定する
 - [ ] アイコンボタンの `aria-label`、ダイアログのフォーカストラップ、`role` 属性を整備する
-- [ ] CodeMirror 言語パックを動的 import にする
-- [ ] 検索・設定・Markdown を `React.lazy` にする
-- [ ] ファイルツリーを仮想化する
-- [ ] バンドルサイズの予算を CI に追加する
+- [x] CodeMirror 言語パックを動的 import にする
+- [x] 検索・設定・Markdown を `React.lazy` にする
+- [x] ファイルツリーを仮想化する
+- [x] バンドルサイズの予算を CI に追加する
 
 ## 9. 仕上げ
 

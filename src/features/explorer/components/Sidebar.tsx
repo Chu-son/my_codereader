@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { OpenEditors } from '@/features/viewer';
@@ -7,6 +8,7 @@ import { FolderGit2 } from 'lucide-react';
 import { STRINGS } from '@/shared/constants/strings';
 
 export function Sidebar() {
+  const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
   const { sidebarOpen, treeData, treeLoading, treeError, treeTruncated, currentRepo } = useAppStore(
     useShallow((s) => ({
       sidebarOpen: s.sidebarOpen,
@@ -56,7 +58,8 @@ export function Sidebar() {
 
         {/* Explorer セクション */}
         <div
-          className="flex-1 overflow-y-auto scroll-smooth"
+          ref={setScrollElement}
+          className="flex-1 overflow-y-auto relative"
           style={{
             overscrollBehaviorY: 'none',
             paddingBottom: 'calc(100px + env(safe-area-inset-bottom))',
@@ -105,7 +108,9 @@ export function Sidebar() {
           )}
 
           {/* ツリー */}
-          {!treeLoading && !treeError && treeData.length > 0 && <FileTree nodes={treeData} />}
+          {!treeLoading && !treeError && treeData.length > 0 && (
+            <FileTree nodes={treeData} scrollElement={scrollElement} />
+          )}
 
           {/* 空状態 */}
           {!treeLoading && !treeError && treeData.length === 0 && !currentRepo && (
