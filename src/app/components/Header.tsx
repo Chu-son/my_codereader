@@ -109,9 +109,7 @@ export function Header() {
         <button
           id="split-toggle"
           onClick={toggleSplitView}
-          className={`${ICON_BUTTON} ${
-            isSplitView ? 'text-[var(--accent-blue)]' : ICON_COLOR
-          }`}
+          className={`${ICON_BUTTON} ${isSplitView ? 'text-[var(--accent-blue)]' : ICON_COLOR}`}
           title={splitLabel}
           aria-label={splitLabel}
         >
