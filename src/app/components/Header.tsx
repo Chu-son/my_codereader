@@ -1,30 +1,23 @@
-// ========================================
-// Header Component
-// ========================================
-
-import { useState, type FormEvent } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
-  PanelLeftOpen,
-  PanelLeftClose,
   Columns2,
+  PanelLeftClose,
+  PanelLeftOpen,
   Rows2,
-  Settings,
   Search,
-  Loader2,
-  ArrowRight,
-  Bookmark,
-  X,
+  Settings,
 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { BranchSelector } from '@/features/repository';
+import { RepoSwitcher } from '@/features/repository';
+import { BookmarkToggleButton } from '@/features/bookmarks';
+
+const ICON_BUTTON = 'touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]';
+const ICON_COLOR = 'text-[var(--text-secondary)]';
 
 export function Header() {
   const {
-    currentRepo,
-    treeLoading,
     sidebarOpen,
     isSplitView,
     splitDirection,
@@ -34,21 +27,10 @@ export function Header() {
     toggleSplitView,
     setSettingsOpen,
     setSearchDrawerOpen,
-    loadRepository,
     navigateBack,
     navigateForward,
-    clearRepo,
-    activePane1FilePath,
-    activeCursorLines,
-    bookmarks,
-    addBookmark,
-    removeBookmark,
-    currentBranch,
-    openedFiles,
   } = useAppStore(
     useShallow((s) => ({
-      currentRepo: s.currentRepo,
-      treeLoading: s.treeLoading,
       sidebarOpen: s.sidebarOpen,
       isSplitView: s.isSplitView,
       splitDirection: s.splitDirection,
@@ -58,85 +40,13 @@ export function Header() {
       toggleSplitView: s.toggleSplitView,
       setSettingsOpen: s.setSettingsOpen,
       setSearchDrawerOpen: s.setSearchDrawerOpen,
-      loadRepository: s.loadRepository,
       navigateBack: s.navigateBack,
       navigateForward: s.navigateForward,
-      clearRepo: s.clearRepo,
-      activePane1FilePath: s.activePane1FilePath,
-      activeCursorLines: s.activeCursorLines,
-      bookmarks: s.bookmarks,
-      addBookmark: s.addBookmark,
-      removeBookmark: s.removeBookmark,
-      currentBranch: s.currentBranch,
-      openedFiles: s.openedFiles,
     })),
   );
 
-  const [repoInput, setRepoInput] = useState('');
-  const [showRepoInput, setShowRepoInput] = useState(!currentRepo);
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (repoInput.trim()) {
-      loadRepository(repoInput.trim());
-      setShowRepoInput(false);
-    }
-  };
-
-  const handleRepoClick = () => {
-    setRepoInput(currentRepo ?? '');
-    setShowRepoInput(true);
-  };
-
-  const handleChangeRepo = () => {
-    clearRepo();
-    setRepoInput('');
-    setShowRepoInput(true);
-  };
-
-  // ブックマークの状態判定とトグル処理
-  const activePath = activePane1FilePath;
-  const activeLine = activePath ? activeCursorLines[activePath] : null;
-
-  const currentBookmark =
-    activePath && activeLine && currentRepo
-      ? bookmarks.find(
-          (b) => b.repo === currentRepo && b.path === activePath && b.line === activeLine,
-        )
-      : null;
-
-  const handleToggleBookmark = () => {
-    if (!activePath || !activeLine) {
-      alert('ブックマークする行を選択してください');
-      return;
-    }
-    if (!currentRepo || !currentBranch) return;
-
-    if (currentBookmark) {
-      removeBookmark(currentBookmark.id);
-    } else {
-      // 対象行のテキストを少し取得してプレビューにする（該当ファイルのcontentから抽出）
-      const file = openedFiles.find((f) => f.path === activePath);
-      let text = '';
-      if (file && file.content) {
-        const lines = file.content.split('\n');
-        text = lines[activeLine - 1]?.trim() || '';
-        if (text.length > 50) text = text.substring(0, 50) + '...';
-      }
-
-      addBookmark({
-        id:
-          typeof crypto !== 'undefined' && crypto.randomUUID
-            ? crypto.randomUUID()
-            : Date.now().toString(36) + Math.random().toString(36).substr(2),
-        repo: currentRepo,
-        branch: currentBranch,
-        path: activePath,
-        line: activeLine,
-        text,
-      });
-    }
-  };
+  const sidebarLabel = sidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く';
+  const splitLabel = isSplitView ? '分割方向を切り替え / 分割を解除' : '画面を分割';
 
   return (
     <header
@@ -148,167 +58,73 @@ export function Header() {
         borderColor: 'var(--border-primary)',
       }}
     >
-      {/* サイドバートグル */}
       <button
         id="sidebar-toggle"
         onClick={toggleSidebar}
-        className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
-        title={sidebarOpen ? 'サイドバーを閉じる' : 'サイドバーを開く'}
+        className={ICON_BUTTON}
+        title={sidebarLabel}
+        aria-label={sidebarLabel}
       >
         {sidebarOpen ? (
-          <PanelLeftClose size={18} className="text-[var(--text-secondary)]" />
+          <PanelLeftClose size={18} className={ICON_COLOR} />
         ) : (
-          <PanelLeftOpen size={18} className="text-[var(--text-secondary)]" />
+          <PanelLeftOpen size={18} className={ICON_COLOR} />
         )}
       </button>
 
-      {/* 戻る / 進む */}
       <button
         id="nav-back"
         onClick={navigateBack}
         disabled={navigationIndex <= 0}
-        className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-30"
+        className={`${ICON_BUTTON} disabled:opacity-30`}
+        aria-label="戻る"
       >
-        <ChevronLeft size={18} className="text-[var(--text-secondary)]" />
+        <ChevronLeft size={18} className={ICON_COLOR} />
       </button>
       <button
         id="nav-forward"
         onClick={navigateForward}
         disabled={navigationIndex >= navigationHistory.length - 1}
-        className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-30"
+        className={`${ICON_BUTTON} disabled:opacity-30`}
+        aria-label="進む"
       >
-        <ChevronRight size={18} className="text-[var(--text-secondary)]" />
+        <ChevronRight size={18} className={ICON_COLOR} />
       </button>
 
-      {/* リポジトリ名 or 入力フォーム */}
       <div className="flex-1 min-w-0 mx-2">
-        {showRepoInput || !currentRepo ? (
-          <form onSubmit={handleSubmit} className="flex gap-2 w-full">
-            <div className="relative flex-1">
-              <input
-                id="repo-input"
-                type="text"
-                value={repoInput}
-                onChange={(e) => setRepoInput(e.target.value)}
-                placeholder="owner/repo (例: facebook/react)"
-                className="w-full h-8 pl-3 pr-8 text-sm rounded-md border outline-none transition-colors"
-                style={{
-                  backgroundColor: 'var(--bg-surface)',
-                  borderColor: 'var(--border-primary)',
-                  color: 'var(--text-primary)',
-                }}
-                autoFocus
-              />
-              {repoInput && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRepoInput('');
-                    document.getElementById('repo-input')?.focus();
-                  }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
-                  title="クリア"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-            <button
-              type="submit"
-              disabled={!repoInput.trim() || treeLoading}
-              className="touch-target rounded-md transition-colors disabled:opacity-40"
-              style={{
-                backgroundColor: 'var(--accent-blue)',
-                color: 'var(--bg-tertiary)',
-              }}
-            >
-              {treeLoading ? (
-                <Loader2 size={18} className="animate-spin" />
-              ) : (
-                <ArrowRight size={18} />
-              )}
-            </button>
-            {currentRepo && (
-              <button
-                type="button"
-                onClick={() => setShowRepoInput(false)}
-                className="h-8 px-3 text-sm rounded-md transition-colors"
-                style={{
-                  backgroundColor: 'var(--bg-hover)',
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                キャンセル
-              </button>
-            )}
-          </form>
-        ) : (
-          <div id="repo-display-container" className="flex items-center gap-1 h-8 max-w-full">
-            {treeLoading && (
-              <Loader2 size={14} className="animate-spin text-[var(--accent-blue)]" />
-            )}
-            <button
-              id="repo-name-btn"
-              onClick={handleRepoClick}
-              onDoubleClick={handleChangeRepo}
-              className="flex items-center px-2 h-full rounded-md transition-colors hover:bg-[var(--bg-hover)] text-sm font-medium text-[var(--text-primary)] truncate-text"
-            >
-              {currentRepo}
-            </button>
-            <BranchSelector />
-          </div>
-        )}
+        <RepoSwitcher />
       </div>
 
-      {/* 右側ボタン群 */}
       <div className="flex items-center gap-0.5">
-        {/* ブックマークボタン */}
-        <button
-          id="bookmark-toggle"
-          onClick={handleToggleBookmark}
-          className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
-          title={currentBookmark ? 'ブックマークを解除' : 'ブックマークを追加'}
-        >
-          <Bookmark
-            size={18}
-            className={
-              currentBookmark
-                ? 'text-[var(--accent-blue)] fill-current'
-                : 'text-[var(--text-secondary)]'
-            }
-          />
-        </button>
-
-        {/* 検索ボタン */}
+        <BookmarkToggleButton />
         <button
           id="search-toggle"
           onClick={() => setSearchDrawerOpen(true)}
-          className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
+          className={ICON_BUTTON}
           title="検索"
+          aria-label="検索"
         >
-          <Search size={18} className="text-[var(--text-secondary)]" />
+          <Search size={18} className={ICON_COLOR} />
         </button>
-
-        {/* 画面分割トグル */}
         <button
           id="split-toggle"
           onClick={toggleSplitView}
-          className={`touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)] ${
-            isSplitView ? 'text-[var(--accent-blue)]' : 'text-[var(--text-secondary)]'
+          className={`${ICON_BUTTON} ${
+            isSplitView ? 'text-[var(--accent-blue)]' : ICON_COLOR
           }`}
-          title={isSplitView ? '分割方向を切り替え / 分割を解除' : '画面を分割'}
+          title={splitLabel}
+          aria-label={splitLabel}
         >
           {splitDirection === 'vertical' ? <Rows2 size={18} /> : <Columns2 size={18} />}
         </button>
-
-        {/* 設定ボタン */}
         <button
           id="settings-toggle"
           onClick={() => setSettingsOpen(true)}
-          className="touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]"
+          className={ICON_BUTTON}
           title="設定"
+          aria-label="設定"
         >
-          <Settings size={18} className="text-[var(--text-secondary)]" />
+          <Settings size={18} className={ICON_COLOR} />
         </button>
       </div>
     </header>
