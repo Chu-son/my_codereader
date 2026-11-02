@@ -2,10 +2,10 @@
 
 ## CI
 
-| ワークフロー | トリガー | 内容 |
-| --- | --- | --- |
-| `ci.yml` | PR / `develop` への push | `npm ci` → `format:check` → `lint` → `typecheck` → `test` → `build` → `check:bundle`（エントリ gzip 150KB）→ `npm audit --omit=dev --audit-level=high` |
-| `deploy.yml` | `main` への push / 手動 | ビルドして GitHub Pages へデプロイ |
+| ワークフロー | トリガー                 | 内容                                                                                                                                                                   |
+| ------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`     | PR / `develop` への push | `npm ci` → `format:check` → `lint` → `typecheck` → `test` → `build` → `check:bundle`（エントリ 初期 JS の gzip 合計 300KB）→ `npm audit --omit=dev --audit-level=high` |
+| `deploy.yml` | `main` への push / 手動  | ビルドして GitHub Pages へデプロイ                                                                                                                                     |
 
 - `npm audit` は、実行時の依存（`--omit=dev`）の High 以上で失敗させる。開発専用の依存は失敗させず、情報として表示する。
 - すべてのチェックが成功しない限り、PR をマージしない（ブランチ保護で強制する）。
