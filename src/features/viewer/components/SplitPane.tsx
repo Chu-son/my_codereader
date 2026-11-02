@@ -6,10 +6,10 @@ import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { FileTabs } from '@/components/FileTabs';
-import { CodeViewer } from '@/components/CodeViewer';
-import { MarkdownPreview } from '@/components/MarkdownPreview';
-import { isMarkdownFile } from '@/lib/fileUtils';
+import { FileTabs } from './FileTabs';
+import { CodeViewer } from './CodeViewer';
+import { MarkdownPreview } from './MarkdownPreview';
+import { isMarkdownFile } from '@/shared/lib/fileUtils';
 import { FileCode, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface PaneContentProps {

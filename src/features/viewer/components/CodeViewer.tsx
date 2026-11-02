@@ -7,7 +7,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView } from '@codemirror/view';
 import { Search } from 'lucide-react';
-import { indentGuideExtension } from '@/lib/indentGuide';
+import { indentGuideExtension } from '../lib/indentGuide';
 
 // Language imports
 import { javascript } from '@codemirror/lang-javascript';
@@ -24,7 +24,7 @@ import { markdown } from '@codemirror/lang-markdown';
 
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { getLanguageFromPath } from '@/lib/fileUtils';
+import { getLanguageFromPath } from '@/shared/lib/fileUtils';
 
 interface CodeViewerProps {
   filePath: string;

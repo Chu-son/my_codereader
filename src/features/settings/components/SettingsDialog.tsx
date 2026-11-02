@@ -6,8 +6,8 @@ import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, Shield, Trash2, Type, WrapText, AlignLeft, RotateCcw } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { fetchRateLimit } from '@/lib/github';
-import { isAbortError } from '@/lib/githubError';
+import { fetchRateLimit } from '@/shared/lib/github';
+import { isAbortError } from '@/shared/lib/githubError';
 
 export function SettingsDialog() {
   const {

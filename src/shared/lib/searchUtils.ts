@@ -2,7 +2,7 @@
 // Client-side Search Utilities
 // ========================================
 
-import type { SearchResult, OpenedFile, TreeNode } from '@/types';
+import type { SearchResult, OpenedFile, TreeNode } from '@/shared/types';
 
 /**
  * ツリー構造からファイル名で検索を行う

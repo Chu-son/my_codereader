@@ -5,7 +5,7 @@
 import { X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { getFileIcon, getFileName } from '@/lib/fileUtils';
+import { getFileIcon, getFileName } from '@/shared/lib/fileUtils';
 
 export function OpenEditors() {
   const { openedFiles, activePane1FilePath, setActiveFile, closeFile } = useAppStore(

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { OpenedFile, TreeNode } from '@/types';
+import type { OpenedFile, TreeNode } from '@/shared/types';
 import { convertGitHubSearchResults, searchInCachedFiles, searchInTree } from './searchUtils';
 
 const blob = (path: string): TreeNode => ({

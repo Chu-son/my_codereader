@@ -3,13 +3,13 @@
 // ========================================
 
 import './App.css';
-import { Header } from '@/components/Header';
-import { Sidebar } from '@/components/Sidebar';
-import { SplitPane } from '@/components/SplitPane';
-import { SearchDrawer } from '@/components/SearchDrawer';
-import { SettingsDialog } from '@/components/SettingsDialog';
-import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
-import { RecentRepos } from '@/components/RecentRepos';
+import { Header } from './components/Header';
+import { Sidebar } from '@/features/explorer';
+import { SplitPane } from '@/features/viewer';
+import { SearchDrawer } from '@/features/search';
+import { SettingsDialog } from '@/features/settings';
+import { PwaInstallPrompt } from '@/features/pwa';
+import { RecentRepos } from '@/features/repository';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { useEffect } from 'react';

@@ -6,7 +6,7 @@ import { useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { getFileIcon, getFileName } from '@/lib/fileUtils';
+import { getFileIcon, getFileName } from '@/shared/lib/fileUtils';
 
 interface FileTabsProps {
   pane: 1 | 2;

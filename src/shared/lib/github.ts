@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { GitHubTreeItem, TreeNode, RepoInfo } from '@/types';
+import type { GitHubTreeItem, TreeNode, RepoInfo } from '@/shared/types';
 import { GitHubError } from './githubError';
 
 const API_BASE = 'https://api.github.com';

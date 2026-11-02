@@ -4,10 +4,10 @@
 
 import { createElement, useCallback } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react';
-import type { TreeNode } from '@/types';
+import type { TreeNode } from '@/shared/types';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { getFileIcon, isBinaryFile } from '@/lib/fileUtils';
+import { getFileIcon, isBinaryFile } from '@/shared/lib/fileUtils';
 
 interface FileTreeProps {
   nodes: TreeNode[];

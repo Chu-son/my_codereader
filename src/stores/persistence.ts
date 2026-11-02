@@ -1,5 +1,5 @@
 import type { StateStorage } from 'zustand/middleware';
-import type { Bookmark } from '@/types';
+import type { Bookmark } from '@/shared/types';
 
 /** 永続化する項目（ユーザー設定とユーザーデータのみ。本文・ツリー・検索結果は含めない） */
 export interface PersistedState {

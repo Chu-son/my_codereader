@@ -7,7 +7,7 @@ import { Drawer } from 'vaul';
 import { Search, FileCode, Loader2, AlertCircle } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { getFileName } from '@/lib/fileUtils';
+import { getFileName } from '@/shared/lib/fileUtils';
 
 export function SearchDrawer() {
   const {

@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { BranchSelector } from '@/components/BranchSelector';
+import { BranchSelector } from '@/features/repository';
 
 export function Header() {
   const {

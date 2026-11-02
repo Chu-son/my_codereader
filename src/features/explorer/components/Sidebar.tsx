@@ -4,9 +4,9 @@
 
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
-import { OpenEditors } from '@/components/OpenEditors';
-import { BookmarksList } from '@/components/BookmarksList';
-import { FileTree } from '@/components/FileTree';
+import { OpenEditors } from '@/features/viewer';
+import { BookmarksList } from '@/features/bookmarks';
+import { FileTree } from './FileTree';
 import { FolderGit2 } from 'lucide-react';
 
 export function Sidebar() {
