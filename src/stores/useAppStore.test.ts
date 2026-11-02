@@ -7,6 +7,27 @@ describe('useAppStore の永続化', () => {
   beforeEach(() => {
     useAppStore.setState(useAppStore.getInitialState(), true);
     localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  it('PAT は既定で sessionStorage のみに保存され、localStorage には残らない', () => {
+    useAppStore.getState().setPat('ghp_x');
+    expect(sessionStorage.getItem('codereader:pat')).toBe('ghp_x');
+    expect(localStorage.getItem('codereader:app')).not.toContain('ghp_x');
+  });
+
+  it('「保存する」を選んだ PAT だけ localStorage に保存される', () => {
+    useAppStore.getState().setPat('ghp_x', true);
+    expect(localStorage.getItem('codereader:app')).toContain('ghp_x');
+    useAppStore.getState().setPat(null);
+    expect(localStorage.getItem('codereader:app')).not.toContain('ghp_x');
+    expect(sessionStorage.getItem('codereader:pat')).toBeNull();
+  });
+
+  it('再読み込み時に sessionStorage の PAT を復元する', async () => {
+    sessionStorage.setItem('codereader:pat', 'ghp_s');
+    await useAppStore.persist.rehydrate();
+    expect(useAppStore.getState().pat).toBe('ghp_s');
   });
 
   it('保存されるのは許可リストの項目だけで、本文・ツリーは含まれない', () => {
@@ -20,7 +41,7 @@ describe('useAppStore の永続化', () => {
     const raw = localStorage.getItem('codereader:app');
     expect(raw).not.toBeNull();
     const saved = JSON.parse(raw ?? '{}');
-    expect(saved.version).toBe(1);
+    expect(saved.version).toBe(2);
     expect(saved.state.fontSize).toBe(16);
     expect(saved.state).not.toHaveProperty('treeData');
     expect(saved.state).not.toHaveProperty('openedFiles');

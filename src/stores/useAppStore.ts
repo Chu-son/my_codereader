@@ -12,6 +12,7 @@ import {
   storage,
   migratePersistedState,
   partializeState,
+  sessionPat,
   type PersistedState,
 } from './persistence';
 import type { AppState } from './types';
@@ -34,6 +35,11 @@ export const useAppStore = create<AppState>()(
       version: PERSIST_VERSION,
       partialize: partializeState,
       migrate: migratePersistedState,
+      // localStorage に PAT が無ければ、同一タブの sessionStorage から復元する
+      merge: (persisted, current) => {
+        const saved = persisted as Partial<PersistedState> | undefined;
+        return { ...current, ...saved, pat: saved?.pat ?? sessionPat.read() };
+      },
     },
   ),
 );

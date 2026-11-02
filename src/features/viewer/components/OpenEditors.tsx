@@ -48,6 +48,7 @@ export function OpenEditors() {
                   e.stopPropagation();
                   closeFile(file.path);
                 }}
+                aria-label={STRINGS.viewer.closeFile(file.path)}
                 className="w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-[var(--bg-active)] transition-opacity shrink-0"
               >
                 <X size={14} className="text-[var(--text-muted)]" />
