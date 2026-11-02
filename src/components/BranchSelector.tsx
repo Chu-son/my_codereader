@@ -4,10 +4,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { GitBranch, Check, ChevronDown, Loader2 } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 
 export function BranchSelector() {
-  const { currentBranch, branches, branchesLoading, switchBranch } = useAppStore();
+  const { currentBranch, branches, branchesLoading, switchBranch } = useAppStore(
+    useShallow((s) => ({
+      currentBranch: s.currentBranch,
+      branches: s.branches,
+      branchesLoading: s.branchesLoading,
+      switchBranch: s.switchBranch,
+    })),
+  );
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

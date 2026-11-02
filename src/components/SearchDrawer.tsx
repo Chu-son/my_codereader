@@ -5,6 +5,7 @@
 import { useState, type FormEvent, useEffect, useRef } from 'react';
 import { Drawer } from 'vaul';
 import { Search, FileCode, Loader2, AlertCircle } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getFileName } from '@/lib/fileUtils';
 
@@ -18,7 +19,18 @@ export function SearchDrawer() {
     setSearchDrawerOpen,
     searchInRepo,
     openFile,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      searchDrawerOpen: s.searchDrawerOpen,
+      searchQuery: s.searchQuery,
+      searchResults: s.searchResults,
+      searchLoading: s.searchLoading,
+      pat: s.pat,
+      setSearchDrawerOpen: s.setSearchDrawerOpen,
+      searchInRepo: s.searchInRepo,
+      openFile: s.openFile,
+    })),
+  );
 
   const [localQuery, setLocalQuery] = useState(searchQuery);
   const inputRef = useRef<HTMLInputElement>(null);

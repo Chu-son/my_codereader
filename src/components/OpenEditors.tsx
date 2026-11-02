@@ -3,11 +3,19 @@
 // ========================================
 
 import { X } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getFileIcon, getFileName } from '@/lib/fileUtils';
 
 export function OpenEditors() {
-  const { openedFiles, activePane1FilePath, setActiveFile, closeFile } = useAppStore();
+  const { openedFiles, activePane1FilePath, setActiveFile, closeFile } = useAppStore(
+    useShallow((s) => ({
+      openedFiles: s.openedFiles,
+      activePane1FilePath: s.activePane1FilePath,
+      setActiveFile: s.setActiveFile,
+      closeFile: s.closeFile,
+    })),
+  );
 
   if (openedFiles.length === 0) return null;
 

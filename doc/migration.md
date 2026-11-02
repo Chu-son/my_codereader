@@ -46,9 +46,9 @@
 
 ## 6. ストア分割
 
-- [ ] 単一ストア (`useAppStore.ts`, 約 580 行) をスライスに分割する
-- [ ] 全コンポーネントをセレクタ購読 (`useShallow`) に置き換える
-- [ ] localStorage キーを `codereader:<domain>` 形式に統一する
+- [x] 単一ストア (`useAppStore.ts`, 約 580 行) をスライスに分割する
+- [x] 全コンポーネントをセレクタ購読 (`useShallow`) に置き換える
+- [x] localStorage キーを `codereader:<domain>` 形式に統一する
 
 ## 7. 構成変更
 

@@ -24,7 +24,7 @@ GitHub CodeReader は、GitHub の公開リポジトリを iPad で快適に読�
 src/
   App.tsx, main.tsx   エントリ
   components/         UI コンポーネント（目標: features/ へ移行）
-  stores/             Zustand ストア（目標: スライス分割）
+  stores/             Zustand ストア（slices/ にスライス分割）
   lib/                GitHub API・純粋関数
   types/              型定義
 doc/                  設計・規約（目次: doc/README.md）

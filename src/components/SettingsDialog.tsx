@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, Shield, Trash2, Type, WrapText, AlignLeft, RotateCcw } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { fetchRateLimit } from '@/lib/github';
 import { isAbortError } from '@/lib/githubError';
@@ -22,7 +23,22 @@ export function SettingsDialog() {
     setShowIndentGuides,
     setFontSize,
     setLineHeight,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      settingsOpen: s.settingsOpen,
+      pat: s.pat,
+      wordWrap: s.wordWrap,
+      showIndentGuides: s.showIndentGuides,
+      fontSize: s.fontSize,
+      lineHeight: s.lineHeight,
+      setSettingsOpen: s.setSettingsOpen,
+      setPat: s.setPat,
+      setWordWrap: s.setWordWrap,
+      setShowIndentGuides: s.setShowIndentGuides,
+      setFontSize: s.setFontSize,
+      setLineHeight: s.setLineHeight,
+    })),
+  );
 
   const [localPat, setLocalPat] = useState(pat ?? '');
   const [showPat, setShowPat] = useState(false);

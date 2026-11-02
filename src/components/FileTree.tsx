@@ -5,6 +5,7 @@
 import { createElement, useCallback } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react';
 import type { TreeNode } from '@/types';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getFileIcon, isBinaryFile } from '@/lib/fileUtils';
 
@@ -14,7 +15,14 @@ interface FileTreeProps {
 }
 
 export function FileTree({ nodes, depth = 0 }: FileTreeProps) {
-  const { expandedDirs, activePane1FilePath, toggleDir, openFile } = useAppStore();
+  const { expandedDirs, activePane1FilePath, toggleDir, openFile } = useAppStore(
+    useShallow((s) => ({
+      expandedDirs: s.expandedDirs,
+      activePane1FilePath: s.activePane1FilePath,
+      toggleDir: s.toggleDir,
+      openFile: s.openFile,
+    })),
+  );
 
   return (
     <div className="select-none">

@@ -1,8 +1,15 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { History, FolderGit2, Trash2, ArrowRight } from 'lucide-react';
 
 export function RecentRepos() {
-  const { recentRepos, loadRepository, removeRecentRepo } = useAppStore();
+  const { recentRepos, loadRepository, removeRecentRepo } = useAppStore(
+    useShallow((s) => ({
+      recentRepos: s.recentRepos,
+      loadRepository: s.loadRepository,
+      removeRecentRepo: s.removeRecentRepo,
+    })),
+  );
 
   if (recentRepos.length === 0) {
     return (

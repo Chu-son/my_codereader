@@ -1,10 +1,19 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { Bookmark as BookmarkIcon, Trash2, FileCode2 } from 'lucide-react';
 
 const getBasename = (path: string) => path.split('/').pop() || path;
 
 export function BookmarksList() {
-  const { bookmarks, currentRepo, removeBookmark, openFile, requestJump } = useAppStore();
+  const { bookmarks, currentRepo, removeBookmark, openFile, requestJump } = useAppStore(
+    useShallow((s) => ({
+      bookmarks: s.bookmarks,
+      currentRepo: s.currentRepo,
+      removeBookmark: s.removeBookmark,
+      openFile: s.openFile,
+      requestJump: s.requestJump,
+    })),
+  );
 
   if (!currentRepo) return null;
 

@@ -17,6 +17,7 @@ import {
   Bookmark,
   X,
 } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { BranchSelector } from '@/components/BranchSelector';
 
@@ -44,7 +45,32 @@ export function Header() {
     removeBookmark,
     currentBranch,
     openedFiles,
-  } = useAppStore();
+  } = useAppStore(
+    useShallow((s) => ({
+      currentRepo: s.currentRepo,
+      treeLoading: s.treeLoading,
+      sidebarOpen: s.sidebarOpen,
+      isSplitView: s.isSplitView,
+      splitDirection: s.splitDirection,
+      navigationIndex: s.navigationIndex,
+      navigationHistory: s.navigationHistory,
+      toggleSidebar: s.toggleSidebar,
+      toggleSplitView: s.toggleSplitView,
+      setSettingsOpen: s.setSettingsOpen,
+      setSearchDrawerOpen: s.setSearchDrawerOpen,
+      loadRepository: s.loadRepository,
+      navigateBack: s.navigateBack,
+      navigateForward: s.navigateForward,
+      clearRepo: s.clearRepo,
+      activePane1FilePath: s.activePane1FilePath,
+      activeCursorLines: s.activeCursorLines,
+      bookmarks: s.bookmarks,
+      addBookmark: s.addBookmark,
+      removeBookmark: s.removeBookmark,
+      currentBranch: s.currentBranch,
+      openedFiles: s.openedFiles,
+    })),
+  );
 
   const [repoInput, setRepoInput] = useState('');
   const [showRepoInput, setShowRepoInput] = useState(!currentRepo);

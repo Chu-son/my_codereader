@@ -4,6 +4,7 @@
 
 import { useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getFileIcon, getFileName } from '@/lib/fileUtils';
 
@@ -13,7 +14,15 @@ interface FileTabsProps {
 
 export function FileTabs({ pane }: FileTabsProps) {
   const { openedFiles, activePane1FilePath, activePane2FilePath, setActiveFile, closeFile } =
-    useAppStore();
+    useAppStore(
+      useShallow((s) => ({
+        openedFiles: s.openedFiles,
+        activePane1FilePath: s.activePane1FilePath,
+        activePane2FilePath: s.activePane2FilePath,
+        setActiveFile: s.setActiveFile,
+        closeFile: s.closeFile,
+      })),
+    );
 
   const activeFilePath = pane === 1 ? activePane1FilePath : activePane2FilePath;
 

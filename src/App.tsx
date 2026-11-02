@@ -10,11 +10,14 @@ import { SearchDrawer } from '@/components/SearchDrawer';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { PwaInstallPrompt } from '@/components/PwaInstallPrompt';
 import { RecentRepos } from '@/components/RecentRepos';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { useEffect } from 'react';
 
 function App() {
-  const { currentRepo, loadRepository } = useAppStore();
+  const { currentRepo, loadRepository } = useAppStore(
+    useShallow((s) => ({ currentRepo: s.currentRepo, loadRepository: s.loadRepository })),
+  );
 
   // 保存されたリポジトリまたは共有されたURLを初回読み込み
   useEffect(() => {

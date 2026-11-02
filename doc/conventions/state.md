@@ -22,7 +22,7 @@
 - `version` と `migrate` を必ず設定する。永続化する形を変えたら `version` を上げ、旧データを移行する。
 - 永続化してよいのは「ユーザー設定」と「ユーザーデータ」のみ。ファイル本文、ツリー、検索結果、通信状態は禁止。
 - `partialize` / `persist` のオプションに型アサーションを使わない（型エラーはそのまま直す）。
-- localStorage のキーは `codereader:<domain>` 形式にする（例: `codereader:settings`）。
+- localStorage のキーは `codereader:<domain>` 形式にする（例: `codereader:app`）。
 - PAT の保存先は [security.md](security.md) に従う。
 
 ## 非同期
