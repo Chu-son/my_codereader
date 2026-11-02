@@ -1,7 +1,11 @@
-import type { SearchResult } from '@/types';
-import { searchCode } from '@/lib/github';
-import { convertGitHubSearchResults, searchInCachedFiles, searchInTree } from '@/lib/searchUtils';
-import { splitRepoFullName } from '@/lib/urlParser';
+import type { SearchResult } from '@/shared/types';
+import { searchCode } from '@/shared/lib/github';
+import {
+  convertGitHubSearchResults,
+  searchInCachedFiles,
+  searchInTree,
+} from '@/shared/lib/searchUtils';
+import { splitRepoFullName } from '@/shared/lib/urlParser';
 import type { SliceCreator } from '../types';
 
 export interface SearchSlice {

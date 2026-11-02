@@ -22,11 +22,11 @@ GitHub CodeReader は、GitHub の公開リポジトリを iPad で快適に読�
 
 ```
 src/
-  App.tsx, main.tsx   エントリ
-  components/         UI コンポーネント（目標: features/ へ移行）
+  main.tsx            エントリ
+  app/                App・Header
+  features/<name>/    repository, explorer, viewer, search, bookmarks, settings, pwa（index.ts が公開 API）
   stores/             Zustand ストア（slices/ にスライス分割）
-  lib/                GitHub API・純粋関数
-  types/              型定義
+  shared/             lib（GitHub API・純粋関数）, types, ui
 doc/                  設計・規約（目次: doc/README.md）
 ```
 

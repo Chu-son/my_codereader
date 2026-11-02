@@ -20,6 +20,8 @@ src/
     types/        共通型
 ```
 
+ストアは機能をまたいで状態を参照するため、`stores/` に単一のストアとして置き（スライスは `stores/slices/`）、feature から import してよい。`stores` は feature の `index.ts` を import しない（循環を避ける）。ストアと feature の両方が使う純粋関数は `shared/lib` に置く。
+
 想定する feature: `repository`（読込・ブランチ・最近のリポジトリ）, `explorer`（ツリー）, `viewer`（コード・Markdown・タブ・分割）, `search`, `bookmarks`, `settings`, `pwa`。
 
 ## 依存方向

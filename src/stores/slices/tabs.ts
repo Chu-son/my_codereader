@@ -1,8 +1,8 @@
-import type { OpenedFile } from '@/types';
-import { fetchFileContent } from '@/lib/github';
-import { isAbortError, toErrorMessage } from '@/lib/githubError';
-import { isBinaryFile } from '@/lib/fileUtils';
-import { splitRepoFullName } from '@/lib/urlParser';
+import type { OpenedFile } from '@/shared/types';
+import { fetchFileContent } from '@/shared/lib/github';
+import { isAbortError, toErrorMessage } from '@/shared/lib/githubError';
+import { isBinaryFile } from '@/shared/lib/fileUtils';
+import { splitRepoFullName } from '@/shared/lib/urlParser';
 import { currentRepoSignal } from '../repoController';
 import type { SliceCreator } from '../types';
 

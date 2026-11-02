@@ -1,4 +1,4 @@
-import type { Bookmark, JumpTarget } from '@/types';
+import type { Bookmark, JumpTarget } from '@/shared/types';
 import type { SliceCreator } from '../types';
 
 export interface BookmarksSlice {

@@ -52,12 +52,12 @@
 
 ## 7. 構成変更
 
-- [ ] `features/` + `shared/` 構成へ移動する
-- [ ] 200 行を超えるコンポーネントを分割する（`Header` 286 行、`SettingsDialog` 361 行、`CodeViewer` 227 行）
-- [ ] 色の直書き（例: `App.tsx` の `#1e1e2e`）を CSS 変数に置き換える
-- [ ] ファイル冒頭の `// ====` バナーコメントを削除する
-- [ ] UI 文言を定数ファイルに集約する
-- [ ] Error Boundary を追加する
+- [x] `features/` + `shared/` 構成へ移動する
+- [x] 200 行を超えるコンポーネントを分割する（`Header`、`SettingsDialog`、`CodeViewer`）
+- [x] 色の直書き（例: `App.tsx` の `#1e1e2e`）を CSS 変数に置き換える
+- [x] ファイル冒頭の `// ====` バナーコメントを削除する
+- [ ] UI 文言を定数ファイルに集約する（約 80 箇所。量が多いため別 PR `refactor/strings` で行う）
+- [x] Error Boundary を追加する
 
 ## 8. セキュリティ・a11y・性能
 

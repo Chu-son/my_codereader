@@ -1,7 +1,7 @@
-import type { BranchInfo, TreeNode } from '@/types';
-import { fetchBranches, fetchRepoInfo, fetchRepoTree } from '@/lib/github';
-import { isAbortError, toErrorMessage } from '@/lib/githubError';
-import { parseRepoInput, splitRepoFullName } from '@/lib/urlParser';
+import type { BranchInfo, TreeNode } from '@/shared/types';
+import { fetchBranches, fetchRepoInfo, fetchRepoTree } from '@/shared/lib/github';
+import { isAbortError, toErrorMessage } from '@/shared/lib/githubError';
+import { parseRepoInput, splitRepoFullName } from '@/shared/lib/urlParser';
 import { renewRepoSignal } from '../repoController';
 import type { SliceCreator } from '../types';
 

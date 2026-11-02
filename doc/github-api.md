@@ -4,7 +4,7 @@
 
 ## 使用エンドポイント
 
-ベース URL は `https://api.github.com`。実装は [src/lib/github.ts](../src/lib/github.ts)。
+ベース URL は `https://api.github.com`。実装は [src/shared/lib/github.ts](../src/shared/lib/github.ts)。
 
 | 用途           | エンドポイント                                             |
 | -------------- | ---------------------------------------------------------- |
@@ -26,4 +26,4 @@
 - 1 MB（`MAX_FILE_BYTES`）を超えるファイルは本文を表示せず、`too_large` エラーにする。
 - Service Worker が API の GET を NetworkFirst（1 時間・200 件）でキャッシュする。
 
-エラーは `GitHubError`（`src/lib/githubError.ts`）に正規化し、レスポンスは zod で検証する。分類は規約を参照。
+エラーは `GitHubError`（`src/shared/lib/githubError.ts`）に正規化し、レスポンスは zod で検証する。分類は規約を参照。
