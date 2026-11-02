@@ -17,7 +17,7 @@ export default defineConfig({
       include: ['src/shared/lib/**', 'src/stores/**'],
       exclude: ['src/**/*.test.{ts,tsx}'],
       // testing.md: lib は行カバレッジ 80% 以上
-      thresholds: { 'src/shared/lib/**': { lines: 80 } },
+      thresholds: { 'src/shared/lib/**': { lines: 80 }, 'src/stores/**': { lines: 70 } },
     },
   },
 });
