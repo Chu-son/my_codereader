@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, Shield, Trash2, Type, WrapText, AlignLeft, RotateCcw } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { fetchRateLimit } from '@/lib/github';
+import { isAbortError } from '@/lib/githubError';
 
 export function SettingsDialog() {
   const {
@@ -46,20 +47,16 @@ export function SettingsDialog() {
   // ダイアログが開かれた時、または PAT が変わった時にレート制限を取得する
   useEffect(() => {
     if (!settingsOpen) return;
-    let cancelled = false;
-    fetchRateLimit(pat)
-      .then((result) => {
-        if (!cancelled) setRateLimit(result);
-      })
-      .catch(() => {
-        if (!cancelled) setRateLimit(null);
+    const controller = new AbortController();
+    fetchRateLimit(pat, controller.signal)
+      .then((result) => setRateLimit(result))
+      .catch((error) => {
+        if (!isAbortError(error)) setRateLimit(null);
       })
       .finally(() => {
-        if (!cancelled) setRateLimitLoading(false);
+        if (!controller.signal.aborted) setRateLimitLoading(false);
       });
-    return () => {
-      cancelled = true;
-    };
+    return () => controller.abort();
   }, [settingsOpen, pat]);
 
   const handleSavePat = () => {

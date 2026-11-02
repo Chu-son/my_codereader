@@ -14,6 +14,7 @@ import {
 } from '@/lib/github';
 import { searchInCachedFiles, searchInTree, convertGitHubSearchResults } from '@/lib/searchUtils';
 import { isBinaryFile } from '@/lib/fileUtils';
+import { isAbortError, toErrorMessage } from '@/lib/githubError';
 import { parseRepoInput, splitRepoFullName } from '@/lib/urlParser';
 import {
   PERSIST_VERSION,
@@ -39,6 +40,8 @@ interface AppState {
   treeData: TreeNode[];
   treeLoading: boolean;
   treeError: string | null;
+  /** GitHub のツリーが一部しか取得できなかった場合 true */
+  treeTruncated: boolean;
   expandedDirs: string[];
 
   // タブ（関心ファイル）管理
@@ -118,6 +121,15 @@ interface AppState {
 // Store
 // ========================================
 
+/** リポジトリ・ブランチ単位のリクエストを中断するためのコントローラ。切替のたびに作り直す */
+let repoController = new AbortController();
+
+function renewRepoController(): AbortSignal {
+  repoController.abort();
+  repoController = new AbortController();
+  return repoController.signal;
+}
+
 export const useAppStore = create<AppState>()(
   persist<AppState, [], [], PersistedState>(
     (set, get) => ({
@@ -129,6 +141,7 @@ export const useAppStore = create<AppState>()(
       treeData: [],
       treeLoading: false,
       treeError: null,
+      treeTruncated: false,
       expandedDirs: [],
       branches: [],
       branchesLoading: false,
@@ -172,10 +185,12 @@ export const useAppStore = create<AppState>()(
 
         const { owner, repo, branch: inputBranch, filePath } = parsed;
         const { pat } = get();
+        const signal = renewRepoController();
 
         set({
           treeLoading: true,
           treeError: null,
+          treeTruncated: false,
           treeData: [],
           openedFiles: [],
           activePane1FilePath: null,
@@ -186,15 +201,16 @@ export const useAppStore = create<AppState>()(
         });
 
         try {
-          const repoInfo = await fetchRepoInfo(owner, repo, pat);
+          const repoInfo = await fetchRepoInfo(owner, repo, pat, signal);
           const branch = inputBranch || repoInfo.defaultBranch;
-          const tree = await fetchRepoTree(owner, repo, branch, pat);
+          const { tree, truncated } = await fetchRepoTree(owner, repo, branch, pat, signal);
 
           set({
             currentRepo: `${owner}/${repo}`,
             currentBranch: branch,
             repoDescription: repoInfo.description ?? null,
             treeData: tree,
+            treeTruncated: truncated,
             treeLoading: false,
           });
 
@@ -203,12 +219,13 @@ export const useAppStore = create<AppState>()(
 
           // ブランチ一覧を非同期で取得
           set({ branchesLoading: true });
-          fetchBranches(owner, repo, pat)
+          fetchBranches(owner, repo, pat, signal)
             .then((branches) => {
               set({ branches, branchesLoading: false });
             })
-            .catch(() => {
-              set({ branchesLoading: false });
+            .catch((error) => {
+              // 中断は新しい読み込みが状態を管理するため触らない
+              if (!isAbortError(error)) set({ branchesLoading: false });
             });
 
           // URLにファイルパスが含まれる場合は自動で開く
@@ -216,10 +233,10 @@ export const useAppStore = create<AppState>()(
             get().openFile(filePath);
           }
         } catch (error) {
+          if (isAbortError(error)) return;
           set({
             treeLoading: false,
-            treeError:
-              error instanceof Error ? error.message : 'リポジトリの読み込みに失敗しました',
+            treeError: toErrorMessage(error, 'リポジトリの読み込みに失敗しました'),
           });
         }
       },
@@ -231,8 +248,8 @@ export const useAppStore = create<AppState>()(
 
         // 既にキャッシュ済みかチェック
         const existing = openedFiles.find((f) => f.path === path);
-        if (existing && existing.content && !existing.error) {
-          // タブ切り替えのみ
+        if (existing && !existing.error && (existing.content || existing.loading)) {
+          // 取得済み・取得中は再リクエストせずタブ切り替えのみ
           if (pane === 1) {
             const history = get().navigationHistory;
             const idx = get().navigationIndex;
@@ -293,6 +310,7 @@ export const useAppStore = create<AppState>()(
             path,
             get().currentBranch,
             pat,
+            repoController.signal,
           );
           set((state) => ({
             openedFiles: state.openedFiles.map((f) =>
@@ -300,7 +318,8 @@ export const useAppStore = create<AppState>()(
             ),
           }));
         } catch (error) {
-          const message = error instanceof Error ? error.message : 'Unknown error';
+          if (isAbortError(error)) return;
+          const message = toErrorMessage(error, 'ファイルの読み込みに失敗しました');
           set((state) => ({
             openedFiles: state.openedFiles.map((f) =>
               f.path === path
@@ -482,6 +501,7 @@ export const useAppStore = create<AppState>()(
       },
 
       clearRepo: () => {
+        renewRepoController();
         set({
           currentRepo: null,
           currentBranch: null,
@@ -489,6 +509,7 @@ export const useAppStore = create<AppState>()(
           treeData: [],
           treeLoading: false,
           treeError: null,
+          treeTruncated: false,
           expandedDirs: [],
           openedFiles: [],
           activePane1FilePath: null,
@@ -507,25 +528,29 @@ export const useAppStore = create<AppState>()(
         const repoParts = currentRepo && splitRepoFullName(currentRepo);
         if (!repoParts) return;
         const { owner, repo } = repoParts;
+        const signal = renewRepoController();
         set({
           treeLoading: true,
           treeError: null,
+          treeTruncated: false,
           openedFiles: [],
           activePane1FilePath: null,
           activePane2FilePath: null,
         });
 
         try {
-          const tree = await fetchRepoTree(owner, repo, branchName, pat);
+          const { tree, truncated } = await fetchRepoTree(owner, repo, branchName, pat, signal);
           set({
             currentBranch: branchName,
             treeData: tree,
+            treeTruncated: truncated,
             treeLoading: false,
           });
         } catch (error) {
+          if (isAbortError(error)) return;
           set({
             treeLoading: false,
-            treeError: error instanceof Error ? error.message : 'ブランチの切り替えに失敗しました',
+            treeError: toErrorMessage(error, 'ブランチの切り替えに失敗しました'),
           });
         }
       },
