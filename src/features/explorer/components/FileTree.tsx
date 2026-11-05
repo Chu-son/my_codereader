@@ -13,7 +13,8 @@ interface FileTreeProps {
   scrollElement: HTMLElement | null;
 }
 
-const ROW_HEIGHT = 40;
+/** タップ領域の下限 44px に合わせる */
+const ROW_HEIGHT = 44;
 
 export function FileTree({ nodes, scrollElement }: FileTreeProps) {
   const { expandedDirs, activePath, toggleDir, navigateTo } = useAppStore(
@@ -105,7 +106,7 @@ function FileTreeNode({
 
   return (
     <button
-      className={`relative flex items-center w-full h-full text-left py-2 pr-2 transition-colors min-h-[40px] ${
+      className={`relative flex items-center w-full h-full text-left py-2 pr-2 transition-colors min-h-[44px] ${
         isActive ? 'bg-[var(--bg-active)]' : 'hover:bg-[var(--bg-hover)]'
       } ${isBinary ? 'opacity-40' : ''}`}
       style={{ paddingLeft: `${depth * 16 + 8}px` }}

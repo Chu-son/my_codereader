@@ -11,6 +11,7 @@ import { useLanguageExtension } from '../hooks/useLanguageExtension';
 import { useJumpTarget } from '../hooks/useJumpTarget';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { SelectionSearchButton } from './SelectionSearchButton';
+import { ScrollStrip } from './ScrollStrip';
 
 interface CodeViewerProps {
   pane: PaneId;
@@ -42,6 +43,9 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
     })),
   );
   const editorRef = useRef<EditorView | null>(null);
+  // スクロールストリップがスクロールを購読するため、作成後に描画し直せるよう state にも持つ
+  const [view, setView] = useState<EditorView | null>(null);
+  const lineCount = useMemo(() => content.split('\n').length, [content]);
   const [selection, setSelection] = useState<{ text: string; x: number; y: number } | null>(null);
 
   const language = getLanguageFromPath(filePath);
@@ -64,6 +68,8 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
           fontFamily: 'var(--font-mono)',
           lineHeight: lineHeight.toString(),
         },
+        // 最終行が親指ツールバーに隠れないよう、本文の下に余白を空ける
+        '.cm-content': { paddingBottom: 'var(--toolbar-clearance)' },
       }),
     );
 
@@ -120,8 +126,10 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
         style={{ height: '100%' }}
         onCreateEditor={(view) => {
           editorRef.current = view;
+          setView(view);
         }}
       />
+      <ScrollStrip view={view} filePath={filePath} lineCount={lineCount} />
 
       {selection && (
         <SelectionSearchButton

@@ -52,7 +52,12 @@
   --header-bg: #181825;
 
   /* Tab bar */
-  --tabbar-height: 42px;
+  --tabbar-height: 44px;
+
+  /* Activity rail / thumb toolbar */
+  --rail-width: 64px;
+  /* 親指ツールバーに最終行が隠れないよう、本文の下に空ける余白 */
+  --toolbar-clearance: 80px;
 
   /* Touch targets */
   --touch-min-size: 44px;
@@ -69,7 +74,6 @@
 
   /* Z-index layers */
   --z-overlay: 40;
-  --z-sidebar: 50;
   --z-drawer: 60;
   --z-dialog: 70;
 }
@@ -77,12 +81,15 @@
 /* ========================================
    Global Resets & Base
    ======================================== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* レイヤー外に置くと Tailwind のユーティリティ（@layer utilities）より強くなり、p-* / m-* が効かなくなる */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html {

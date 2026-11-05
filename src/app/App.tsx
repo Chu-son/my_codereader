@@ -1,15 +1,10 @@
 import './App.css';
-import { Header } from './components/Header';
+import { AppShell } from './components/AppShell';
 import { useShareTarget } from './hooks/useShareTarget';
-import { Sidebar } from '@/features/explorer';
-import { SplitPane } from '@/features/viewer';
 import { PwaInstallPrompt } from '@/features/pwa';
-import { RecentRepos } from '@/features/repository';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { lazy, Suspense } from 'react';
-import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
-import { STRINGS } from '@/shared/constants/strings';
 
 // 初期表示に不要な画面は使われるときに読み込む
 const SearchDrawer = lazy(() =>
@@ -20,9 +15,8 @@ const SettingsDialog = lazy(() =>
 );
 
 function App() {
-  const { currentRepo, settingsOpen, loadRepository } = useAppStore(
+  const { settingsOpen, loadRepository } = useAppStore(
     useShallow((s) => ({
-      currentRepo: s.currentRepo,
       settingsOpen: s.settingsOpen,
       loadRepository: s.loadRepository,
     })),
@@ -41,21 +35,7 @@ function App() {
         backgroundColor: 'var(--app-bg)', // ヘッダーの背景色と合わせる
       }}
     >
-      {/* ヘッダー */}
-      <Header />
-
-      {/* メインコンテンツ */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* サイドバー */}
-        <Sidebar />
-
-        {/* メインエリア（分割対応） */}
-        <main className="flex-1 overflow-hidden" style={{ backgroundColor: 'var(--bg-primary)' }}>
-          <ErrorBoundary label={STRINGS.app.boundaryMain}>
-            {currentRepo ? <SplitPane /> : <RecentRepos />}
-          </ErrorBoundary>
-        </main>
-      </div>
+      <AppShell />
 
       {/* 検索ドロワー */}
       <Suspense fallback={null}>

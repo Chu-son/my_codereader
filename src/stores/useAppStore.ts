@@ -19,6 +19,7 @@ import {
 import type { AppState } from './types';
 
 export type { AppState } from './types';
+export type { SidePanel } from './slices/ui';
 
 export const useAppStore = create<AppState>()(
   persist<AppState, [], [], PersistedState>(

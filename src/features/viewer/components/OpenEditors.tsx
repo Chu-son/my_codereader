@@ -42,26 +42,26 @@ export function OpenEditors() {
           return (
             <div
               key={path}
-              className={`group flex items-center min-h-[40px] px-2 cursor-pointer transition-colors ${
+              className={`flex items-center min-h-[44px] pr-2 cursor-pointer transition-colors ${
                 isActive ? 'bg-[var(--bg-active)]' : 'hover:bg-[var(--bg-hover)]'
               }`}
               onClick={() => setActiveFile(pane, path)}
               title={path}
             >
-              {/* 閉じるボタン */}
+              {/* 閉じるボタン。タッチ端末にはホバーが無いため常に表示する */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   closeFile(pane, path);
                 }}
                 aria-label={STRINGS.viewer.closeFile(path)}
-                className="w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-[var(--bg-active)] transition-opacity shrink-0"
+                className="touch-target shrink-0 rounded opacity-60 hover:opacity-100 hover:bg-[var(--bg-active)]"
               >
                 <X size={14} className="text-[var(--text-muted)]" />
               </button>
 
               {/* アイコン */}
-              <FileIcon size={14} className="shrink-0 mx-1.5 text-[var(--text-secondary)]" />
+              <FileIcon size={14} className="shrink-0 mr-1.5 text-[var(--text-secondary)]" />
 
               {/* ファイル名 */}
               <span

@@ -24,6 +24,18 @@ const bookmark = (id: string, line: number): Bookmark => ({
   text: 'x',
 });
 
+describe('ui スライス', () => {
+  it('左パネルは既定でエクスプローラーを開き、同じパネルを選ぶと閉じる', () => {
+    expect(store().activePanel).toBe('explorer');
+    store().togglePanel('explorer');
+    expect(store().activePanel).toBeNull();
+    store().togglePanel('bookmarks');
+    expect(store().activePanel).toBe('bookmarks');
+    store().togglePanel('explorer');
+    expect(store().activePanel).toBe('explorer');
+  });
+});
+
 describe('bookmarks スライス', () => {
   it('同じ行のブックマークは重複して追加されない', () => {
     store().addBookmark(bookmark('1', 3));

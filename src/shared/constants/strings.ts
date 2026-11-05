@@ -20,12 +20,18 @@ export const STRINGS = {
     boundaryMessage: (label: string) => `${label}の表示中に問題が発生しました`,
   },
   header: {
-    sidebarClose: 'サイドバーを閉じる',
-    sidebarOpen: 'サイドバーを開く',
+    breadcrumb: '表示中のファイルのパス',
     splitToggle: '分割方向を切り替え / 分割を解除',
     splitStart: '画面を分割',
     back: '戻る',
     forward: '進む',
+  },
+  shell: {
+    rail: 'パネルの切り替え',
+    toolbar: '移動と表示の操作',
+    explorer: 'エクスプローラー',
+    bookmarks: 'ブックマーク',
+    outline: 'アウトライン',
   },
   repository: {
     inputPlaceholder: 'owner/repo (例: facebook/react)',

@@ -55,7 +55,7 @@ export function FileTabs({ pane }: FileTabsProps) {
           <div
             key={path}
             data-tab-path={path}
-            className={`group flex items-center gap-1.5 px-3 h-full border-r cursor-pointer transition-colors shrink-0 ${
+            className={`flex items-center gap-1.5 pl-3 pr-1 h-full border-r cursor-pointer transition-colors shrink-0 ${
               isActive
                 ? 'border-t-2 border-t-[var(--accent-blue)]'
                 : 'border-t-2 border-t-transparent hover:bg-[var(--bg-hover)]'
@@ -82,11 +82,10 @@ export function FileTabs({ pane }: FileTabsProps) {
                 closeFile(pane, path);
               }}
               aria-label={STRINGS.viewer.closeFile(path)}
-              className={`w-7 h-7 flex items-center justify-center rounded transition-opacity ${
-                isActive
-                  ? 'opacity-60 hover:opacity-100'
-                  : 'opacity-0 group-hover:opacity-60 hover:!opacity-100'
-              } hover:bg-[var(--bg-active)]`}
+              // タッチ端末にはホバーが無いため、非アクティブなタブでも閉じるボタンを薄く表示する
+              className={`w-8 h-8 flex items-center justify-center rounded transition-opacity ${
+                isActive ? 'opacity-60' : 'opacity-30'
+              } hover:opacity-100 hover:bg-[var(--bg-active)]`}
             >
               <X size={14} />
             </button>
