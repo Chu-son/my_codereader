@@ -32,6 +32,8 @@ export const STRINGS = {
     explorer: 'エクスプローラー',
     bookmarks: 'ブックマーク',
     outline: 'アウトライン',
+    openPanels: 'パネルを開く',
+    drawerHint: 'エクスプローラーやブックマークを選び、ファイルを開くと閉じます',
   },
   repository: {
     inputPlaceholder: 'owner/repo (例: facebook/react)',

@@ -34,6 +34,15 @@ describe('ui スライス', () => {
     store().togglePanel('explorer');
     expect(store().activePanel).toBe('explorer');
   });
+
+  it('検索・設定を開くと左ドロワーを閉じる', () => {
+    store().setNavDrawerOpen(true);
+    store().setSearchDrawerOpen(true);
+    expect(store().navDrawerOpen).toBe(false);
+    store().setNavDrawerOpen(true);
+    store().setSettingsOpen(true);
+    expect(store().navDrawerOpen).toBe(false);
+  });
 });
 
 describe('bookmarks スライス', () => {
@@ -171,6 +180,16 @@ describe('files / panes スライス', () => {
     expect(store().history).toHaveLength(before);
     store().navigateBack();
     expect(store().panes[1].active).toBe('b.ts');
+  });
+
+  it('分割は preferred の向きで始まり、もう一方の向き、解除の順に切り替わる', () => {
+    store().toggleSplitView('vertical');
+    expect(store().isSplitView).toBe(true);
+    expect(store().splitDirection).toBe('vertical');
+    store().toggleSplitView('vertical');
+    expect(store().splitDirection).toBe('horizontal');
+    store().toggleSplitView('vertical');
+    expect(store().isSplitView).toBe(false);
   });
 
   it('分割を解除した後は、pane 2 の履歴も pane 1 に表示する', async () => {

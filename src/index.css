@@ -78,6 +78,13 @@
   --z-dialog: 70;
 }
 
+/* 縦向きはツールバーを本文の外（画面下端）に固定するため、最終行の下に余白を足さなくてよい */
+@media (orientation: portrait) {
+  :root {
+    --toolbar-clearance: 16px;
+  }
+}
+
 /* ========================================
    Global Resets & Base
    ======================================== */
@@ -216,16 +223,18 @@ body {
 
 /* ========================================
    Vaul Drawer overrides
+   （vaul 1.x の属性名は data-vaul-*。旧名の [vaul-drawer] は一致しない）
    ======================================== */
-[vaul-drawer] {
-  background: var(--bg-secondary) !important;
+[data-vaul-drawer][data-vaul-drawer-direction='bottom'] {
   border-top: 1px solid var(--border-primary);
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
 }
 
-[vaul-drawer-overlay] {
-  background: rgba(0, 0, 0, 0.5) !important;
+[data-vaul-drawer][data-vaul-drawer-direction='left'] {
+  border-right: 1px solid var(--border-primary);
+}
+
+[data-vaul-overlay] {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* ========================================

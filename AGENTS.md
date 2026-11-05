@@ -25,7 +25,7 @@ src/
   app/                App・Header
   features/<name>/    repository, explorer, viewer, search, bookmarks, settings, pwa（index.ts が公開 API）
   stores/             Zustand ストア（slices/ にスライス分割）
-  shared/             lib（GitHub API・純粋関数）, types, ui
+  shared/             lib（GitHub API・純粋関数）, hooks, types, ui
 doc/                  設計・規約（目次: doc/README.md）
 ```
 

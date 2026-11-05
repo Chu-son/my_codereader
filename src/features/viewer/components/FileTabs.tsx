@@ -38,7 +38,8 @@ export function FileTabs({ pane }: FileTabsProps) {
   return (
     <div
       id={`file-tabs-pane-${pane}`}
-      className="flex items-center border-b overflow-x-auto shrink-0"
+      // 縦向きは幅が狭く、区切り線つきのタブだと 1 画面に収まる数が少ないため、余白の少ないチップにする
+      className="flex items-center border-b overflow-x-auto shrink-0 portrait:gap-1.5 portrait:px-2"
       style={{
         height: 'var(--tabbar-height)',
         backgroundColor: 'var(--tab-inactive-bg)',
@@ -55,15 +56,12 @@ export function FileTabs({ pane }: FileTabsProps) {
           <div
             key={path}
             data-tab-path={path}
-            className={`flex items-center gap-1.5 pl-3 pr-1 h-full border-r cursor-pointer transition-colors shrink-0 ${
+            className={`flex items-center gap-1.5 pl-3 pr-1 h-full border-r border-r-[var(--tab-border)] cursor-pointer transition-colors shrink-0 portrait:h-9 portrait:pl-2.5 portrait:rounded-full portrait:border portrait:border-t ${
               isActive
-                ? 'border-t-2 border-t-[var(--accent-blue)]'
-                : 'border-t-2 border-t-transparent hover:bg-[var(--bg-hover)]'
+                ? 'border-t-2 border-t-[var(--accent-blue)] portrait:border-[var(--accent-blue)]'
+                : 'border-t-2 border-t-transparent hover:bg-[var(--bg-hover)] portrait:border-[var(--tab-border)]'
             }`}
-            style={{
-              backgroundColor: isActive ? 'var(--tab-active-bg)' : undefined,
-              borderRightColor: 'var(--tab-border)',
-            }}
+            style={{ backgroundColor: isActive ? 'var(--tab-active-bg)' : undefined }}
             onClick={() => setActiveFile(pane, path)}
           >
             <FileIcon size={14} className="shrink-0 text-[var(--text-secondary)]" />

@@ -38,7 +38,8 @@ export interface PanesSlice {
   setActiveFile: (pane: PaneId, path: string) => void;
   closeFile: (pane: PaneId, path: string) => void;
   focusPane: (pane: PaneId) => void;
-  toggleSplitView: () => void;
+  /** preferred は分割を始めるときの向き（縦向きの画面では上下が自然なため、呼び出し側が渡す） */
+  toggleSplitView: (preferred?: SplitDirection) => void;
   toggleSplitDirection: () => void;
   updateScrollTop: (pane: PaneId, path: string, scrollTop: number) => void;
   setCursorLine: (pane: PaneId, path: string, line: number) => void;
@@ -177,18 +178,21 @@ export const createPanesSlice: SliceCreator<PanesSlice> = (set, get) => {
 
     focusPane: (pane) => set({ focusedPane: resolvePane(pane) }),
 
-    // 分割なし -> 横分割 -> 縦分割 -> 分割なし の順に切り替える
-    toggleSplitView: () => {
+    // 分割なし -> preferred の向き -> もう一方の向き -> 分割なし の順に切り替える。
+    // 分割中に画面を回転しても向きは変えない（ユーザーが選んだ向きを上書きしない）
+    toggleSplitView: (preferred = 'horizontal') => {
       set((s) => {
         if (!s.isSplitView) {
           const active = s.panes[1].active;
           return {
             isSplitView: true,
-            splitDirection: 'horizontal',
+            splitDirection: preferred,
             panes: { ...s.panes, 2: active ? { tabs: [active], active } : emptyPane() },
           };
         }
-        if (s.splitDirection === 'horizontal') return { splitDirection: 'vertical' };
+        if (s.splitDirection === preferred) {
+          return { splitDirection: preferred === 'horizontal' ? 'vertical' : 'horizontal' };
+        }
         return { isSplitView: false, panes: { ...s.panes, 2: emptyPane() }, focusedPane: 1 };
       });
     },

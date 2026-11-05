@@ -7,11 +7,19 @@ import { STRINGS } from '@/shared/constants/strings';
 const ICON_BUTTON =
   'touch-target rounded-full transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-30';
 
+interface ThumbToolbarProps {
+  /**
+   * 縦向き。本文の上に浮かせず画面下端に固定する。
+   * 分割も上下で始める（縦長の画面を左右に割ると 1 行が短くなりすぎるため）
+   */
+  portrait: boolean;
+}
+
 /**
- * 画面下中央の親指ツールバー。iPad を両手で持ったまま届く位置に、頻繁に使う移動操作を集める。
+ * 親指ツールバー。iPad を持ったまま届く下端に、頻繁に使う移動操作を集める。
  * Peek とクイックオープンは、それぞれの機能の段で加える。
  */
-export function ThumbToolbar() {
+export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
   const {
     isSplitView,
     splitDirection,
@@ -39,12 +47,16 @@ export function ThumbToolbar() {
       id="thumb-toolbar"
       role="toolbar"
       aria-label={STRINGS.shell.toolbar}
-      className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-1 rounded-full border select-none"
+      className={
+        portrait
+          ? 'flex items-center justify-around shrink-0 px-2 py-1 border-t select-none'
+          : 'absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-1 rounded-full border select-none'
+      }
       style={{
         backgroundColor: 'var(--header-bg)',
         borderColor: 'var(--border-primary)',
-        boxShadow: 'var(--shadow-card)',
-        zIndex: 'var(--z-overlay)',
+        // 下端の safe area は App の外枠が空けている
+        ...(portrait ? {} : { boxShadow: 'var(--shadow-card)', zIndex: 'var(--z-overlay)' }),
       }}
     >
       <button
@@ -68,7 +80,7 @@ export function ThumbToolbar() {
       <BookmarkToggleButton />
       <button
         id="split-toggle"
-        onClick={toggleSplitView}
+        onClick={() => toggleSplitView(portrait ? 'vertical' : 'horizontal')}
         className={`${ICON_BUTTON} ${isSplitView ? 'text-[var(--accent-blue)]' : 'text-[var(--text-secondary)]'}`}
         title={splitLabel}
         aria-label={splitLabel}
