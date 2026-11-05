@@ -1,6 +1,6 @@
 import { Bookmark } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
-import { useAppStore } from '@/stores/useAppStore';
+import { useAppStore, selectFocusedPath, viewKey } from '@/stores/useAppStore';
 import { STRINGS } from '@/shared/constants/strings';
 
 const PREVIEW_MAX_LENGTH = 50;
@@ -17,25 +17,27 @@ export function BookmarkToggleButton() {
     currentRepo,
     currentBranch,
     activePath,
-    activeCursorLines,
+    activeLine,
     bookmarks,
-    openedFiles,
+    content,
     addBookmark,
     removeBookmark,
   } = useAppStore(
-    useShallow((s) => ({
-      currentRepo: s.currentRepo,
-      currentBranch: s.currentBranch,
-      activePath: s.activePane1FilePath,
-      activeCursorLines: s.activeCursorLines,
-      bookmarks: s.bookmarks,
-      openedFiles: s.openedFiles,
-      addBookmark: s.addBookmark,
-      removeBookmark: s.removeBookmark,
-    })),
+    useShallow((s) => {
+      const path = selectFocusedPath(s);
+      return {
+        currentRepo: s.currentRepo,
+        currentBranch: s.currentBranch,
+        activePath: path,
+        activeLine: path ? (s.viewState[viewKey(s.focusedPane, path)]?.cursorLine ?? null) : null,
+        bookmarks: s.bookmarks,
+        content: path ? s.files[path]?.content : undefined,
+        addBookmark: s.addBookmark,
+        removeBookmark: s.removeBookmark,
+      };
+    }),
   );
 
-  const activeLine = activePath ? activeCursorLines[activePath] : null;
   const currentBookmark =
     activePath && activeLine && currentRepo
       ? bookmarks.find(
@@ -51,7 +53,6 @@ export function BookmarkToggleButton() {
       return;
     }
     // 一覧で見分けられるよう、対象行の先頭部分をプレビューとして保存する
-    const content = openedFiles.find((f) => f.path === activePath)?.content;
     let text = content?.split('\n')[activeLine - 1]?.trim() ?? '';
     if (text.length > PREVIEW_MAX_LENGTH) text = text.slice(0, PREVIEW_MAX_LENGTH) + '...';
 

@@ -6,13 +6,12 @@ import { STRINGS } from '@/shared/constants/strings';
 const getBasename = (path: string) => path.split('/').pop() || path;
 
 export function BookmarksList() {
-  const { bookmarks, currentRepo, removeBookmark, openFile, requestJump } = useAppStore(
+  const { bookmarks, currentRepo, removeBookmark, navigateTo } = useAppStore(
     useShallow((s) => ({
       bookmarks: s.bookmarks,
       currentRepo: s.currentRepo,
       removeBookmark: s.removeBookmark,
-      openFile: s.openFile,
-      requestJump: s.requestJump,
+      navigateTo: s.navigateTo,
     })),
   );
 
@@ -33,8 +32,7 @@ export function BookmarksList() {
   }
 
   const handleBookmarkClick = async (path: string, line: number) => {
-    await openFile(path, 1);
-    requestJump(path, line);
+    await navigateTo(path, { line });
   };
 
   return (

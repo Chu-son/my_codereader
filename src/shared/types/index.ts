@@ -18,11 +18,10 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
-/** 開いているファイル */
+/** 取得したファイル本文のキャッシュ（タブの有無とは独立して保持する） */
 export interface OpenedFile {
   path: string;
   content: string;
-  scrollPos: number;
   sha: string;
   loading: boolean;
   error?: string;
@@ -69,9 +68,26 @@ export interface Bookmark {
   text: string;
 }
 
-/** ジャンプターゲット */
+/** 分割表示のペイン。2 ペイン固定（デザイン G が 2 ペインのみのため一般化しない） */
+export type PaneId = 1 | 2;
+
+/** 行ジャンプの依頼。pane を持つことで、同じファイルを開く別ペインを巻き込まない */
 export interface JumpTarget {
   path: string;
   line: number;
+  pane: PaneId;
   timestamp: number;
+}
+
+/** ジャンプ履歴の 1 件。戻ったときに行まで復元する */
+export interface HistoryEntry {
+  path: string;
+  line: number;
+  pane: PaneId;
+}
+
+/** ペインごと・ファイルごとの表示状態（スクロール位置とカーソル行） */
+export interface ViewState {
+  scrollTop: number;
+  cursorLine: number;
 }

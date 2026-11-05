@@ -9,7 +9,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
-import { useAppStore } from '@/stores/useAppStore';
+import { useAppStore, selectCanGoBack, selectCanGoForward } from '@/stores/useAppStore';
 import { RepoSwitcher } from '@/features/repository';
 import { BookmarkToggleButton } from '@/features/bookmarks';
 import { STRINGS } from '@/shared/constants/strings';
@@ -22,8 +22,8 @@ export function Header() {
     sidebarOpen,
     isSplitView,
     splitDirection,
-    navigationIndex,
-    navigationHistory,
+    canGoBack,
+    canGoForward,
     toggleSidebar,
     toggleSplitView,
     setSettingsOpen,
@@ -35,8 +35,8 @@ export function Header() {
       sidebarOpen: s.sidebarOpen,
       isSplitView: s.isSplitView,
       splitDirection: s.splitDirection,
-      navigationIndex: s.navigationIndex,
-      navigationHistory: s.navigationHistory,
+      canGoBack: selectCanGoBack(s),
+      canGoForward: selectCanGoForward(s),
       toggleSidebar: s.toggleSidebar,
       toggleSplitView: s.toggleSplitView,
       setSettingsOpen: s.setSettingsOpen,
@@ -76,7 +76,7 @@ export function Header() {
       <button
         id="nav-back"
         onClick={navigateBack}
-        disabled={navigationIndex <= 0}
+        disabled={!canGoBack}
         className={`${ICON_BUTTON} disabled:opacity-30`}
         aria-label={STRINGS.header.back}
       >
@@ -85,7 +85,7 @@ export function Header() {
       <button
         id="nav-forward"
         onClick={navigateForward}
-        disabled={navigationIndex >= navigationHistory.length - 1}
+        disabled={!canGoForward}
         className={`${ICON_BUTTON} disabled:opacity-30`}
         aria-label={STRINGS.header.forward}
       >

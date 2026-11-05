@@ -3,6 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView } from '@codemirror/view';
 import { useShallow } from 'zustand/react/shallow';
+import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
 import { getLanguageFromPath } from '@/shared/lib/fileUtils';
 import { indentGuideExtension } from '../lib/indentGuide';
@@ -12,33 +13,32 @@ import { useScrollPosition } from '../hooks/useScrollPosition';
 import { SelectionSearchButton } from './SelectionSearchButton';
 
 interface CodeViewerProps {
+  pane: PaneId;
   filePath: string;
   content: string;
-  scrollPos?: number;
 }
 
-export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
+/** 1 ペイン・1 ファイル分の読み取り専用エディタ。ファイルを替えるときは key で作り直す */
+export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
   const {
     wordWrap,
     showIndentGuides,
     fontSize,
     lineHeight,
-    updateScrollPos,
     searchInRepo,
-    setActiveCursorLine,
+    setCursorLine,
     jumpTarget,
-    setJumpTarget,
+    clearJumpTarget,
   } = useAppStore(
     useShallow((s) => ({
       wordWrap: s.wordWrap,
       showIndentGuides: s.showIndentGuides,
       fontSize: s.fontSize,
       lineHeight: s.lineHeight,
-      updateScrollPos: s.updateScrollPos,
       searchInRepo: s.searchInRepo,
-      setActiveCursorLine: s.setActiveCursorLine,
+      setCursorLine: s.setCursorLine,
       jumpTarget: s.jumpTarget,
-      setJumpTarget: s.setJumpTarget,
+      clearJumpTarget: s.clearJumpTarget,
     })),
   );
   const editorRef = useRef<EditorView | null>(null);
@@ -73,7 +73,7 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
           const main = update.state.selection.main;
           const line = update.state.doc.lineAt(main.head).number;
           // setTimeoutを用いてCodeMirrorの更新サイクル外でReactのStateを更新する
-          setTimeout(() => setActiveCursorLine(filePath, line), 0);
+          setTimeout(() => setCursorLine(pane, filePath, line), 0);
 
           if (!main.empty) {
             const text = update.state.sliceDoc(main.from, main.to).trim();
@@ -92,15 +92,15 @@ export function CodeViewer({ filePath, content, scrollPos }: CodeViewerProps) {
       }),
     );
     return ext;
-  }, [wordWrap, showIndentGuides, fontSize, lineHeight, filePath, setActiveCursorLine]);
+  }, [wordWrap, showIndentGuides, fontSize, lineHeight, pane, filePath, setCursorLine]);
 
   const extensions = useMemo(
     () => [...langExtension, ...readOnlyExt],
     [langExtension, readOnlyExt],
   );
 
-  useScrollPosition(editorRef, filePath, scrollPos, updateScrollPos);
-  useJumpTarget(editorRef, filePath, jumpTarget, setJumpTarget);
+  useScrollPosition(editorRef, pane, filePath);
+  useJumpTarget(editorRef, pane, filePath, jumpTarget, clearJumpTarget);
 
   return (
     <div

@@ -2,7 +2,7 @@
 
 ## ストア設計
 
-- Zustand のストアは **スライス** に分割する（`repository` / `tabs` / `search` / `bookmarks` / `settings` / `ui` など）。1 ファイルに全状態を詰め込まない。
+- Zustand のストアは **スライス** に分割する（`repository` / `files` / `panes` / `search` / `bookmarks` / `settings` / `ui` など）。状態を増やしたら、そのスライスの `initialXxxState()` に含め、リセットする側はそれを使う。1 ファイルに全状態を詰め込まない。
 - 状態の種類を分ける。
   - **サーバー由来**: ツリー、ファイル本文、検索結果（キャッシュ。永続化しない）
   - **ユーザー設定**: 折り返し、フォントサイズ、行間、PAT など（永続化する）

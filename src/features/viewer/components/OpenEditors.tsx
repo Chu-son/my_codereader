@@ -4,17 +4,23 @@ import { useAppStore } from '@/stores/useAppStore';
 import { getFileIcon, getFileName } from '@/shared/lib/fileUtils';
 import { STRINGS } from '@/shared/constants/strings';
 
+/** 操作中のペインで開いているファイルの一覧 */
 export function OpenEditors() {
-  const { openedFiles, activePane1FilePath, setActiveFile, closeFile } = useAppStore(
-    useShallow((s) => ({
-      openedFiles: s.openedFiles,
-      activePane1FilePath: s.activePane1FilePath,
-      setActiveFile: s.setActiveFile,
-      closeFile: s.closeFile,
-    })),
+  const { pane, tabs, activePath, files, setActiveFile, closeFile } = useAppStore(
+    useShallow((s) => {
+      const current = s.panes[s.focusedPane];
+      return {
+        pane: s.focusedPane,
+        tabs: current.tabs,
+        activePath: current.active,
+        files: s.files,
+        setActiveFile: s.setActiveFile,
+        closeFile: s.closeFile,
+      };
+    }),
   );
 
-  if (openedFiles.length === 0) return null;
+  if (tabs.length === 0) return null;
 
   return (
     <div className="select-none">
@@ -28,27 +34,27 @@ export function OpenEditors() {
 
       {/* ファイルリスト */}
       <div className="pb-1">
-        {openedFiles.map((file) => {
-          const isActive = file.path === activePane1FilePath;
-          const FileIcon = getFileIcon(file.path);
-          const fileName = getFileName(file.path);
+        {tabs.map((path) => {
+          const isActive = path === activePath;
+          const FileIcon = getFileIcon(path);
+          const fileName = getFileName(path);
 
           return (
             <div
-              key={file.path}
+              key={path}
               className={`group flex items-center min-h-[40px] px-2 cursor-pointer transition-colors ${
                 isActive ? 'bg-[var(--bg-active)]' : 'hover:bg-[var(--bg-hover)]'
               }`}
-              onClick={() => setActiveFile(1, file.path)}
-              title={file.path}
+              onClick={() => setActiveFile(pane, path)}
+              title={path}
             >
               {/* 閉じるボタン */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  closeFile(file.path);
+                  closeFile(pane, path);
                 }}
-                aria-label={STRINGS.viewer.closeFile(file.path)}
+                aria-label={STRINGS.viewer.closeFile(path)}
                 className="w-6 h-6 flex items-center justify-center rounded opacity-0 group-hover:opacity-100 hover:bg-[var(--bg-active)] transition-opacity shrink-0"
               >
                 <X size={14} className="text-[var(--text-muted)]" />
@@ -67,7 +73,7 @@ export function OpenEditors() {
               </span>
 
               {/* ローディングインジケーター */}
-              {file.loading && (
+              {files[path]?.loading && (
                 <span className="ml-auto">
                   <span className="block w-2 h-2 rounded-full bg-[var(--accent-blue)] animate-pulse" />
                 </span>

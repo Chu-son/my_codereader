@@ -1,19 +1,20 @@
 import { useEffect, type RefObject } from 'react';
 import { EditorView } from '@codemirror/view';
-import type { JumpTarget } from '@/shared/types';
+import type { JumpTarget, PaneId } from '@/shared/types';
 
 const FLASH_DURATION_MS = 600;
 
-/** ブックマークや検索結果からの行ジャンプを処理し、対象行を一瞬点滅させる */
+/** 自分のペイン宛ての行ジャンプを処理し、対象行を一瞬点滅させる */
 export function useJumpTarget(
   editorRef: RefObject<EditorView | null>,
+  pane: PaneId,
   filePath: string,
   jumpTarget: JumpTarget | null,
-  setJumpTarget: (target: JumpTarget | null) => void,
+  clearJumpTarget: () => void,
 ) {
   useEffect(() => {
     const view = editorRef.current;
-    if (!jumpTarget || jumpTarget.path !== filePath || !view) return;
+    if (!jumpTarget || jumpTarget.pane !== pane || jumpTarget.path !== filePath || !view) return;
 
     const line = Math.min(jumpTarget.line, view.state.doc.lines);
     const pos = view.state.doc.line(line).from;
@@ -34,6 +35,6 @@ export function useJumpTarget(
       }, FLASH_DURATION_MS);
     });
 
-    setJumpTarget(null);
-  }, [editorRef, jumpTarget, filePath, setJumpTarget]);
+    clearJumpTarget();
+  }, [editorRef, pane, jumpTarget, filePath, clearJumpTarget]);
 }

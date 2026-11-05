@@ -4,7 +4,8 @@ import { createBookmarksSlice } from './slices/bookmarks';
 import { createRepositorySlice } from './slices/repository';
 import { createSearchSlice } from './slices/search';
 import { createSettingsSlice } from './slices/settings';
-import { createTabsSlice } from './slices/tabs';
+import { createFilesSlice } from './slices/files';
+import { createPanesSlice } from './slices/panes';
 import { createUiSlice } from './slices/ui';
 import {
   PERSIST_VERSION,
@@ -26,7 +27,8 @@ export const useAppStore = create<AppState>()(
       ...createBookmarksSlice(...args),
       ...createUiSlice(...args),
       ...createRepositorySlice(...args),
-      ...createTabsSlice(...args),
+      ...createFilesSlice(...args),
+      ...createPanesSlice(...args),
       ...createSearchSlice(...args),
     }),
     {
@@ -43,3 +45,13 @@ export const useAppStore = create<AppState>()(
     },
   ),
 );
+
+// ペインのセレクタは複数の feature が使うため、ストアの入口から公開する
+export {
+  viewKey,
+  selectCanGoBack,
+  selectCanGoForward,
+  selectCurrentLocation,
+  selectFocusedPath,
+  selectOpenPaths,
+} from './slices/panes';

@@ -1,4 +1,4 @@
-import type { SearchResult } from '@/shared/types';
+import type { OpenedFile, SearchResult } from '@/shared/types';
 import { searchCode } from '@/shared/lib/github';
 import {
   MAX_SEARCH_RESULTS,
@@ -9,8 +9,22 @@ import {
 import { isAbortError } from '@/shared/lib/githubError';
 import { splitRepoFullName } from '@/shared/lib/urlParser';
 import { currentRepoSignal } from '../repoController';
-import type { SliceCreator } from '../types';
+import type { AppState, SliceCreator } from '../types';
+import { selectOpenPaths } from './panes';
 import { STRINGS } from '@/shared/constants/strings';
+
+export const initialSearchState = (): Pick<
+  SearchSlice,
+  'searchQuery' | 'searchResults' | 'searchLoading'
+> => ({ searchQuery: '', searchResults: [], searchLoading: false });
+
+/** 検索対象のキャッシュ。タブを閉じたファイルは含めない（「開いているファイル内」の意味を保つ） */
+function openFiles(s: AppState): OpenedFile[] {
+  return selectOpenPaths(s).flatMap((path) => {
+    const file = s.files[path];
+    return file ? [file] : [];
+  });
+}
 
 export interface SearchSlice {
   searchQuery: string;
@@ -23,12 +37,11 @@ export interface SearchSlice {
 let searchController = new AbortController();
 
 export const createSearchSlice: SliceCreator<SearchSlice> = (set, get) => ({
-  searchQuery: '',
-  searchResults: [],
-  searchLoading: false,
+  ...initialSearchState(),
 
   searchInRepo: async (query) => {
-    const { pat, currentRepo, openedFiles, treeData } = get();
+    const { pat, currentRepo, treeData } = get();
+    const openedFiles = openFiles(get());
     searchController.abort();
     const own = new AbortController();
     searchController = own;

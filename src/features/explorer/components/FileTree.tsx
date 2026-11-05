@@ -3,7 +3,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react';
 import type { TreeNode } from '@/shared/types';
 import { useShallow } from 'zustand/react/shallow';
-import { useAppStore } from '@/stores/useAppStore';
+import { useAppStore, selectFocusedPath } from '@/stores/useAppStore';
 import { flattenTree } from '../lib/flattenTree';
 import { getFileIcon, isBinaryFile } from '@/shared/lib/fileUtils';
 
@@ -16,12 +16,12 @@ interface FileTreeProps {
 const ROW_HEIGHT = 40;
 
 export function FileTree({ nodes, scrollElement }: FileTreeProps) {
-  const { expandedDirs, activePane1FilePath, toggleDir, openFile } = useAppStore(
+  const { expandedDirs, activePath, toggleDir, navigateTo } = useAppStore(
     useShallow((s) => ({
       expandedDirs: s.expandedDirs,
-      activePane1FilePath: s.activePane1FilePath,
+      activePath: selectFocusedPath(s),
       toggleDir: s.toggleDir,
-      openFile: s.openFile,
+      navigateTo: s.navigateTo,
     })),
   );
   const listRef = useRef<HTMLDivElement>(null);
@@ -58,9 +58,9 @@ export function FileTree({ nodes, scrollElement }: FileTreeProps) {
               node={row.node}
               depth={row.depth}
               isExpanded={expandedDirs.includes(row.node.path)}
-              isActive={activePane1FilePath === row.node.path}
+              isActive={activePath === row.node.path}
               onToggle={toggleDir}
-              onFileClick={openFile}
+              onFileClick={navigateTo}
             />
           </div>
         );

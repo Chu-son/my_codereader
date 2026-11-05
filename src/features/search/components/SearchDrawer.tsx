@@ -16,7 +16,7 @@ export function SearchDrawer() {
     pat,
     setSearchDrawerOpen,
     searchInRepo,
-    openFile,
+    navigateTo,
   } = useAppStore(
     useShallow((s) => ({
       searchDrawerOpen: s.searchDrawerOpen,
@@ -26,7 +26,7 @@ export function SearchDrawer() {
       pat: s.pat,
       setSearchDrawerOpen: s.setSearchDrawerOpen,
       searchInRepo: s.searchInRepo,
-      openFile: s.openFile,
+      navigateTo: s.navigateTo,
     })),
   );
 
@@ -55,8 +55,9 @@ export function SearchDrawer() {
     }
   };
 
-  const handleResultClick = (path: string) => {
-    openFile(path);
+  // ファイル名一致は lineNumber が 0。その場合は行を指定せずに開く
+  const handleResultClick = (path: string, lineNumber: number) => {
+    void navigateTo(path, lineNumber > 0 ? { line: lineNumber } : {});
     setSearchDrawerOpen(false);
   };
 
@@ -152,7 +153,7 @@ export function SearchDrawer() {
                   <button
                     key={`${result.path}-${result.lineNumber}-${i}`}
                     className="flex items-start gap-3 w-full px-4 py-2.5 text-left transition-colors hover:bg-[var(--bg-hover)]"
-                    onClick={() => handleResultClick(result.path)}
+                    onClick={() => handleResultClick(result.path, result.lineNumber)}
                   >
                     <FileCode size={16} className="shrink-0 mt-0.5 text-[var(--text-muted)]" />
                     <div className="min-w-0 flex-1">
