@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bookmark, BookmarkMinus, Link, PanelRight } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore, findBookmark } from '@/stores/useAppStore';
@@ -33,10 +33,16 @@ export function LineMenu({ path, line, anchor, onClose }: LineMenuProps) {
   );
   const [copied, setCopied] = useState<boolean | null>(null);
 
+  // 結果を見せてから閉じる。メニューが先に消えたら取り消す（後から開いた別のメニューを閉じないため）
+  useEffect(() => {
+    if (copied === null) return;
+    const timer = window.setTimeout(onClose, FEEDBACK_MS);
+    return () => window.clearTimeout(timer);
+  }, [copied, onClose]);
+
   const copyLink = async () => {
     if (!repo || !branch) return;
     setCopied(await copyText(toGitHubLineUrl(repo, branch, path, line)));
-    window.setTimeout(onClose, FEEDBACK_MS);
   };
 
   return (

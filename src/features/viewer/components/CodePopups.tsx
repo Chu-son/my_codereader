@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useCallback } from 'react';
 import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
 import type { CodePopup } from '../lib/codeInteractions';
@@ -22,8 +22,9 @@ interface CodePopupsProps {
 /** 本文の上に出すメニュー・ボタン・シートの切り替え */
 export function CodePopups({ popup, onChange, pane, path, content }: CodePopupsProps) {
   const searchInRepo = useAppStore((s) => s.searchInRepo);
+  // メニュー側の effect（外側タップの購読・閉じるタイマー）が描画のたびに張り直されないよう固定する
+  const close = useCallback(() => onChange(null), [onChange]);
   if (!popup) return null;
-  const close = () => onChange(null);
 
   switch (popup.kind) {
     case 'line':
