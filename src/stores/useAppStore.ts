@@ -56,3 +56,4 @@ export {
   selectFocusedPath,
   selectOpenPaths,
 } from './slices/panes';
+export { findBookmark } from './slices/bookmarks';

@@ -1,12 +1,12 @@
 import { useAppStore } from '@/stores/useAppStore';
 import { ExplorerPanel } from '@/features/explorer';
 import { BookmarksList } from '@/features/bookmarks';
-import { HistoryList } from '@/features/viewer';
+import { HistoryList, OutlinePanel } from '@/features/viewer';
 
 /** アクティビティレールで選んだ左パネル。閉じているときは何も描かない */
 export function SidePanel() {
   const activePanel = useAppStore((s) => s.activePanel);
-  if (!activePanel || activePanel === 'outline') return null;
+  if (!activePanel) return null;
 
   return (
     <aside
@@ -21,6 +21,8 @@ export function SidePanel() {
     >
       {activePanel === 'explorer' ? (
         <ExplorerPanel />
+      ) : activePanel === 'outline' ? (
+        <OutlinePanel />
       ) : activePanel === 'bookmarks' ? (
         <BookmarksList />
       ) : (

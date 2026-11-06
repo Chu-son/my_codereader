@@ -1,4 +1,4 @@
-import type { OpenedFile } from '@/shared/types';
+import type { DocSymbol, OpenedFile } from '@/shared/types';
 import { fetchFileContent } from '@/shared/lib/github';
 import { isAbortError, toErrorMessage } from '@/shared/lib/githubError';
 import { splitRepoFullName } from '@/shared/lib/urlParser';
@@ -12,14 +12,26 @@ import { STRINGS } from '@/shared/constants/strings';
  */
 export interface FilesSlice {
   files: Record<string, OpenedFile>;
+  /**
+   * ファイルごとの宣言の一覧（エディタが構文木から作る派生値）。アウトラインなど、
+   * エディタの外の UI が読む。本文と同じくリポジトリ単位で捨て、永続化しない
+   */
+  symbols: Record<string, DocSymbol[]>;
+  setSymbols: (path: string, symbols: DocSymbol[]) => void;
   /** 未取得・失敗済みなら取得する。取得済み・取得中なら何もしない */
   ensureFile: (path: string) => Promise<void>;
 }
 
-export const initialFilesState = (): Pick<FilesSlice, 'files'> => ({ files: {} });
+export const initialFilesState = (): Pick<FilesSlice, 'files' | 'symbols'> => ({
+  files: {},
+  symbols: {},
+});
 
 export const createFilesSlice: SliceCreator<FilesSlice> = (set, get) => ({
   ...initialFilesState(),
+
+  setSymbols: (path, symbols) =>
+    set((state) => ({ symbols: { ...state.symbols, [path]: symbols } })),
 
   ensureFile: async (path) => {
     const existing = get().files[path];

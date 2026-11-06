@@ -58,6 +58,22 @@ describe('bookmarks スライス', () => {
     store().removeBookmark('1');
     expect(store().bookmarks).toEqual([]);
   });
+
+  it('toggleBookmark は表示中のリポジトリで行を付け外しし、行の先頭をプレビューにする', () => {
+    useAppStore.setState({
+      currentRepo: 'o/r',
+      currentBranch: 'main',
+      files: {
+        'a.ts': { path: 'a.ts', content: 'one\n  two  \nthree', sha: 's', loading: false },
+      },
+    });
+    store().toggleBookmark('a.ts', 2);
+    expect(store().bookmarks).toMatchObject([
+      { repo: 'o/r', branch: 'main', path: 'a.ts', line: 2, text: 'two' },
+    ]);
+    store().toggleBookmark('a.ts', 2);
+    expect(store().bookmarks).toEqual([]);
+  });
 });
 
 describe('files / panes スライス', () => {
@@ -319,6 +335,9 @@ describe('repository スライス: switchBranch', () => {
       currentRepo: 'o/r',
       currentBranch: 'main',
       files: { 'a.ts': { path: 'a.ts', content: 'a', sha: 's', loading: false } },
+      symbols: {
+        'a.ts': [{ name: 'a', kind: 'variable', from: 0, line: 1, endLine: 1, depth: 0 }],
+      },
       panes: { 1: { tabs: ['a.ts'], active: 'a.ts' }, 2: { tabs: [], active: null } },
       history: [{ path: 'a.ts', line: 1, pane: 1 }],
       historyIndex: 0,
@@ -328,6 +347,7 @@ describe('repository スライス: switchBranch', () => {
     expect(store().currentBranch).toBe('dev');
     expect(store().treeData.map((n) => n.path)).toEqual(['dev.md']);
     expect(store().files).toEqual({});
+    expect(store().symbols).toEqual({});
     expect(store().panes[1].tabs).toEqual([]);
     // 別ブランチの履歴で空画面に戻らないよう履歴も捨てる。分割のレイアウトは保つ
     expect(store().history).toEqual([]);

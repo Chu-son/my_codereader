@@ -91,3 +91,29 @@ export interface ViewState {
   scrollTop: number;
   cursorLine: number;
 }
+
+/** シンボル（宣言）の種類。アウトラインのアイコンと、メソッド判定に使う */
+export type SymbolKind =
+  | 'function'
+  | 'method'
+  | 'class'
+  | 'interface'
+  | 'type'
+  | 'enum'
+  | 'variable'
+  | 'property'
+  | 'module';
+
+/** 構文木から取り出した宣言 1 件。アウトライン・定義へ・スコープ表示で共用する */
+export interface DocSymbol {
+  name: string;
+  kind: SymbolKind;
+  /** 名前の開始位置（文書先頭からの文字オフセット） */
+  from: number;
+  /** 名前のある行（1 始まり） */
+  line: number;
+  /** 宣言の最終行（1 始まり）。カーソルがどの宣言の中にあるかの判定に使う */
+  endLine: number;
+  /** 囲んでいる宣言の数（トップレベルは 0） */
+  depth: number;
+}

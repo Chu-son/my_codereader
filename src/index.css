@@ -194,6 +194,9 @@ body {
   border-right: 1px solid var(--border-primary) !important;
   color: var(--text-muted) !important;
   min-width: 48px !important;
+  /* 行番号の長押しで行メニューを出すため、iOS のコールアウトと文字選択を抑える */
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .cm-editor .cm-activeLineGutter {

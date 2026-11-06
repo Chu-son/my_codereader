@@ -16,15 +16,18 @@ src/
   features/
     repository/         RepoSwitcher（入力・表示）、BranchSelector、RecentRepos
     explorer/           ExplorerPanel（開いているファイル + ツリー）、FileTree
-    viewer/             SplitPane、CodeViewer、ScrollStrip、FileTabs、OpenEditors、TrailBar、HistoryList、MarkdownPreview
-                        hooks/（スクロール復元・行ジャンプ）、lib/（言語拡張・インデントガイド・スクロールマーカー）
+    viewer/             SplitPane、CodeViewer、ScrollStrip、FileTabs、OpenEditors、TrailBar、HistoryList、OutlinePanel、
+                        MarkdownPreview、本文の上のメニュー（CodePopups → LineMenu / WordMenu / ReferencesSheet）
+                        hooks/（スクロール復元・行ジャンプ・シンボル抽出）、lib/（言語拡張・インデントガイド・
+                        スクロールマーカー・symbols（シンボル抽出・定義・参照）・codeInteractions・pointerGestures）
     search/             SearchDrawer（ファイル名・キャッシュ内・GitHub コード検索）
     bookmarks/          BookmarksList、BookmarkToggleButton
     settings/           SettingsDialog（エディタ設定・PAT・レート制限の各セクション）
     pwa/                PwaInstallPrompt
   stores/               単一の Zustand ストア。slices/ にスライス、persistence.ts に永続化
   shared/
-    lib/                github.ts, githubError.ts, fileUtils.ts, urlParser.ts, searchUtils.ts, navigationHistory.ts
+    lib/                github.ts, githubError.ts, fileUtils.ts, urlParser.ts, searchUtils.ts, navigationHistory.ts,
+                        clipboard.ts
     types/              共通型
     hooks/              useFocusTrap, useOrientation（縦向きの判定）
     ui/                 ToggleSwitch, ErrorBoundary
@@ -37,11 +40,13 @@ src/
 - **ストアの分担**: `files` スライスは本文のキャッシュ（タブを閉じても破棄しない）。`panes` スライスは 2 ペインのタブ・操作中のペイン・分割・ペインごとの表示状態（`viewState`：スクロール位置とカーソル行）・ジャンプ履歴。履歴の操作は純粋関数 `shared/lib/navigationHistory.ts`。
 - **戻る・進む**: 履歴は 1 本（上限 50 件）で、各項目は `{ path, line, pane }`。戻る前に現在地を記録するので、タブ切替で履歴外にいても元の場所へ帰れる。閉じたタブは開き直す。分割を解除した後の pane 2 の項目は pane 1 に表示する。軌跡バー（`TrailBar`）と履歴パネル（`HistoryList`）は同じ履歴を描き、項目をタップすると `goToHistory(index)` でその位置へ移る（進む側の項目は、履歴外にいても切り捨てない）。
 - **隣のペイン**: `openInOtherPane(path, { line, direction })` は操作中でない側のペインに `navigateTo` で開く（履歴に乗る）。分割していなければ `direction` の向きで分割を始める。`OpenEditors` は分割中はペインごとに分けて並べ、`moveToOtherPane(from, path, direction)` でタブを隣へ移す（履歴には積まない）。`direction` は呼び出し側が `usePreferredSplitDirection()`（縦向きなら上下）で渡す。
+- **シンボル**: `extractSymbols(tree, doc, language)`（`viewer/lib/symbols.ts`）が構文木から宣言の一覧 `DocSymbol[]` を作る。アウトライン・定義へ・（今後の）クイックオープンの `@`・集中モードのスコープ表示で共用する。言語ごとの宣言ノードは `SPECS` の小さなマップで持つ。`CodeViewer` は構文木が変わるたびに（まとめて 1 回）`ensureSyntaxTree` で末尾まで解析させてから抽出し、`files.symbols[path]` に入れる（CodeMirror は見えている範囲から遅延して解析するため、そのままの木では長いファイルの後半が抜ける）。TypeScript は `.tsx` だけ JSX 込みで解析する（`.ts` の `<T>(x) => x` を JSX と誤読して以降の木が崩れるため）。
+- **行メニュー・単語メニュー**: 行番号のタップか長押しで `LineMenu`（ブックマーク・GitHub の行 URL をコピー・隣のペインで開く）、識別子のタップで `WordMenu`（定義へ・定義を隣のペインで開く・参照・リポジトリ内を検索）を出す。定義は同じファイルの宣言を名前で引き、同名が複数あればタップ位置より前で最も近いものを選ぶ。参照は同じファイル内の単語単位の出現（上限 200 件）を `ReferencesSheet`（vaul、開くときだけ読込）に並べる。移動はすべて `navigateTo` を通るので「戻る」で帰れる。本文の上に浮かべる UI（行・単語メニュー、選択の検索ボタン、参照シート）は `CodePopups` の 1 つの state で切り替え、同時に 1 つだけ出す。メニューは本文がスクロールしたら閉じる。
 - **ブランチ切替**: `switchBranch(branch)` → 新しいブランチのツリーを再取得。本文・タブ・履歴は捨て、分割のレイアウトは保つ。リセットは各スライスの `initialXxxState()` を使う。
 - **画面構成**: `AppShell` が配置だけを担い、各部品は必要な状態だけを購読する。左パネルは `ui.activePanel`（`explorer` / `bookmarks` / `history` / `outline`、`null` で閉じる）で切り替える。検索はパネルにせず `SearchDrawer` を開く。`ScrollStrip` は表示範囲・ブックマーク・検索ヒットの位置を描くだけで、表示範囲はエディタのスクロールイベントから DOM を直接更新する（スクロールで React を再描画しない）。縦向き（`useIsPortrait`）では、同じ `ActivityRail` と `SidePanel` を左ドロワー `NavDrawer` に入れ、ツールバーを画面下端に固定する。ドロワーは表示中のファイルかジャンプ先が変わると閉じる。分割は縦向きなら上下で始める（`toggleSplitView(preferred)`）。分割中に回転しても向きは変えない。
 - **Share Target**: PWA の共有 (`?url=` / `?text=`) → `app/App.tsx` で `github.com/owner/repo` を抽出 → `loadRepository` → `history.replaceState` で URL を整理。
 - **検索**: ツリーのファイル名検索、取得済みファイル内の検索、GitHub `/search/code`（PAT 必須）。
-- **ブックマーク**: `{ id, repo, branch, path, line, text }`。`navigateTo(path, { line })` で該当行へ移動する。行ジャンプは `jumpTarget`（path / line / pane / timestamp）で、宛先のペインの `CodeViewer` だけが処理する。
+- **ブックマーク**: `{ id, repo, branch, path, line, text }`。付け外しは `toggleBookmark(path, line)`（ツールバーのボタンと行メニューで共用）。`navigateTo(path, { line })` で該当行へ移動する。行ジャンプは `jumpTarget`（path / line / pane / timestamp）で、宛先のペインの `CodeViewer` だけが処理する。ジャンプとスクロール復元は、エディタが作られた後（`@uiw/react-codemirror` は初回描画の後で作るため、`EditorView` は state で持つ）、高さが付いてから（分割直後のペインは高さ 0 で作られる。`whenSized`）実行する。
 
 ## ビルドと配信
 

@@ -1,4 +1,12 @@
-import { Bookmark, Files, History, Search, Settings, type LucideIcon } from 'lucide-react';
+import {
+  Bookmark,
+  Files,
+  History,
+  ListTree,
+  Search,
+  Settings,
+  type LucideIcon,
+} from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore, type SidePanel } from '@/stores/useAppStore';
 import { STRINGS } from '@/shared/constants/strings';
@@ -6,9 +14,9 @@ import { STRINGS } from '@/shared/constants/strings';
 const RAIL_BUTTON =
   'flex items-center justify-center w-12 h-12 rounded-xl transition-colors hover:bg-[var(--bg-hover)]';
 
-// アウトラインはシンボル抽出（C）の段で加える
 const PANELS: { panel: SidePanel; label: string; Icon: LucideIcon }[] = [
   { panel: 'explorer', label: STRINGS.shell.explorer, Icon: Files },
+  { panel: 'outline', label: STRINGS.shell.outline, Icon: ListTree },
   { panel: 'bookmarks', label: STRINGS.shell.bookmarks, Icon: Bookmark },
   { panel: 'history', label: STRINGS.shell.history, Icon: History },
 ];
