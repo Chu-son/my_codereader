@@ -78,9 +78,15 @@
   --z-dialog: 70;
 }
 
+/* 横向きで軌跡バー（ツールバーの上に重ねる 1 段）が出ている間は、その分も空ける */
+[data-trail] {
+  --toolbar-clearance: 132px;
+}
+
 /* 縦向きはツールバーを本文の外（画面下端）に固定するため、最終行の下に余白を足さなくてよい */
 @media (orientation: portrait) {
-  :root {
+  :root,
+  [data-trail] {
     --toolbar-clearance: 16px;
   }
 }

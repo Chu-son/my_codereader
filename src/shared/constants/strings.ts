@@ -32,6 +32,8 @@ export const STRINGS = {
     explorer: 'エクスプローラー',
     bookmarks: 'ブックマーク',
     outline: 'アウトライン',
+    history: 'ジャンプ履歴',
+    trail: 'ジャンプの軌跡',
     openPanels: 'パネルを開く',
     drawerHint: 'エクスプローラーやブックマークを選び、ファイルを開くと閉じます',
   },
@@ -63,6 +65,17 @@ export const STRINGS = {
     fileLoadFailed: 'ファイルの読み込みに失敗しました',
     closeFile: (path: string) => `${path} を閉じる`,
     reload: '再読み込み',
+    moveToOtherPane: (path: string) => `${path} を隣のペインへ移す`,
+    paneLabel: (pane: 1 | 2, direction: 'horizontal' | 'vertical') =>
+      direction === 'horizontal'
+        ? pane === 1
+          ? '左のペイン'
+          : '右のペイン'
+        : pane === 1
+          ? '上のペイン'
+          : '下のペイン',
+    historyEmpty: 'ファイルを開くと、移動した場所がここに並びます',
+    historyEntry: (path: string, line: number) => `${path} の ${line} 行目へ移動`,
     noFileTitle: 'ファイルが選択されていません',
     noFileHint: 'サイドバーのエクスプローラーからファイルを選択してください',
   },

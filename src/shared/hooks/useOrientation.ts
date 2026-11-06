@@ -15,3 +15,11 @@ const getSnapshot = () => window.matchMedia(PORTRAIT_QUERY).matches;
 export function useIsPortrait(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot, () => false);
 }
+
+/**
+ * 分割を始めるときの向き。縦長の画面を左右に割ると 1 行が短くなりすぎるため、縦向きでは上下に割る
+ * （'horizontal' は左右に並べる、'vertical' は上下に並べる）
+ */
+export function usePreferredSplitDirection(): 'horizontal' | 'vertical' {
+  return useIsPortrait() ? 'vertical' : 'horizontal';
+}

@@ -1,7 +1,7 @@
 import type { SliceCreator } from '../types';
 
 /** アクティビティレールで切り替える左パネル。検索は既存のドロワーを開くため含めない */
-export type SidePanel = 'explorer' | 'bookmarks' | 'outline';
+export type SidePanel = 'explorer' | 'bookmarks' | 'history' | 'outline';
 
 export interface UiSlice {
   /** 開いている左パネル。null なら閉じている */

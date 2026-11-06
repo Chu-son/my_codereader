@@ -34,6 +34,15 @@ export interface PanesSlice {
   navigateTo: (path: string, options?: NavigateOptions) => Promise<void>;
   navigateBack: () => void;
   navigateForward: () => void;
+  /** 軌跡バー・履歴一覧から、履歴の任意の位置へ移る */
+  goToHistory: (index: number) => void;
+  /**
+   * 操作中でない側のペインに開く（定義を見ながら元のコードを読み続けるため）。
+   * 分割していなければ direction の向きで分割を始める
+   */
+  openInOtherPane: (path: string, options?: OtherPaneOptions) => Promise<void>;
+  /** タブを隣のペインへ移す（タブ一覧での振り分け）。分割していなければ分割を始める */
+  moveToOtherPane: (from: PaneId, path: string, direction?: SplitDirection) => void;
   /** タブの切替。履歴には積まない */
   setActiveFile: (pane: PaneId, path: string) => void;
   closeFile: (pane: PaneId, path: string) => void;
@@ -44,6 +53,12 @@ export interface PanesSlice {
   updateScrollTop: (pane: PaneId, path: string, scrollTop: number) => void;
   setCursorLine: (pane: PaneId, path: string, line: number) => void;
   clearJumpTarget: () => void;
+}
+
+export interface OtherPaneOptions {
+  line?: number;
+  /** 分割していないときに始める向き */
+  direction?: SplitDirection;
 }
 
 export const viewKey = (pane: PaneId, path: string) => `${pane}:${path}`;
@@ -99,6 +114,11 @@ export function selectOpenPaths(s: AppState): string[] {
   return [...new Set([...s.panes[1].tabs, ...s.panes[2].tabs])];
 }
 
+const otherPane = (pane: PaneId): PaneId => (pane === 1 ? 2 : 1);
+
+const samePlace = (a: HistoryEntry, b: HistoryEntry | null) =>
+  !!b && a.path === b.path && a.pane === b.pane;
+
 function withTab(pane: PaneState, path: string): PaneState {
   return { tabs: pane.tabs.includes(path) ? pane.tabs : [...pane.tabs, path], active: path };
 }
@@ -132,6 +152,16 @@ export const createPanesSlice: SliceCreator<PanesSlice> = (set, get) => {
     void show(target, true);
   };
 
+  /** 分割していなければ、pane 2 を空にして分割を始める */
+  const ensureSplit = (direction: SplitDirection) => {
+    if (get().isSplitView) return;
+    set((s) => ({
+      isSplitView: true,
+      splitDirection: direction,
+      panes: { ...s.panes, 2: emptyPane() },
+    }));
+  };
+
   return {
     ...initialPanesState(),
 
@@ -155,6 +185,43 @@ export const createPanesSlice: SliceCreator<PanesSlice> = (set, get) => {
 
     navigateBack: () => moveInHistory(-1),
     navigateForward: () => moveInHistory(1),
+
+    goToHistory: (index) => {
+      const s = get();
+      const target = s.history[index];
+      if (!target) return;
+      if (index === s.historyIndex) {
+        void show(target, true);
+        return;
+      }
+      const current = selectCurrentLocation(s);
+      const head = s.history[s.historyIndex];
+      // 先へ進むときに履歴外の現在地を積むと、進む側（タップした項目）が切り捨てられるため、
+      // 先頭と同じ場所で行が変わっただけのときに限って記録する
+      const cursor =
+        index < s.historyIndex || (head && samePlace(head, current))
+          ? recordLocation(cursorOf(s), current)
+          : cursorOf(s);
+      // 記録で先頭が置き換わったり上限で古い項目が落ちたりしても、項目の同一性で位置を引き直す
+      const nextIndex = cursor.history.indexOf(target);
+      set({ history: cursor.history, historyIndex: nextIndex < 0 ? cursor.index : nextIndex });
+      if (nextIndex >= 0) void show(target, true);
+    },
+
+    openInOtherPane: async (path, options = {}) => {
+      const s = get();
+      const target = s.isSplitView ? otherPane(s.focusedPane) : 2;
+      ensureSplit(options.direction ?? 'horizontal');
+      await get().navigateTo(path, { line: options.line, pane: target });
+    },
+
+    moveToOtherPane: (from, path, direction = 'horizontal') => {
+      if (!get().isSplitView && from === 2) return;
+      ensureSplit(direction);
+      const to = otherPane(from);
+      get().closeFile(from, path);
+      get().setActiveFile(to, path);
+    },
 
     setActiveFile: (pane, path) => {
       set((s) => ({

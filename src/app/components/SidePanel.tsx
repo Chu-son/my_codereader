@@ -1,6 +1,7 @@
 import { useAppStore } from '@/stores/useAppStore';
 import { ExplorerPanel } from '@/features/explorer';
 import { BookmarksList } from '@/features/bookmarks';
+import { HistoryList } from '@/features/viewer';
 
 /** アクティビティレールで選んだ左パネル。閉じているときは何も描かない */
 export function SidePanel() {
@@ -18,7 +19,13 @@ export function SidePanel() {
         overscrollBehaviorY: 'none',
       }}
     >
-      {activePanel === 'explorer' ? <ExplorerPanel /> : <BookmarksList />}
+      {activePanel === 'explorer' ? (
+        <ExplorerPanel />
+      ) : activePanel === 'bookmarks' ? (
+        <BookmarksList />
+      ) : (
+        <HistoryList />
+      )}
     </aside>
   );
 }

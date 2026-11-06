@@ -206,6 +206,56 @@ describe('files / panes スライス', () => {
     expect(store().panes[1].active).toBe('b.ts');
     expect(store().jumpTarget?.pane).toBe(1);
   });
+
+  it('隣のペインに開くと、分割していなければ分割を始めて pane 2 に開き、戻ると元のペインへ帰る', async () => {
+    mockFile('a.ts', 'a');
+    mockFile('b.ts', 'b');
+    await store().navigateTo('a.ts');
+    store().setCursorLine(1, 'a.ts', 5);
+    await store().openInOtherPane('b.ts', { line: 20, direction: 'vertical' });
+    expect(store().isSplitView).toBe(true);
+    expect(store().splitDirection).toBe('vertical');
+    expect(store().panes[1]).toEqual({ tabs: ['a.ts'], active: 'a.ts' });
+    expect(store().panes[2]).toEqual({ tabs: ['b.ts'], active: 'b.ts' });
+    expect(store().jumpTarget).toMatchObject({ path: 'b.ts', line: 20, pane: 2 });
+
+    // pane 2 を操作中なら、隣は pane 1
+    await store().openInOtherPane('a.ts', { line: 9 });
+    expect(store().jumpTarget).toMatchObject({ path: 'a.ts', line: 9, pane: 1 });
+
+    store().navigateBack();
+    expect(store().jumpTarget).toMatchObject({ path: 'b.ts', line: 20, pane: 2 });
+  });
+
+  it('タブを隣のペインへ移す', async () => {
+    mockFile('a.ts', 'a');
+    mockFile('b.ts', 'b');
+    await store().navigateTo('a.ts');
+    await store().navigateTo('b.ts');
+    store().moveToOtherPane(1, 'b.ts', 'vertical');
+    expect(store().isSplitView).toBe(true);
+    expect(store().splitDirection).toBe('vertical');
+    expect(store().panes[1]).toEqual({ tabs: ['a.ts'], active: 'a.ts' });
+    expect(store().panes[2]).toEqual({ tabs: ['b.ts'], active: 'b.ts' });
+    expect(store().focusedPane).toBe(2);
+  });
+
+  it('履歴の任意の位置へ移り、進む側の項目も残る', async () => {
+    for (const p of ['a.ts', 'b.ts', 'c.ts']) mockFile(p, p);
+    await store().navigateTo('a.ts', { line: 1 });
+    await store().navigateTo('b.ts', { line: 2 });
+    await store().navigateTo('c.ts', { line: 3 });
+    store().goToHistory(0);
+    expect(store().historyIndex).toBe(0);
+    expect(store().jumpTarget).toMatchObject({ path: 'a.ts', line: 1 });
+
+    // タブ切替で履歴外に居ても、進む側をタップすれば切り捨てずに移る
+    store().setActiveFile(1, 'b.ts');
+    store().goToHistory(2);
+    expect(store().history.map((h) => h.path)).toEqual(['a.ts', 'b.ts', 'c.ts']);
+    expect(store().historyIndex).toBe(2);
+    expect(store().panes[1].active).toBe('c.ts');
+  });
 });
 
 describe('search スライス', () => {

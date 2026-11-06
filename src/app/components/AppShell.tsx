@@ -21,6 +21,8 @@ const NavDrawer = lazy(() => import('./NavDrawer').then((m) => ({ default: m.Nav
  */
 export function AppShell() {
   const currentRepo = useAppStore((s) => s.currentRepo);
+  // 軌跡バーが出ている間は、浮かせたツールバーが 1 段高くなる
+  const hasTrail = useAppStore((s) => s.history.length > 1);
   const portrait = useIsPortrait();
 
   return (
@@ -34,6 +36,7 @@ export function AppShell() {
           </>
         )}
         <main
+          data-trail={hasTrail || undefined}
           className="relative flex flex-col flex-1 min-w-0 overflow-hidden"
           style={{ backgroundColor: 'var(--bg-primary)' }}
         >

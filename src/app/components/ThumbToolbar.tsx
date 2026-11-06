@@ -2,6 +2,8 @@ import { ChevronLeft, ChevronRight, Columns2, Rows2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore, selectCanGoBack, selectCanGoForward } from '@/stores/useAppStore';
 import { BookmarkToggleButton } from '@/features/bookmarks';
+import { TrailBar } from '@/features/viewer';
+import { usePreferredSplitDirection } from '@/shared/hooks/useOrientation';
 import { STRINGS } from '@/shared/constants/strings';
 
 const ICON_BUTTON =
@@ -17,6 +19,7 @@ interface ThumbToolbarProps {
 
 /**
  * 親指ツールバー。iPad を持ったまま届く下端に、頻繁に使う移動操作を集める。
+ * 上にジャンプの軌跡バーを重ね、戻る・進むの行き先を見えるようにする。
  * Peek とクイックオープンは、それぞれの機能の段で加える。
  */
 export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
@@ -40,53 +43,86 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
     })),
   );
 
+  const preferredSplit = usePreferredSplitDirection();
   const splitLabel = isSplitView ? STRINGS.header.splitToggle : STRINGS.header.splitStart;
 
   return (
     <div
-      id="thumb-toolbar"
-      role="toolbar"
-      aria-label={STRINGS.shell.toolbar}
       className={
         portrait
-          ? 'flex items-center justify-around shrink-0 px-2 py-1 border-t select-none'
-          : 'absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-1 rounded-full border select-none'
+          ? 'flex flex-col shrink-0 border-t'
+          : // 軌跡バーが長くても本文の幅を超えないよう、左右に余白を残して中央に寄せる
+            'absolute bottom-3 inset-x-4 flex flex-col items-center gap-1 pointer-events-none'
       }
       style={{
-        backgroundColor: 'var(--header-bg)',
         borderColor: 'var(--border-primary)',
-        // 下端の safe area は App の外枠が空けている
-        ...(portrait ? {} : { boxShadow: 'var(--shadow-card)', zIndex: 'var(--z-overlay)' }),
+        backgroundColor: portrait ? 'var(--header-bg)' : undefined,
+        zIndex: portrait ? undefined : 'var(--z-overlay)',
       }}
     >
-      <button
-        id="nav-back"
-        onClick={navigateBack}
-        disabled={!canGoBack}
-        className={`${ICON_BUTTON} text-[var(--text-secondary)]`}
-        aria-label={STRINGS.header.back}
+      <div
+        className={
+          portrait
+            ? 'flex px-2 empty:hidden'
+            : 'flex max-w-full px-1 rounded-full border pointer-events-auto empty:hidden'
+        }
+        style={
+          portrait
+            ? undefined
+            : {
+                backgroundColor: 'var(--header-bg)',
+                borderColor: 'var(--border-primary)',
+                boxShadow: 'var(--shadow-card)',
+              }
+        }
       >
-        <ChevronLeft size={22} />
-      </button>
-      <button
-        id="nav-forward"
-        onClick={navigateForward}
-        disabled={!canGoForward}
-        className={`${ICON_BUTTON} text-[var(--text-secondary)]`}
-        aria-label={STRINGS.header.forward}
+        <TrailBar />
+      </div>
+      <div
+        id="thumb-toolbar"
+        role="toolbar"
+        aria-label={STRINGS.shell.toolbar}
+        className={
+          portrait
+            ? 'flex items-center justify-around px-2 py-1 select-none'
+            : 'flex items-center gap-1 px-2 py-1 rounded-full border select-none pointer-events-auto'
+        }
+        style={{
+          backgroundColor: 'var(--header-bg)',
+          borderColor: 'var(--border-primary)',
+          // 下端の safe area は App の外枠が空けている
+          ...(portrait ? {} : { boxShadow: 'var(--shadow-card)' }),
+        }}
       >
-        <ChevronRight size={22} />
-      </button>
-      <BookmarkToggleButton />
-      <button
-        id="split-toggle"
-        onClick={() => toggleSplitView(portrait ? 'vertical' : 'horizontal')}
-        className={`${ICON_BUTTON} ${isSplitView ? 'text-[var(--accent-blue)]' : 'text-[var(--text-secondary)]'}`}
-        title={splitLabel}
-        aria-label={splitLabel}
-      >
-        {splitDirection === 'vertical' ? <Rows2 size={20} /> : <Columns2 size={20} />}
-      </button>
+        <button
+          id="nav-back"
+          onClick={navigateBack}
+          disabled={!canGoBack}
+          className={`${ICON_BUTTON} text-[var(--text-secondary)]`}
+          aria-label={STRINGS.header.back}
+        >
+          <ChevronLeft size={22} />
+        </button>
+        <button
+          id="nav-forward"
+          onClick={navigateForward}
+          disabled={!canGoForward}
+          className={`${ICON_BUTTON} text-[var(--text-secondary)]`}
+          aria-label={STRINGS.header.forward}
+        >
+          <ChevronRight size={22} />
+        </button>
+        <BookmarkToggleButton />
+        <button
+          id="split-toggle"
+          onClick={() => toggleSplitView(preferredSplit)}
+          className={`${ICON_BUTTON} ${isSplitView ? 'text-[var(--accent-blue)]' : 'text-[var(--text-secondary)]'}`}
+          title={splitLabel}
+          aria-label={splitLabel}
+        >
+          {splitDirection === 'vertical' ? <Rows2 size={20} /> : <Columns2 size={20} />}
+        </button>
+      </div>
     </div>
   );
 }
