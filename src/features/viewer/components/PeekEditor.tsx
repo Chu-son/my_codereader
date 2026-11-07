@@ -3,16 +3,15 @@ import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { Decoration, EditorView } from '@codemirror/view';
 import type { Extension } from '@codemirror/state';
-import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { getLanguageFromPath } from '@/shared/lib/fileUtils';
 import { languageKey } from '../lib/languageExtension';
 import { createCodeInteractions } from '../lib/codeInteractions';
-import { findDefinition } from '../lib/symbols';
 import { whenSized } from '../lib/whenSized';
 import { useLanguageExtension } from '../hooks/useLanguageExtension';
 import { useEditorDisplay } from '../hooks/useEditorDisplay';
 import { useSymbolExtraction } from '../hooks/useSymbolExtraction';
+import { useDefinitionResolver } from '../hooks/useDefinition';
 
 const BASIC_SETUP = { lineNumbers: false, highlightActiveLine: false } as const;
 const NOOP = () => {};
@@ -44,9 +43,8 @@ interface PeekEditorProps {
 /** Peek の中身。本文と同じ表示設定で、定義の行を枠の上端に出す */
 export function PeekEditor({ path, line, content }: PeekEditorProps) {
   const [view, setView] = useState<EditorView | null>(null);
-  const { symbols, pushPeek } = useAppStore(
-    useShallow((s) => ({ symbols: s.symbols[path], pushPeek: s.pushPeek })),
-  );
+  const pushPeek = useAppStore((s) => s.pushPeek);
+  const { find, locate } = useDefinitionResolver();
   const language = getLanguageFromPath(path);
   const langExtension = useLanguageExtension(languageKey(language, path));
   const displayExt = useEditorDisplay();
@@ -61,14 +59,16 @@ export function PeekEditor({ path, line, content }: PeekEditorProps) {
       onLineMenu: NOOP,
       // 枠の中ではメニューを出さず、定義が分かる識別子ならそのままたどる（枠の上にメニューを重ねないため）
       onWordTap: (word) => {
-        const definition = findDefinition(symbols ?? [], word.text, word.from);
-        if (definition && definition.from !== word.from) {
-          pushPeek({ path, line: definition.line, name: word.text });
-        }
+        void (async () => {
+          const target = await find(path, content, word);
+          if (target.kind === 'local' && target.isSelf) return;
+          const location = await locate(path, target);
+          if (location) pushPeek({ ...location, name: word.text });
+        })().catch(() => {});
       },
       onTreeChange: refreshSymbols,
     });
-  }, [interactions, symbols, path, pushPeek, refreshSymbols]);
+  }, [interactions, path, content, find, locate, pushPeek, refreshSymbols]);
 
   useEffect(() => {
     if (!view) return;

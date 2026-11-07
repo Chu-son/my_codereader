@@ -84,7 +84,9 @@ export const STRINGS = {
     wordMenu: (word: string) => `「${word}」の操作`,
     goToDefinition: '定義へ',
     definitionLine: (line: number) => `${line} 行目`,
-    noDefinition: 'このファイルに定義なし',
+    noDefinition: '定義が見つかりません',
+    locatingDefinition: '定義を探しています…',
+    definitionExternal: (source: string) => `${source}（たどれません）`,
     isDefinition: 'ここが定義',
     openDefinitionInOtherPane: '定義を隣のペインで開く',
     references: (count: number, max: number) =>
