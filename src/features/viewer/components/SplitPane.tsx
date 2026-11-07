@@ -6,6 +6,7 @@ import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
 import { FileTabs } from './FileTabs';
 import { CodeViewer } from './CodeViewer';
+import { PeekView } from './PeekView';
 const MarkdownPreview = lazy(() =>
   import('./MarkdownPreview').then((m) => ({ default: m.MarkdownPreview })),
 );
@@ -47,7 +48,7 @@ function PaneContent({ pane }: PaneContentProps) {
       <FileTabs pane={pane} />
 
       {/* コンテンツエリア */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         {activeFile ? (
           activeFile.loading ? (
             <LoadingState />
@@ -94,6 +95,8 @@ function PaneContent({ pane }: PaneContentProps) {
         ) : (
           <EmptyState />
         )}
+        {/* タブを切り替えても残るよう、エディタではなくペインに置く */}
+        <PeekView pane={pane} />
       </div>
     </div>
   );

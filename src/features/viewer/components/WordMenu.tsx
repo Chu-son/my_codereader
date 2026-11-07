@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Crosshair, ListTree, PanelRight, Search } from 'lucide-react';
+import { Crosshair, ListTree, PanelRight, PictureInPicture2, Search } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
@@ -22,6 +22,7 @@ interface WordMenuProps {
 /**
  * 単語をタップしたときのメニュー。定義は同じファイルの宣言から名前で引く
  * （import 先の解決と、リポジトリ全体のコード検索は後の段で足す）。
+ * 「定義へ」は読んでいる場所を移し、Peek は移さずに浮かぶ枠で見せる。
  */
 export function WordMenu({
   pane,
@@ -33,10 +34,11 @@ export function WordMenu({
   onShowReferences,
 }: WordMenuProps) {
   const direction = usePreferredSplitDirection();
-  const { symbols, navigateTo, openInOtherPane, searchInRepo } = useAppStore(
+  const { symbols, navigateTo, openPeek, openInOtherPane, searchInRepo } = useAppStore(
     useShallow((s) => ({
       symbols: s.symbols[path],
       navigateTo: s.navigateTo,
+      openPeek: s.openPeek,
       openInOtherPane: s.openInOtherPane,
       searchInRepo: s.searchInRepo,
     })),
@@ -73,6 +75,14 @@ export function WordMenu({
         disabled={!definition || isDefinition}
         onSelect={run(() => {
           if (definition) void navigateTo(path, { line: definition.line, pane });
+        })}
+      />
+      <MenuItem
+        Icon={PictureInPicture2}
+        label={STRINGS.viewer.peekDefinition}
+        disabled={!definition || isDefinition}
+        onSelect={run(() => {
+          if (definition) openPeek(pane, { path, line: definition.line, name: word.text });
         })}
       />
       <MenuItem

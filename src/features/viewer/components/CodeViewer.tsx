@@ -6,13 +6,13 @@ import { useShallow } from 'zustand/react/shallow';
 import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
 import { getLanguageFromPath } from '@/shared/lib/fileUtils';
-import { indentGuideExtension } from '../lib/indentGuide';
 import { languageKey } from '../lib/languageExtension';
 import { createCodeInteractions, type CodePopup } from '../lib/codeInteractions';
 import { useLanguageExtension } from '../hooks/useLanguageExtension';
 import { useJumpTarget } from '../hooks/useJumpTarget';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { useSymbolExtraction } from '../hooks/useSymbolExtraction';
+import { useEditorDisplay } from '../hooks/useEditorDisplay';
 import { ScrollStrip } from './ScrollStrip';
 import { CodePopups } from './CodePopups';
 
@@ -25,20 +25,15 @@ interface CodeViewerProps {
 // 行番号は長押しを受けるため codeInteractions 側で入れ直す
 const BASIC_SETUP = { lineNumbers: false } as const;
 
+// 最終行が親指ツールバーに隠れないよう、本文の下に余白を空ける
+const TOOLBAR_CLEARANCE = EditorView.theme({
+  '.cm-content': { paddingBottom: 'var(--toolbar-clearance)' },
+});
+
 /** 1 ペイン・1 ファイル分の読み取り専用エディタ。ファイルを替えるときは key で作り直す */
 export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
-  const {
-    wordWrap,
-    showIndentGuides,
-    fontSize,
-    lineHeight,
-    setCursorLine,
-    jumpTarget,
-    clearJumpTarget,
-  } = useAppStore(
+  const { fontSize, lineHeight, setCursorLine, jumpTarget, clearJumpTarget } = useAppStore(
     useShallow((s) => ({
-      wordWrap: s.wordWrap,
-      showIndentGuides: s.showIndentGuides,
       fontSize: s.fontSize,
       lineHeight: s.lineHeight,
       setCursorLine: s.setCursorLine,
@@ -80,23 +75,10 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
     return () => scroller.removeEventListener('scroll', onScroll);
   }, [view]);
 
-  const displayExt = useMemo(() => {
-    const ext = [EditorView.editable.of(false)];
-    if (wordWrap) ext.push(EditorView.lineWrapping);
-    if (showIndentGuides) ext.push(indentGuideExtension());
-    ext.push(
-      EditorView.theme({
-        '&': { fontSize: `${fontSize}px`, lineHeight: lineHeight.toString() },
-        '.cm-scroller': { fontFamily: 'var(--font-mono)', lineHeight: lineHeight.toString() },
-        // 最終行が親指ツールバーに隠れないよう、本文の下に余白を空ける
-        '.cm-content': { paddingBottom: 'var(--toolbar-clearance)' },
-      }),
-    );
-    return ext;
-  }, [wordWrap, showIndentGuides, fontSize, lineHeight]);
+  const displayExt = useEditorDisplay();
 
   const extensions = useMemo(
-    () => [...langExtension, interactions.extension, ...displayExt],
+    () => [...langExtension, interactions.extension, ...displayExt, TOOLBAR_CLEARANCE],
     [langExtension, interactions, displayExt],
   );
 

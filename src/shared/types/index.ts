@@ -86,6 +86,23 @@ export interface HistoryEntry {
   pane: PaneId;
 }
 
+/** Peek で見ている定義。name はパンくずに出す名前 */
+export interface PeekEntry {
+  path: string;
+  line: number;
+  name: string;
+}
+
+/**
+ * Peek（定義を浮かぶ枠で見る）の状態。枠は同時に 1 枚だけで、定義から定義へたどった道筋を stack に積む。
+ * 閉じても stack は残し、ツールバーから開き直せるようにする
+ */
+export interface PeekState {
+  pane: PaneId;
+  stack: PeekEntry[];
+  visible: boolean;
+}
+
 /** ペインごと・ファイルごとの表示状態（スクロール位置とカーソル行） */
 export interface ViewState {
   scrollTop: number;

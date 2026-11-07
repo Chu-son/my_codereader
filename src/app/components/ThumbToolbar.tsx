@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Columns2, Rows2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Columns2, PictureInPicture2, Rows2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore, selectCanGoBack, selectCanGoForward } from '@/stores/useAppStore';
 import { BookmarkToggleButton } from '@/features/bookmarks';
@@ -20,7 +20,8 @@ interface ThumbToolbarProps {
 /**
  * 親指ツールバー。iPad を持ったまま届く下端に、頻繁に使う移動操作を集める。
  * 上にジャンプの軌跡バーを重ね、戻る・進むの行き先を見えるようにする。
- * Peek とクイックオープンは、それぞれの機能の段で加える。
+ * Peek は単語のメニューから開き、ここでは閉じる・開き直すだけを受け持つ。
+ * クイックオープンは、その機能の段で加える。
  */
 export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
   const {
@@ -31,6 +32,9 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
     toggleSplitView,
     navigateBack,
     navigateForward,
+    hasPeek,
+    peekVisible,
+    setPeekVisible,
   } = useAppStore(
     useShallow((s) => ({
       isSplitView: s.isSplitView,
@@ -40,10 +44,18 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
       toggleSplitView: s.toggleSplitView,
       navigateBack: s.navigateBack,
       navigateForward: s.navigateForward,
+      hasPeek: s.peek !== null,
+      peekVisible: s.peek?.visible ?? false,
+      setPeekVisible: s.setPeekVisible,
     })),
   );
 
   const preferredSplit = usePreferredSplitDirection();
+  const peekLabel = !hasPeek
+    ? STRINGS.viewer.peekUnavailable
+    : peekVisible
+      ? STRINGS.viewer.peekClose
+      : STRINGS.viewer.peekReopen;
   const splitLabel = isSplitView ? STRINGS.header.splitToggle : STRINGS.header.splitStart;
 
   return (
@@ -113,6 +125,17 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
           <ChevronRight size={22} />
         </button>
         <BookmarkToggleButton />
+        <button
+          id="peek-toggle"
+          onClick={() => setPeekVisible(!peekVisible)}
+          disabled={!hasPeek}
+          aria-pressed={peekVisible}
+          className={`${ICON_BUTTON} ${peekVisible ? 'text-[var(--accent-blue)]' : 'text-[var(--text-secondary)]'}`}
+          title={peekLabel}
+          aria-label={peekLabel}
+        >
+          <PictureInPicture2 size={20} />
+        </button>
         <button
           id="split-toggle"
           onClick={() => toggleSplitView(preferredSplit)}

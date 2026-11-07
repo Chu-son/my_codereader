@@ -1,4 +1,11 @@
-import type { HistoryEntry, JumpTarget, PaneId, ViewState } from '@/shared/types';
+import type {
+  HistoryEntry,
+  JumpTarget,
+  PaneId,
+  PeekEntry,
+  PeekState,
+  ViewState,
+} from '@/shared/types';
 import { isBinaryFile } from '@/shared/lib/fileUtils';
 import { pushJump, recordLocation, type HistoryCursor } from '@/shared/lib/navigationHistory';
 import type { AppState, SliceCreator } from '../types';
@@ -30,6 +37,16 @@ export interface PanesSlice {
   history: HistoryEntry[];
   historyIndex: number;
   jumpTarget: JumpTarget | null;
+  /** Peek。履歴とタブには積まない（覗くだけで、読んでいる場所は動かさないため） */
+  peek: PeekState | null;
+  /** 本文から Peek を開く。前の Peek の道筋は捨てて、この定義から始める */
+  openPeek: (pane: PaneId, entry: PeekEntry) => void;
+  /** Peek の中の定義をたどる（道筋に積む） */
+  pushPeek: (entry: PeekEntry) => void;
+  /** パンくずで道筋の途中へ戻る */
+  popPeekTo: (index: number) => void;
+  /** 開いている Peek を閉じる・閉じた Peek を開き直す */
+  setPeekVisible: (visible: boolean) => void;
   /** 履歴に積んで移動する。ブックマーク・検索・ツリー・定義ジャンプはすべてここを通る */
   navigateTo: (path: string, options?: NavigateOptions) => Promise<void>;
   navigateBack: () => void;
@@ -75,6 +92,7 @@ export const initialPanesState = (): Pick<
   | 'history'
   | 'historyIndex'
   | 'jumpTarget'
+  | 'peek'
 > => ({
   panes: { 1: emptyPane(), 2: emptyPane() },
   focusedPane: 1,
@@ -84,6 +102,7 @@ export const initialPanesState = (): Pick<
   history: [],
   historyIndex: -1,
   jumpTarget: null,
+  peek: null,
 });
 
 /** 操作中のペインで表示しているファイルと行（履歴に記録する現在地） */
@@ -260,7 +279,13 @@ export const createPanesSlice: SliceCreator<PanesSlice> = (set, get) => {
         if (s.splitDirection === preferred) {
           return { splitDirection: preferred === 'horizontal' ? 'vertical' : 'horizontal' };
         }
-        return { isSplitView: false, panes: { ...s.panes, 2: emptyPane() }, focusedPane: 1 };
+        return {
+          isSplitView: false,
+          panes: { ...s.panes, 2: emptyPane() },
+          focusedPane: 1,
+          // 消えるペインの Peek は残ったペインに出す
+          peek: s.peek && { ...s.peek, pane: 1 },
+        };
       });
     },
 
@@ -291,5 +316,30 @@ export const createPanesSlice: SliceCreator<PanesSlice> = (set, get) => {
     },
 
     clearJumpTarget: () => set({ jumpTarget: null }),
+
+    openPeek: (pane, entry) => {
+      set({ peek: { pane: resolvePane(pane), stack: [entry], visible: true } });
+      void get().ensureFile(entry.path);
+    },
+
+    pushPeek: (entry) => {
+      const { peek } = get();
+      if (!peek) return;
+      const top = peek.stack.at(-1);
+      if (top && top.path === entry.path && top.line === entry.line) return;
+      set({ peek: { ...peek, stack: [...peek.stack, entry], visible: true } });
+      void get().ensureFile(entry.path);
+    },
+
+    popPeekTo: (index) => {
+      const { peek } = get();
+      if (!peek || index < 0 || index >= peek.stack.length) return;
+      set({ peek: { ...peek, stack: peek.stack.slice(0, index + 1) } });
+    },
+
+    setPeekVisible: (visible) => {
+      const { peek } = get();
+      if (peek && peek.visible !== visible) set({ peek: { ...peek, visible } });
+    },
   };
 };

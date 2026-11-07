@@ -272,6 +272,52 @@ describe('files / panes スライス', () => {
     expect(store().historyIndex).toBe(2);
     expect(store().panes[1].active).toBe('c.ts');
   });
+
+  it('Peek は履歴とタブを動かさずに開き、道筋を積んで途中へ戻れる', async () => {
+    mockFile('a.ts', 'a');
+    await store().navigateTo('a.ts', { line: 10 });
+    const before = { history: store().history, panes: store().panes };
+
+    store().openPeek(1, { path: 'a.ts', line: 3, name: 'foo' });
+    store().pushPeek({ path: 'a.ts', line: 7, name: 'bar' });
+    // 同じ定義を続けて積まない
+    store().pushPeek({ path: 'a.ts', line: 7, name: 'bar' });
+    expect(store().peek?.stack.map((e) => e.name)).toEqual(['foo', 'bar']);
+    expect(store().history).toBe(before.history);
+    expect(store().panes).toBe(before.panes);
+
+    store().popPeekTo(0);
+    expect(store().peek?.stack.map((e) => e.name)).toEqual(['foo']);
+
+    // 本文から開き直すと、前の道筋は捨てる
+    store().pushPeek({ path: 'a.ts', line: 7, name: 'bar' });
+    store().openPeek(1, { path: 'a.ts', line: 20, name: 'baz' });
+    expect(store().peek?.stack.map((e) => e.name)).toEqual(['baz']);
+  });
+
+  it('Peek を閉じても道筋は残り、開き直せる。開いていないファイルは取得する', async () => {
+    const onRequest = vi.fn();
+    mockFile('b.ts', 'b', onRequest);
+    store().openPeek(1, { path: 'b.ts', line: 1, name: 'b' });
+    await vi.waitFor(() => expect(store().files['b.ts']?.loading).toBe(false));
+    expect(onRequest).toHaveBeenCalledOnce();
+    expect(store().panes[1].tabs).toEqual([]);
+
+    store().setPeekVisible(false);
+    expect(store().peek).toMatchObject({ visible: false, stack: [{ path: 'b.ts' }] });
+    store().setPeekVisible(true);
+    expect(store().peek?.visible).toBe(true);
+  });
+
+  it('分割を解除すると、pane 2 の Peek は pane 1 に出す', () => {
+    store().toggleSplitView('horizontal');
+    store().openPeek(2, { path: 'a.ts', line: 1, name: 'a' });
+    expect(store().peek?.pane).toBe(2);
+    store().toggleSplitView('horizontal');
+    store().toggleSplitView('horizontal');
+    expect(store().isSplitView).toBe(false);
+    expect(store().peek?.pane).toBe(1);
+  });
 });
 
 describe('search スライス', () => {
@@ -342,6 +388,7 @@ describe('repository スライス: switchBranch', () => {
       history: [{ path: 'a.ts', line: 1, pane: 1 }],
       historyIndex: 0,
       isSplitView: true,
+      peek: { pane: 1, stack: [{ path: 'a.ts', line: 1, name: 'a' }], visible: true },
     });
     await store().switchBranch('dev');
     expect(store().currentBranch).toBe('dev');
@@ -351,6 +398,7 @@ describe('repository スライス: switchBranch', () => {
     expect(store().panes[1].tabs).toEqual([]);
     // 別ブランチの履歴で空画面に戻らないよう履歴も捨てる。分割のレイアウトは保つ
     expect(store().history).toEqual([]);
+    expect(store().peek).toBeNull();
     expect(store().isSplitView).toBe(true);
   });
 

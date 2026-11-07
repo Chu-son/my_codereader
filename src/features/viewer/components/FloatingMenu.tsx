@@ -42,13 +42,17 @@ export function FloatingMenu({ anchor, label, title, onClose, children }: Floati
       onClose();
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key !== 'Escape') return;
+      // 下にある Peek まで一度に閉じないよう、メニューで受けたことを知らせる
+      e.preventDefault();
+      onClose();
     };
     document.addEventListener('pointerdown', onPointerDown, true);
-    document.addEventListener('keydown', onKeyDown);
+    // Peek より先に受けるため捕捉段階で聞く
+    document.addEventListener('keydown', onKeyDown, true);
     return () => {
       document.removeEventListener('pointerdown', onPointerDown, true);
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', onKeyDown, true);
     };
   }, [onClose]);
 
