@@ -9,11 +9,13 @@ export interface UiSlice {
   /** 縦向きで、レールとパネルを入れた左ドロワーが開いているか（横向きでは使わない） */
   navDrawerOpen: boolean;
   searchDrawerOpen: boolean;
+  quickOpenOpen: boolean;
   settingsOpen: boolean;
   /** 開いているパネルを再度選ぶと閉じる */
   togglePanel: (panel: SidePanel) => void;
   setNavDrawerOpen: (open: boolean) => void;
   setSearchDrawerOpen: (open: boolean) => void;
+  setQuickOpenOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
 }
 
@@ -21,6 +23,7 @@ export const createUiSlice: SliceCreator<UiSlice> = (set) => ({
   activePanel: 'explorer',
   navDrawerOpen: false,
   searchDrawerOpen: false,
+  quickOpenOpen: false,
   settingsOpen: false,
 
   togglePanel: (panel) =>
@@ -29,6 +32,7 @@ export const createUiSlice: SliceCreator<UiSlice> = (set) => ({
   // ドロワーを重ねないよう、検索・設定を開くときは左ドロワーを閉じる
   setSearchDrawerOpen: (open) =>
     set(open ? { searchDrawerOpen: true, navDrawerOpen: false } : { searchDrawerOpen: false }),
+  setQuickOpenOpen: (open) => set({ quickOpenOpen: open }),
   setSettingsOpen: (open) =>
     set(open ? { settingsOpen: true, navDrawerOpen: false } : { settingsOpen: false }),
 });

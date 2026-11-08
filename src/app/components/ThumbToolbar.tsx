@@ -1,4 +1,11 @@
-import { ChevronLeft, ChevronRight, Columns2, PictureInPicture2, Rows2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Columns2,
+  FileSearch,
+  PictureInPicture2,
+  Rows2,
+} from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore, selectCanGoBack, selectCanGoForward } from '@/stores/useAppStore';
 import { BookmarkToggleButton } from '@/features/bookmarks';
@@ -21,7 +28,6 @@ interface ThumbToolbarProps {
  * 親指ツールバー。iPad を持ったまま届く下端に、頻繁に使う移動操作を集める。
  * 上にジャンプの軌跡バーを重ね、戻る・進むの行き先を見えるようにする。
  * Peek は単語のメニューから開き、ここでは閉じる・開き直すだけを受け持つ。
- * クイックオープンは、その機能の段で加える。
  */
 export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
   const {
@@ -35,6 +41,7 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
     hasPeek,
     peekVisible,
     setPeekVisible,
+    setQuickOpenOpen,
   } = useAppStore(
     useShallow((s) => ({
       isSplitView: s.isSplitView,
@@ -47,6 +54,7 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
       hasPeek: s.peek !== null,
       peekVisible: s.peek?.visible ?? false,
       setPeekVisible: s.setPeekVisible,
+      setQuickOpenOpen: s.setQuickOpenOpen,
     })),
   );
 
@@ -144,6 +152,15 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
           aria-label={splitLabel}
         >
           {splitDirection === 'vertical' ? <Rows2 size={20} /> : <Columns2 size={20} />}
+        </button>
+        <button
+          id="quick-open"
+          onClick={() => setQuickOpenOpen(true)}
+          className={`${ICON_BUTTON} text-[var(--text-secondary)]`}
+          title={STRINGS.quickOpen.open}
+          aria-label={STRINGS.quickOpen.open}
+        >
+          <FileSearch size={20} />
         </button>
       </div>
     </div>

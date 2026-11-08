@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
+import { blobPaths } from '@/shared/lib/fileUtils';
 import {
   findDefinitionTarget,
   findLocalTarget,
@@ -9,7 +10,6 @@ import {
   type DefinitionTarget,
   type Word,
 } from '../lib/definition/resolveDefinition';
-import { blobPaths } from '../lib/definition/resolvePath';
 
 /** 取得済みの本文を返す。取得に失敗した・別の取得の途中なら null */
 async function loadContent(path: string): Promise<string | null> {

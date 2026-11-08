@@ -10,6 +10,7 @@ import { lazy, Suspense } from 'react';
 const SearchDrawer = lazy(() =>
   import('@/features/search').then((m) => ({ default: m.SearchDrawer })),
 );
+const QuickOpen = lazy(() => import('@/features/search').then((m) => ({ default: m.QuickOpen })));
 const SettingsDialog = lazy(() =>
   import('@/features/settings').then((m) => ({ default: m.SettingsDialog })),
 );
@@ -40,6 +41,11 @@ function App() {
       {/* 検索ドロワー */}
       <Suspense fallback={null}>
         <SearchDrawer />
+      </Suspense>
+
+      {/* 開く操作の中で入力欄にフォーカスできるよう（iPad のキーボードを出すため）、先に読み込んでおく */}
+      <Suspense fallback={null}>
+        <QuickOpen />
       </Suspense>
 
       {/* 設定ダイアログ */}
