@@ -12,7 +12,7 @@ import {
 } from '../lib/definition/resolveDefinition';
 
 /** 取得済みの本文を返す。取得に失敗した・別の取得の途中なら null */
-async function loadContent(path: string): Promise<string | null> {
+export async function loadContent(path: string): Promise<string | null> {
   await useAppStore.getState().ensureFile(path);
   const file = useAppStore.getState().files[path];
   return file && !file.loading && !file.error ? file.content : null;

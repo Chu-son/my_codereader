@@ -367,6 +367,47 @@ describe('search スライス', () => {
   });
 });
 
+describe('search スライス: searchWordInRepo', () => {
+  const ac = () => new AbortController().signal;
+
+  it('PAT が無ければリクエストしない', async () => {
+    useAppStore.setState({ pat: null, currentRepo: 'o/r' });
+    await expect(store().searchWordInRepo('foo', ac())).resolves.toEqual([]);
+  });
+
+  it('同じ語の再検索は API を呼ばず、ドロワーの状態も変えない', async () => {
+    let calls = 0;
+    server.use(
+      http.get(`${API}/search/code`, () => {
+        calls++;
+        return HttpResponse.json({ items: [{ path: 'x.ts' }] });
+      }),
+    );
+    useAppStore.setState({ pat: 'token', currentRepo: 'cache/once' });
+    await expect(store().searchWordInRepo('foo', ac())).resolves.toEqual([{ path: 'x.ts' }]);
+    await expect(store().searchWordInRepo('foo', ac())).resolves.toEqual([{ path: 'x.ts' }]);
+    expect(calls).toBe(1);
+    expect(store().searchDrawerOpen).toBe(false);
+    expect(store().searchQuery).toBe('');
+  });
+
+  it('失敗は覚えず、次は検索し直す', async () => {
+    let calls = 0;
+    server.use(
+      http.get(`${API}/search/code`, () => {
+        calls++;
+        return calls === 1
+          ? new HttpResponse(null, { status: 500 })
+          : HttpResponse.json({ items: [] });
+      }),
+    );
+    useAppStore.setState({ pat: 'token', currentRepo: 'cache/retry' });
+    await expect(store().searchWordInRepo('foo', ac())).rejects.toThrow();
+    await expect(store().searchWordInRepo('foo', ac())).resolves.toEqual([]);
+    expect(calls).toBe(2);
+  });
+});
+
 describe('repository スライス: switchBranch', () => {
   it('ブランチを切り替えるとツリーを取得し直し、開いていたファイルと履歴を捨てる', async () => {
     server.use(

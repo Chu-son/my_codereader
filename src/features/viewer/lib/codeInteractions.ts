@@ -16,11 +16,14 @@ export interface TappedWord {
 }
 
 /** 本文の上に出すもの。浮かぶ UI は常に 1 つだけにする（重なって読めなくなるのを防ぐ） */
+/** 参照シートの範囲。repo はコード検索を使う */
+export type ReferenceScope = 'file' | 'repo';
+
 export type CodePopup =
   | { kind: 'line'; line: number; anchor: Anchor }
   | { kind: 'word'; word: TappedWord; anchor: Anchor }
   | { kind: 'selection'; text: string; x: number; y: number }
-  | { kind: 'references'; word: string; line: number };
+  | { kind: 'references'; word: string; line: number; scope: ReferenceScope };
 
 export interface SelectionInfo {
   text: string;

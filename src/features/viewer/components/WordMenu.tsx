@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Crosshair, ListTree, PanelRight, PictureInPicture2, Search } from 'lucide-react';
+import {
+  Crosshair,
+  FileSearch,
+  ListTree,
+  PanelRight,
+  PictureInPicture2,
+  Search,
+} from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
 import { usePreferredSplitDirection } from '@/shared/hooks/useOrientation';
 import { STRINGS } from '@/shared/constants/strings';
-import type { Anchor, TappedWord } from '../lib/codeInteractions';
+import type { Anchor, ReferenceScope, TappedWord } from '../lib/codeInteractions';
 import { REFERENCE_LIMIT, findReferences } from '../lib/symbols';
 import type { DefinitionLocation, DefinitionTarget } from '../lib/definition/resolveDefinition';
 import { useDefinitionResolver, useDefinitionTarget } from '../hooks/useDefinition';
@@ -19,7 +26,7 @@ interface WordMenuProps {
   word: TappedWord;
   anchor: Anchor;
   onClose: () => void;
-  onShowReferences: () => void;
+  onShowReferences: (scope: ReferenceScope) => void;
 }
 
 /** メニューの「定義へ」の補足。別ファイルの行は取得するまで分からないので、ファイル名を出す */
@@ -40,8 +47,8 @@ function definitionDetail(target: DefinitionTarget | null): string {
 }
 
 /**
- * 単語をタップしたときのメニュー。定義は同じファイルの宣言と、相対 import の先から引く
- * （リポジトリ全体のコード検索は後の段で足す）。
+ * 単語をタップしたときのメニュー。定義は同じファイルの宣言と、相対 import の先から引く。
+ * たどれないときだけ、リポジトリ全体のコード検索で候補を探す入口を出す。
  * 「定義へ」は読んでいる場所を移し、Peek は移さずに浮かぶ枠で見せる。
  */
 export function WordMenu({
@@ -120,11 +127,19 @@ export function WordMenu({
         disabled={!reachable || locating}
         onSelect={withDefinition((d) => void openInOtherPane(d.path, { line: d.line, direction }))}
       />
+      {target && !reachable && (
+        <MenuItem
+          Icon={FileSearch}
+          label={STRINGS.viewer.findDefinitionCandidates}
+          // シートへ切り替えるので、ここでは閉じない
+          onSelect={() => onShowReferences('repo')}
+        />
+      )}
       <MenuItem
         Icon={ListTree}
         label={STRINGS.viewer.references(referenceCount, REFERENCE_LIMIT)}
         // シートへ切り替えるので、ここでは閉じない（閉じると開いたシートまで消える）
-        onSelect={onShowReferences}
+        onSelect={() => onShowReferences('file')}
       />
       <MenuItem
         Icon={Search}

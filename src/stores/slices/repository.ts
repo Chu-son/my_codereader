@@ -12,6 +12,8 @@ import { STRINGS } from '@/shared/constants/strings';
 export interface RepositorySlice {
   currentRepo: string | null;
   currentBranch: string | null;
+  /** コード検索の索引はこのブランチだけなので、別ブランチの閲覧中は結果に注記する */
+  defaultBranch: string | null;
   repoDescription: string | null;
   branches: BranchInfo[];
   branchesLoading: boolean;
@@ -33,6 +35,7 @@ export interface RepositorySlice {
 export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) => ({
   currentRepo: null,
   currentBranch: null,
+  defaultBranch: null,
   repoDescription: null,
   branches: [],
   branchesLoading: false,
@@ -74,6 +77,7 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
       set({
         currentRepo: `${owner}/${repo}`,
         currentBranch: branch,
+        defaultBranch: repoInfo.defaultBranch,
         repoDescription: repoInfo.description ?? null,
         treeData: tree,
         treeTruncated: truncated,
@@ -112,6 +116,7 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
     set({
       currentRepo: null,
       currentBranch: null,
+      defaultBranch: null,
       repoDescription: null,
       treeData: [],
       treeLoading: false,

@@ -48,7 +48,7 @@ src/
 - **画面構成**: `AppShell` が配置だけを担い、各部品は必要な状態だけを購読する。左パネルは `ui.activePanel`（`explorer` / `bookmarks` / `history` / `outline`、`null` で閉じる）で切り替える。検索はパネルにせず `SearchDrawer` を開く。`ScrollStrip` は表示範囲・ブックマーク・検索ヒットの位置を描くだけで、表示範囲はエディタのスクロールイベントから DOM を直接更新する（スクロールで React を再描画しない）。縦向き（`useIsPortrait`）では、同じ `ActivityRail` と `SidePanel` を左ドロワー `NavDrawer` に入れ、ツールバーを画面下端に固定する。ドロワーは表示中のファイルかジャンプ先が変わると閉じる。分割は縦向きなら上下で始める（`toggleSplitView(preferred)`）。分割中に回転しても向きは変えない。
 - **集中モード**: `ui.focusMode` の間、`AppShell` はレール・パネル・ツールバーを、`PaneContent` はタブを出さず、`CodeViewer` は `ScopeHeader`（ファイル名と、宣言が画面の上へ流れた囲み。`findScopeChain`）を出す。エディタの上の 2 本指は `useTwoFingerGestures` が扱い、ピンチの間は `--font-size-code` だけを変えて、指を離したときに `fontSize` へ確定する（永続化の書き込みを毎フレーム走らせないため）。横スワイプは `navigateBack` / `navigateForward`。
 - **Share Target**: PWA の共有 (`?url=` / `?text=`) → `app/App.tsx` で `github.com/owner/repo` を抽出 → `loadRepository` → `history.replaceState` で URL を整理。
-- **検索**: ツリーのファイル名検索、取得済みファイル内の検索、GitHub `/search/code`（PAT 必須）。
+- **検索**: ツリーのファイル名検索、取得済みファイル内の検索、GitHub `/search/code`（PAT 必須）。単語メニューの「定義の候補を探す」と参照シートの「リポジトリ全体」も `/search/code` を使う（`viewer/lib/codeCandidates`、`searchWordInRepo`）。
 - **クイックオープン**: ツールバーから開くダイアログ（`search/components/QuickOpen.tsx`）。入力の先頭の記号で動作が変わり、接頭辞なしはツリーのあいまい一致（50 件まで）、`@` は操作中のファイルの `symbols`、`:` は行番号、`#` は `searchInRepo` に渡す。候補の計算は `search/lib/quickOpen.ts` の純粋関数で API を使わず、移動はすべて `navigateTo` を通るので履歴に乗る。
 - **ブックマーク**: `{ id, repo, branch, path, line, text }`。付け外しは `toggleBookmark(path, line)`（ツールバーのボタンと行メニューで共用）。`navigateTo(path, { line })` で該当行へ移動する。行ジャンプは `jumpTarget`（path / line / pane / timestamp）で、宛先のペインの `CodeViewer` だけが処理する。ジャンプとスクロール復元は、エディタが作られた後（`@uiw/react-codemirror` は初回描画の後で作るため、`EditorView` は state で持つ）、高さが付いてから（分割直後のペインは高さ 0 で作られる。`whenSized`）実行する。
 

@@ -1,5 +1,5 @@
 import type { OpenedFile, SearchResult } from '@/shared/types';
-import { searchCode } from '@/shared/lib/github';
+import { searchCode, type CodeSearchItem } from '@/shared/lib/github';
 import {
   MAX_SEARCH_RESULTS,
   convertGitHubSearchResults,
@@ -31,7 +31,16 @@ export interface SearchSlice {
   searchResults: SearchResult[];
   searchLoading: boolean;
   searchInRepo: (query: string) => Promise<void>;
+  /** 単語の候補を探すコード検索。結果は呼び出し元が持ち、検索ドロワーの状態には触らない */
+  searchWordInRepo: (word: string, signal: AbortSignal) => Promise<CodeSearchItem[]>;
 }
+
+/**
+ * 候補の検索結果を覚えておく語数。/search/code は 10 回/分と厳しく、候補を開いて戻り、
+ * 別の候補を見る動きで同じ語を検索し直さないため（メモリのみで永続化しない）
+ */
+const WORD_CACHE_SIZE = 20;
+const wordCache = new Map<string, CodeSearchItem[]>();
 
 /** 進行中の検索。新しい検索を始めたら中断する */
 let searchController = new AbortController();
@@ -82,5 +91,25 @@ export const createSearchSlice: SliceCreator<SearchSlice> = (set, get) => ({
       console.error('Search error:', error);
       set({ searchLoading: false });
     }
+  },
+
+  searchWordInRepo: async (word, signal) => {
+    const { pat, currentRepo } = get();
+    const repoParts = currentRepo ? splitRepoFullName(currentRepo) : null;
+    if (!pat || !repoParts) return [];
+    const key = `${currentRepo}\0${word}`;
+    const cached = wordCache.get(key);
+    if (cached) return cached;
+    const items = await searchCode(
+      repoParts.owner,
+      repoParts.repo,
+      word,
+      pat,
+      AbortSignal.any([signal, currentRepoSignal()]),
+    );
+    wordCache.set(key, items);
+    const oldest = wordCache.keys().next().value;
+    if (wordCache.size > WORD_CACHE_SIZE && oldest !== undefined) wordCache.delete(oldest);
+    return items;
   },
 });

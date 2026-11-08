@@ -38,11 +38,12 @@ export function CodePopups({ popup, onChange, pane, path, content }: CodePopupsP
           word={popup.word}
           anchor={popup.anchor}
           onClose={close}
-          onShowReferences={() =>
+          onShowReferences={(scope) =>
             onChange({
               kind: 'references',
               word: popup.word.text,
               line: content.slice(0, popup.word.from).split('\n').length,
+              scope,
             })
           }
         />
@@ -67,6 +68,7 @@ export function CodePopups({ popup, onChange, pane, path, content }: CodePopupsP
             content={content}
             word={popup.word}
             currentLine={popup.line}
+            initialScope={popup.scope}
             onClose={close}
           />
         </Suspense>

@@ -83,7 +83,7 @@ export function searchInCachedFiles(query: string, openedFiles: OpenedFile[]): S
 }
 
 /** 正規表現の特殊文字をエスケープ */
-function escapeRegExp(string: string): string {
+export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
