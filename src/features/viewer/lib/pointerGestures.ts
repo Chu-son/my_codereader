@@ -25,6 +25,7 @@ export function trackPress(down: PointerEvent, { onLongPress, onTap }: PressHand
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup', onUp);
     window.removeEventListener('pointercancel', finish);
+    window.removeEventListener('pointerdown', onOtherDown);
   };
   const timer = onLongPress
     ? window.setTimeout(() => {
@@ -39,6 +40,10 @@ export function trackPress(down: PointerEvent, { onLongPress, onTap }: PressHand
       finish();
     }
   };
+  // 2 本目の指が触れたらピンチなどの始まりで、タップではない
+  const onOtherDown = (e: PointerEvent) => {
+    if (e.pointerId !== down.pointerId) finish();
+  };
   const onUp = (e: PointerEvent) => {
     if (e.pointerId !== down.pointerId || finished) return;
     finish();
@@ -48,4 +53,5 @@ export function trackPress(down: PointerEvent, { onLongPress, onTap }: PressHand
   window.addEventListener('pointermove', onMove);
   window.addEventListener('pointerup', onUp);
   window.addEventListener('pointercancel', finish);
+  window.addEventListener('pointerdown', onOtherDown);
 }

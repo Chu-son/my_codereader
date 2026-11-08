@@ -19,13 +19,14 @@ interface PaneContentProps {
 }
 
 function PaneContent({ pane }: PaneContentProps) {
-  const { activeFile, isFocused, isSplitView, ensureFile, focusPane } = useAppStore(
+  const { activeFile, isFocused, isSplitView, focusMode, ensureFile, focusPane } = useAppStore(
     useShallow((s) => {
       const path = s.panes[pane].active;
       return {
         activeFile: path ? s.files[path] : undefined,
         isFocused: s.focusedPane === pane,
         isSplitView: s.isSplitView,
+        focusMode: s.focusMode,
         ensureFile: s.ensureFile,
         focusPane: s.focusPane,
       };
@@ -45,7 +46,7 @@ function PaneContent({ pane }: PaneContentProps) {
       }}
     >
       {/* タブバー */}
-      <FileTabs pane={pane} />
+      {!focusMode && <FileTabs pane={pane} />}
 
       {/* コンテンツエリア */}
       <div className="flex-1 overflow-hidden relative">

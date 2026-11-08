@@ -11,7 +11,13 @@ const tsParser = typescriptLanguage.parser;
 const pyParser = pythonLanguage.parser;
 const goParser = goLanguage.parser;
 const cppParser = cppLanguage.parser;
-import { extractSymbols, findDefinition, findEnclosingSymbol, findReferences } from './symbols';
+import {
+  extractSymbols,
+  findDefinition,
+  findEnclosingSymbol,
+  findReferences,
+  findScopeChain,
+} from './symbols';
 
 const extract = (parser: Parser, src: string, lang: string | null) =>
   extractSymbols(parser.parse(src), Text.of(src.split('\n')), lang);
@@ -127,5 +133,24 @@ describe('findReferences', () => {
   it('上限で打ち切り、正規表現の記号はそのまま扱う', () => {
     expect(findReferences('a a a a', 'a', 2)).toHaveLength(2);
     expect(findReferences('$el.x $el', '$el')).toHaveLength(2);
+  });
+});
+
+describe('findScopeChain', () => {
+  const src = ['class A {', '  run() {', '    work();', '  }', '}', 'const x = 1;'].join('\n');
+  const names = (line: number) =>
+    findScopeChain(extract(tsParser, src, 'typescript'), line).map((s) => s.name);
+
+  it('宣言が画面の上へ流れた囲みを外側から順に返す', () => {
+    expect(names(3)).toEqual(['A', 'run']);
+  });
+
+  it('宣言の行がまだ見えているものは含めない', () => {
+    expect(names(2)).toEqual(['A']);
+    expect(names(1)).toEqual([]);
+  });
+
+  it('囲みの外では空', () => {
+    expect(names(6)).toEqual([]);
   });
 });

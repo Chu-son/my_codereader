@@ -184,6 +184,11 @@ export function findEnclosingSymbol(symbols: readonly DocSymbol[], line: number)
   return found;
 }
 
+/** 宣言の行が画面の上へ流れた、topLine を囲む宣言（外側から順）。1 行の宣言は囲みにならない */
+export function findScopeChain(symbols: readonly DocSymbol[], topLine: number): DocSymbol[] {
+  return symbols.filter((s) => s.line < topLine && s.endLine >= topLine);
+}
+
 export interface Reference {
   line: number;
   /** 行内での出現位置（0 始まり） */

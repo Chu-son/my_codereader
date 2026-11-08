@@ -35,6 +35,8 @@ export const STRINGS = {
     history: 'ジャンプ履歴',
     trail: 'ジャンプの軌跡',
     openPanels: 'パネルを開く',
+    focusEnter: '集中モード',
+    focusExit: '集中モードを終える',
     drawerHint: 'エクスプローラーやブックマークを選び、ファイルを開くと閉じます',
   },
   repository: {
@@ -59,6 +61,7 @@ export const STRINGS = {
     emptyLine2: '読み込みを開始してください',
   },
   viewer: {
+    scope: '現在のスコープ',
     openEditors: '開いているエディタ',
     fileLoading: 'ファイルを読み込み中...',
     fileLoadFailedTitle: 'ファイルを読み込めませんでした',

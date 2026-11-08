@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView } from '@codemirror/view';
@@ -13,6 +13,8 @@ import { useJumpTarget } from '../hooks/useJumpTarget';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { useSymbolExtraction } from '../hooks/useSymbolExtraction';
 import { useEditorDisplay } from '../hooks/useEditorDisplay';
+import { useTwoFingerGestures } from '../hooks/useTwoFingerGestures';
+import { ScopeHeader } from './ScopeHeader';
 import { ScrollStrip } from './ScrollStrip';
 import { CodePopups } from './CodePopups';
 
@@ -32,15 +34,17 @@ const TOOLBAR_CLEARANCE = EditorView.theme({
 
 /** 1 ペイン・1 ファイル分の読み取り専用エディタ。ファイルを替えるときは key で作り直す */
 export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
-  const { fontSize, lineHeight, setCursorLine, jumpTarget, clearJumpTarget } = useAppStore(
-    useShallow((s) => ({
-      fontSize: s.fontSize,
-      lineHeight: s.lineHeight,
-      setCursorLine: s.setCursorLine,
-      jumpTarget: s.jumpTarget,
-      clearJumpTarget: s.clearJumpTarget,
-    })),
-  );
+  const { fontSize, lineHeight, focusMode, setCursorLine, jumpTarget, clearJumpTarget } =
+    useAppStore(
+      useShallow((s) => ({
+        fontSize: s.fontSize,
+        lineHeight: s.lineHeight,
+        focusMode: s.focusMode,
+        setCursorLine: s.setCursorLine,
+        jumpTarget: s.jumpTarget,
+        clearJumpTarget: s.clearJumpTarget,
+      })),
+    );
   // エディタは初回描画の後で作られるため state で持つ（作られたときにフックを再実行させる）
   const [view, setView] = useState<EditorView | null>(null);
   const lineCount = useMemo(() => content.split('\n').length, [content]);
@@ -84,10 +88,13 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
 
   useScrollPosition(view, pane, filePath);
   useJumpTarget(view, pane, filePath, jumpTarget, clearJumpTarget);
+  const rootRef = useRef<HTMLDivElement>(null);
+  useTwoFingerGestures(view, rootRef, focusMode);
 
   return (
     <div
-      className="h-full overflow-hidden relative"
+      ref={rootRef}
+      className="h-full overflow-hidden flex flex-col"
       style={
         {
           '--font-size-code': `${fontSize}px`,
@@ -95,16 +102,19 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
         } as React.CSSProperties
       }
     >
-      <CodeMirror
-        value={content}
-        theme={vscodeDark}
-        basicSetup={BASIC_SETUP}
-        extensions={extensions}
-        height="100%"
-        style={{ height: '100%' }}
-        onCreateEditor={setView}
-      />
-      <ScrollStrip view={view} filePath={filePath} lineCount={lineCount} />
+      {focusMode && <ScopeHeader view={view} filePath={filePath} />}
+      <div className="relative flex-1 min-h-0">
+        <CodeMirror
+          value={content}
+          theme={vscodeDark}
+          basicSetup={BASIC_SETUP}
+          extensions={extensions}
+          height="100%"
+          style={{ height: '100%' }}
+          onCreateEditor={setView}
+        />
+        <ScrollStrip view={view} filePath={filePath} lineCount={lineCount} />
+      </div>
       <CodePopups popup={popup} onChange={setPopup} pane={pane} path={filePath} content={content} />
     </div>
   );

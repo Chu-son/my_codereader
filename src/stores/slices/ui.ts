@@ -11,12 +11,15 @@ export interface UiSlice {
   searchDrawerOpen: boolean;
   quickOpenOpen: boolean;
   settingsOpen: boolean;
+  /** 集中モード。レール・パネル・ツールバー・タブを隠して本文だけにする */
+  focusMode: boolean;
   /** 開いているパネルを再度選ぶと閉じる */
   togglePanel: (panel: SidePanel) => void;
   setNavDrawerOpen: (open: boolean) => void;
   setSearchDrawerOpen: (open: boolean) => void;
   setQuickOpenOpen: (open: boolean) => void;
   setSettingsOpen: (open: boolean) => void;
+  setFocusMode: (on: boolean) => void;
 }
 
 export const createUiSlice: SliceCreator<UiSlice> = (set) => ({
@@ -25,6 +28,7 @@ export const createUiSlice: SliceCreator<UiSlice> = (set) => ({
   searchDrawerOpen: false,
   quickOpenOpen: false,
   settingsOpen: false,
+  focusMode: false,
 
   togglePanel: (panel) =>
     set((state) => ({ activePanel: state.activePanel === panel ? null : panel })),
@@ -35,4 +39,5 @@ export const createUiSlice: SliceCreator<UiSlice> = (set) => ({
   setQuickOpenOpen: (open) => set({ quickOpenOpen: open }),
   setSettingsOpen: (open) =>
     set(open ? { settingsOpen: true, navDrawerOpen: false } : { settingsOpen: false }),
+  setFocusMode: (on) => set({ focusMode: on }),
 });

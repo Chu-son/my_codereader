@@ -3,6 +3,7 @@ import {
   ChevronRight,
   Columns2,
   FileSearch,
+  Maximize2,
   PictureInPicture2,
   Rows2,
 } from 'lucide-react';
@@ -42,6 +43,7 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
     peekVisible,
     setPeekVisible,
     setQuickOpenOpen,
+    setFocusMode,
   } = useAppStore(
     useShallow((s) => ({
       isSplitView: s.isSplitView,
@@ -55,6 +57,7 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
       peekVisible: s.peek?.visible ?? false,
       setPeekVisible: s.setPeekVisible,
       setQuickOpenOpen: s.setQuickOpenOpen,
+      setFocusMode: s.setFocusMode,
     })),
   );
 
@@ -161,6 +164,15 @@ export function ThumbToolbar({ portrait }: ThumbToolbarProps) {
           aria-label={STRINGS.quickOpen.open}
         >
           <FileSearch size={20} />
+        </button>
+        <button
+          id="focus-enter"
+          onClick={() => setFocusMode(true)}
+          className={`${ICON_BUTTON} text-[var(--text-secondary)]`}
+          title={STRINGS.shell.focusEnter}
+          aria-label={STRINGS.shell.focusEnter}
+        >
+          <Maximize2 size={20} />
         </button>
       </div>
     </div>

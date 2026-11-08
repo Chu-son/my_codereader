@@ -1,4 +1,6 @@
 import { lazy, Suspense } from 'react';
+import { Minimize2 } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/stores/useAppStore';
 import { SplitPane } from '@/features/viewer';
 import { RecentRepos } from '@/features/repository';
@@ -20,7 +22,15 @@ const NavDrawer = lazy(() => import('./NavDrawer').then((m) => ({ default: m.Nav
  * 部品は共通で、向きによって置き場所だけを変える（状態と挙動を 1 つに保つため）。
  */
 export function AppShell() {
-  const currentRepo = useAppStore((s) => s.currentRepo);
+  const { currentRepo, focusMode, setFocusMode } = useAppStore(
+    useShallow((s) => ({
+      currentRepo: s.currentRepo,
+      focusMode: s.focusMode,
+      setFocusMode: s.setFocusMode,
+    })),
+  );
+  // リポジトリを閉じると本文が無くなるので、集中モードのままでも通常の配置に戻す
+  const focused = focusMode && currentRepo !== null;
   // 軌跡バーが出ている間は、浮かせたツールバーが 1 段高くなる
   const hasTrail = useAppStore((s) => s.history.length > 1);
   const portrait = useIsPortrait();
@@ -29,14 +39,14 @@ export function AppShell() {
     <>
       <Header portrait={portrait} />
       <div className="flex flex-1 overflow-hidden">
-        {!portrait && (
+        {!portrait && !focused && (
           <>
             <ActivityRail />
             <SidePanel />
           </>
         )}
         <main
-          data-trail={hasTrail || undefined}
+          data-trail={(hasTrail && !focused) || undefined}
           className="relative flex flex-col flex-1 min-w-0 overflow-hidden"
           style={{ backgroundColor: 'var(--bg-primary)' }}
         >
@@ -45,7 +55,24 @@ export function AppShell() {
               {currentRepo ? <SplitPane /> : <RecentRepos />}
             </ErrorBoundary>
           </div>
-          {currentRepo && <ThumbToolbar portrait={portrait} />}
+          {currentRepo && !focused && <ThumbToolbar portrait={portrait} />}
+          {focused && (
+            <button
+              id="focus-exit"
+              onClick={() => setFocusMode(false)}
+              className="absolute bottom-3 right-6 touch-target rounded-full border text-[var(--text-secondary)]"
+              style={{
+                backgroundColor: 'var(--header-bg)',
+                borderColor: 'var(--border-primary)',
+                boxShadow: 'var(--shadow-card)',
+                zIndex: 'var(--z-overlay)',
+              }}
+              title={STRINGS.shell.focusExit}
+              aria-label={STRINGS.shell.focusExit}
+            >
+              <Minimize2 size={20} />
+            </button>
+          )}
         </main>
       </div>
       {portrait && (

@@ -12,7 +12,7 @@ src/
     App.tsx             最上位（safe area、ドロワー・ダイアログの遅延読込）、Share Target の処理
     components/         AppShell（画面の骨組み）、Header（リポジトリ切替・パンくず）、
                         ActivityRail（左パネルの切替・検索・設定）、SidePanel、NavDrawer（縦向きの左ドロワー）、
-                        ThumbToolbar（戻る・進む・ブックマーク・Peek・分割・クイックオープン。上に viewer の TrailBar を重ねる）
+                        ThumbToolbar（戻る・進む・ブックマーク・Peek・分割・クイックオープン・集中モード。上に viewer の TrailBar を重ねる）
   features/
     repository/         RepoSwitcher（入力・表示）、BranchSelector、RecentRepos
     explorer/           ExplorerPanel（開いているファイル + ツリー）、FileTree
@@ -46,6 +46,7 @@ src/
 - **Peek**: 読んでいる場所を動かさずに、定義を浮かぶ枠（`PeekView` / `PeekEditor`）で見る。状態は panes スライスの `peek`（`{ pane, stack, visible }`）で、枠は同時に 1 枚だけ、開いたペインの下側に出す（タブを切り替えても残るよう、エディタではなくペインに置く）。本文から開く（`openPeek`）と道筋を捨てて始め直し、枠の中で識別子をタップすると、メニューを出さずにその定義（別ファイルも含む）へ進んで道筋に積む（`pushPeek`。メニューを枠の上に重ねないため）。パンくずで途中へ戻れる（`popPeekTo`）。履歴とタブには積まず、「このペインで開く」「隣のペインで開く」を選んだときだけ `navigateTo` / `openInOtherPane` で移動する。閉じても道筋は残り、ツールバーの Peek ボタンで開き直せる。開いていないファイルの定義も見られるよう、本文は `ensureFile` で取得し、`PeekEditor` も宣言の一覧を作る。表示設定の拡張は `useEditorDisplay` で本文と共用する。
 - **ブランチ切替**: `switchBranch(branch)` → 新しいブランチのツリーを再取得。本文・タブ・履歴は捨て、分割のレイアウトは保つ。リセットは各スライスの `initialXxxState()` を使う。
 - **画面構成**: `AppShell` が配置だけを担い、各部品は必要な状態だけを購読する。左パネルは `ui.activePanel`（`explorer` / `bookmarks` / `history` / `outline`、`null` で閉じる）で切り替える。検索はパネルにせず `SearchDrawer` を開く。`ScrollStrip` は表示範囲・ブックマーク・検索ヒットの位置を描くだけで、表示範囲はエディタのスクロールイベントから DOM を直接更新する（スクロールで React を再描画しない）。縦向き（`useIsPortrait`）では、同じ `ActivityRail` と `SidePanel` を左ドロワー `NavDrawer` に入れ、ツールバーを画面下端に固定する。ドロワーは表示中のファイルかジャンプ先が変わると閉じる。分割は縦向きなら上下で始める（`toggleSplitView(preferred)`）。分割中に回転しても向きは変えない。
+- **集中モード**: `ui.focusMode` の間、`AppShell` はレール・パネル・ツールバーを、`PaneContent` はタブを出さず、`CodeViewer` は `ScopeHeader`（ファイル名と、宣言が画面の上へ流れた囲み。`findScopeChain`）を出す。エディタの上の 2 本指は `useTwoFingerGestures` が扱い、ピンチの間は `--font-size-code` だけを変えて、指を離したときに `fontSize` へ確定する（永続化の書き込みを毎フレーム走らせないため）。横スワイプは `navigateBack` / `navigateForward`。
 - **Share Target**: PWA の共有 (`?url=` / `?text=`) → `app/App.tsx` で `github.com/owner/repo` を抽出 → `loadRepository` → `history.replaceState` で URL を整理。
 - **検索**: ツリーのファイル名検索、取得済みファイル内の検索、GitHub `/search/code`（PAT 必須）。
 - **クイックオープン**: ツールバーから開くダイアログ（`search/components/QuickOpen.tsx`）。入力の先頭の記号で動作が変わり、接頭辞なしはツリーのあいまい一致（50 件まで）、`@` は操作中のファイルの `symbols`、`:` は行番号、`#` は `searchInRepo` に渡す。候補の計算は `search/lib/quickOpen.ts` の純粋関数で API を使わず、移動はすべて `navigateTo` を通るので履歴に乗る。
