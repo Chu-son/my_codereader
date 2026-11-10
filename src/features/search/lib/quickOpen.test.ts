@@ -4,6 +4,7 @@ import {
   buildItems,
   emptyMessage,
   fuzzyScore,
+  matchPositions,
   parseQuery,
   rankPaths,
   rankSymbols,
@@ -88,7 +89,36 @@ describe('rankSymbols', () => {
   });
 });
 
+describe('matchPositions', () => {
+  it('部分文字列で一致すればその範囲', () => {
+    expect(matchPositions('err', 'HTTPError.ts')).toEqual([4, 5, 6]);
+  });
+
+  it('飛び飛びの一致は前から順に拾う', () => {
+    expect(matchPositions('hte', 'HTTPError.ts')).toEqual([0, 1, 4]);
+  });
+
+  it('一致しない・空の入力は null', () => {
+    expect(matchPositions('xyz', 'Ky.ts')).toBeNull();
+    expect(matchPositions('', 'Ky.ts')).toBeNull();
+  });
+});
+
 describe('buildItems', () => {
+  it('一致した文字の位置と、開いているかを付ける', () => {
+    const items = buildItems('ky', source);
+    expect(items[0]).toMatchObject({ title: 'Ky.ts', matches: [0, 1], isOpen: true });
+    const guide = items.find((i) => i.title === 'ky-guide.md');
+    expect(guide).toMatchObject({ matches: [0, 1] });
+    expect(guide?.isOpen).toBeUndefined();
+  });
+
+  it('ディレクトリ名だけに一致したファイルは強調しない', () => {
+    const item = buildItems('core', source).find((i) => i.title === 'Ky.ts');
+    expect(item).toBeDefined();
+    expect(item?.matches).toBeUndefined();
+  });
+
   it('入力が無ければ開いているタブ', () => {
     expect(buildItems('', source).map((i) => i.action)).toEqual([
       { kind: 'open', path: 'src/core/Ky.ts' },

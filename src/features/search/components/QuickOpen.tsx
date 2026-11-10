@@ -29,6 +29,21 @@ const MODE_CHIPS: { mode: QuickOpenMode; prefix: string; label: string }[] = [
   { mode: 'text', prefix: '#', label: STRINGS.quickOpen.modeText },
 ];
 
+/** 入力に一致した文字を強調する（どの文字で絞り込まれたかが見えるように） */
+function Highlighted({ text, matches }: { text: string; matches?: number[] }) {
+  if (!matches?.length) return text;
+  const set = new Set(matches);
+  return [...text].map((char, i) =>
+    set.has(i) ? (
+      <span key={i} className="font-semibold text-[var(--accent-blue)]">
+        {char}
+      </span>
+    ) : (
+      char
+    ),
+  );
+}
+
 /** 閉じている間は中身を作らず、開くたびに入力を空から始める */
 export function QuickOpen() {
   const open = useAppStore((s) => s.quickOpenOpen);
@@ -179,11 +194,16 @@ function QuickOpenDialog() {
                 >
                   <Icon size={16} className="shrink-0 text-[var(--text-muted)]" />
                   <span className="shrink-0 max-w-[60%] truncate-text text-[13px] text-[var(--text-primary)]">
-                    {item.title}
+                    <Highlighted text={item.title} matches={item.matches} />
                   </span>
                   {item.detail && (
                     <span className="min-w-0 truncate-text text-xs text-[var(--text-muted)]">
                       {item.detail}
+                    </span>
+                  )}
+                  {item.isOpen && (
+                    <span className="ml-auto shrink-0 text-xs text-[var(--text-muted)]">
+                      {STRINGS.quickOpen.openBadge}
                     </span>
                   )}
                 </button>

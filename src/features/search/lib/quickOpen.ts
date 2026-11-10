@@ -50,6 +50,23 @@ export function fuzzyScore(query: string, target: string): number | null {
   return score - target.length * 0.01;
 }
 
+/**
+ * 強調表示する文字の位置。部分文字列で一致すればその範囲、そうでなければ fuzzyScore と同じく
+ * 前から順に拾った位置。一致しなければ null
+ */
+export function matchPositions(query: string, target: string): number[] | null {
+  const q = query.toLowerCase();
+  if (!q) return null;
+  const t = target.toLowerCase();
+  const substring = t.indexOf(q);
+  if (substring >= 0) return Array.from({ length: q.length }, (_, i) => substring + i);
+  const positions: number[] = [];
+  for (let i = 0; i < t.length && positions.length < q.length; i++) {
+    if (t.charAt(i) === q.charAt(positions.length)) positions.push(i);
+  }
+  return positions.length === q.length ? positions : null;
+}
+
 function scorePath(term: string, path: string): number | null {
   // 「/」を含む入力はディレクトリまで指定しているので、パス全体で比べる
   if (!term.includes('/')) {
@@ -90,6 +107,10 @@ export interface QuickOpenItem {
   mode: QuickOpenMode;
   title: string;
   detail?: string;
+  /** title の中で入力に一致した文字の位置（強調表示に使う） */
+  matches?: number[];
+  /** どちらかのペインのタブで開いている */
+  isOpen?: boolean;
   action: QuickOpenAction;
 }
 
@@ -105,13 +126,20 @@ export interface QuickOpenSource {
   lineCount: number | null;
 }
 
-const fileItem = (path: string): QuickOpenItem => ({
-  key: path,
-  mode: 'file',
-  title: getFileName(path),
-  detail: path,
-  action: { kind: 'open', path },
-});
+function fileItem(path: string, term: string, openTabs: readonly string[]): QuickOpenItem {
+  const title = getFileName(path);
+  // ディレクトリ名だけに一致したときは、ファイル名に強調する文字が無い
+  const matches = term.includes('/') ? null : matchPositions(term, title);
+  return {
+    key: path,
+    mode: 'file',
+    title,
+    detail: path,
+    ...(matches && { matches }),
+    ...(openTabs.includes(path) && { isOpen: true }),
+    action: { kind: 'open', path },
+  };
+}
 
 function lineItems(term: string, source: QuickOpenSource): QuickOpenItem[] {
   const { activePath, lineCount } = source;
@@ -133,18 +161,26 @@ function lineItems(term: string, source: QuickOpenSource): QuickOpenItem[] {
 export function buildItems(query: string, source: QuickOpenSource): QuickOpenItem[] {
   const { mode, term } = parseQuery(query);
   switch (mode) {
-    case 'file':
-      return (term ? rankPaths(term, source.paths) : source.openTabs).map(fileItem);
+    case 'file': {
+      const compact = term.replace(/\s/g, '');
+      return (term ? rankPaths(term, source.paths) : source.openTabs).map((path) =>
+        fileItem(path, compact, source.openTabs),
+      );
+    }
     case 'symbol': {
       const { activePath } = source;
       if (!activePath) return [];
-      return rankSymbols(term, source.symbols).map((symbol) => ({
-        key: `symbol:${symbol.from}`,
-        mode,
-        title: symbol.name,
-        detail: STRINGS.quickOpen.lineDetail(symbol.line),
-        action: { kind: 'open', path: activePath, line: symbol.line },
-      }));
+      return rankSymbols(term, source.symbols).map((symbol) => {
+        const matches = matchPositions(term, symbol.name);
+        return {
+          key: `symbol:${symbol.from}`,
+          mode,
+          title: symbol.name,
+          ...(matches && { matches }),
+          detail: STRINGS.quickOpen.lineDetail(symbol.line),
+          action: { kind: 'open', path: activePath, line: symbol.line },
+        };
+      });
     }
     case 'line':
       return lineItems(term, source);

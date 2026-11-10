@@ -46,34 +46,39 @@ function CandidateList({ pane, word, onClose }: RepoReferencesProps) {
   };
 
   return (
-    <ul>
-      {state.candidates.map((candidate) => (
-        <li key={candidate.path}>
-          <button
-            onClick={() => void open(candidate)}
-            disabled={opening !== null}
-            className="w-full px-4 py-2 min-h-[44px] text-left transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-60"
-          >
-            <span className="flex items-baseline gap-2 text-sm text-[var(--text-primary)]">
-              <span className="truncate-text">{getFileName(candidate.path)}</span>
-              {candidate.isDefinition && (
-                <span className="shrink-0 text-xs text-[var(--accent-blue)]">
-                  {STRINGS.viewer.candidateDefinition}
+    <>
+      <p className="px-4 pt-2 text-xs text-[var(--text-muted)]">
+        {STRINGS.viewer.candidateFiles(state.candidates.length)}
+      </p>
+      <ul>
+        {state.candidates.map((candidate) => (
+          <li key={candidate.path}>
+            <button
+              onClick={() => void open(candidate)}
+              disabled={opening !== null}
+              className="w-full px-4 py-2 min-h-[44px] text-left transition-colors hover:bg-[var(--bg-hover)] disabled:opacity-60"
+            >
+              <span className="flex items-baseline gap-2 text-sm text-[var(--text-primary)]">
+                <span className="truncate-text">{getFileName(candidate.path)}</span>
+                {candidate.isDefinition && (
+                  <span className="shrink-0 text-xs text-[var(--accent-blue)]">
+                    {STRINGS.viewer.candidateDefinition}
+                  </span>
+                )}
+                <span className="ml-auto min-w-0 truncate-text text-xs text-[var(--text-muted)]">
+                  {opening === candidate.path ? STRINGS.viewer.candidateOpening : candidate.path}
+                </span>
+              </span>
+              {candidate.text && (
+                <span className="block font-mono text-xs truncate-text text-[var(--text-secondary)]">
+                  {candidate.text}
                 </span>
               )}
-              <span className="ml-auto min-w-0 truncate-text text-xs text-[var(--text-muted)]">
-                {opening === candidate.path ? STRINGS.viewer.candidateOpening : candidate.path}
-              </span>
-            </span>
-            {candidate.text && (
-              <span className="block font-mono text-xs truncate-text text-[var(--text-secondary)]">
-                {candidate.text}
-              </span>
-            )}
-          </button>
-        </li>
-      ))}
-    </ul>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

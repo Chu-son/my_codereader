@@ -6,6 +6,7 @@ import { useShallow } from 'zustand/react/shallow';
 import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
 import { getLanguageFromPath } from '@/shared/lib/fileUtils';
+import { STRINGS } from '@/shared/constants/strings';
 import { languageKey } from '../lib/languageExtension';
 import { createCodeInteractions, type CodePopup } from '../lib/codeInteractions';
 import { useLanguageExtension } from '../hooks/useLanguageExtension';
@@ -89,7 +90,7 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
   useScrollPosition(view, pane, filePath);
   useJumpTarget(view, pane, filePath, jumpTarget, clearJumpTarget);
   const rootRef = useRef<HTMLDivElement>(null);
-  useTwoFingerGestures(view, rootRef, focusMode);
+  const pinchSize = useTwoFingerGestures(view, rootRef, focusMode);
 
   return (
     <div
@@ -114,6 +115,21 @@ export function CodeViewer({ pane, filePath, content }: CodeViewerProps) {
           onCreateEditor={setView}
         />
         <ScrollStrip view={view} filePath={filePath} lineCount={lineCount} />
+        {pinchSize !== null && (
+          <div
+            role="status"
+            className="absolute left-1/2 top-1/3 -translate-x-1/2 px-5 py-3 rounded-xl border text-lg font-semibold pointer-events-none"
+            style={{
+              backgroundColor: 'var(--header-bg)',
+              borderColor: 'var(--border-primary)',
+              boxShadow: 'var(--shadow-card)',
+              color: 'var(--text-primary)',
+              zIndex: 'var(--z-overlay)',
+            }}
+          >
+            {STRINGS.viewer.pinchFontSize(pinchSize)}
+          </div>
+        )}
       </div>
       <CodePopups popup={popup} onChange={setPopup} pane={pane} path={filePath} content={content} />
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, type RefObject } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 import { EditorView } from '@codemirror/view';
 import { useAppStore } from '@/stores/useAppStore';
 import { MAX_FONT_SIZE, MIN_FONT_SIZE } from '@/stores/persistence';
@@ -11,12 +11,15 @@ const pointOf = (t: Touch) => ({ x: t.clientX, y: t.clientY });
  * Pointer Events では iOS が 2 本指をパン・ズームとして pointercancel してしまうため、
  * touchmove を preventDefault できる Touch Events を使う。
  * 1 本指は触らないので、スクロールと Safari の端からの「戻る」はそのまま効く。
+ * 戻り値はピンチ中の文字サイズ（指を離すと null）。変わっていく値を画面に出すため
  */
 export function useTwoFingerGestures(
   view: EditorView | null,
   rootRef: RefObject<HTMLElement | null>,
   enabled: boolean,
-) {
+): number | null {
+  const [pinchSize, setPinchSize] = useState<number | null>(null);
+
   useEffect(() => {
     if (!view || !enabled) return;
     const dom = view.dom;
@@ -30,6 +33,8 @@ export function useTwoFingerGestures(
     // 確定するまでは永続化する store を書かず、CSS 変数だけを変える（毎フレームの書き込みを避ける）
     const preview = (next: number) => {
       size = next;
+      // 値は整数の刻みでしか変わらないので、描き直しはピンチ中でも数回で済む
+      setPinchSize(next);
       rootRef.current?.style.setProperty('--font-size-code', `${next}px`);
       cancelAnimationFrame(frame);
       // 文字サイズで行の高さが変わっても、読んでいた行を画面の上端に保つ
@@ -41,6 +46,7 @@ export function useTwoFingerGestures(
     const end = (cancelled: boolean) => {
       if (!update) return;
       update = null;
+      setPinchSize(null);
       if (size !== startSize) {
         if (cancelled) preview(startSize);
         else useAppStore.getState().setFontSize(size);
@@ -97,6 +103,9 @@ export function useTwoFingerGestures(
       dom.removeEventListener('touchend', onEnd);
       dom.removeEventListener('touchcancel', onCancel);
       dom.removeEventListener('gesturestart', onGestureStart);
+      setPinchSize(null);
     };
   }, [view, rootRef, enabled]);
+
+  return pinchSize;
 }

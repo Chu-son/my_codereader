@@ -110,6 +110,8 @@ export const STRINGS = {
     candidatesDefaultBranch: (branch: string) => `デフォルトブランチ（${branch}）の結果です`,
     candidateDefinition: '定義',
     candidateOpening: '開いています…',
+    candidateFiles: (count: number) => `${count} ファイル`,
+    pinchFontSize: (size: number) => `${size} px`,
     outlineNoFile: 'ファイルを開くと、関数やクラスの一覧がここに並びます',
     outlineEmpty: 'このファイルでは宣言が見つかりません',
     outlineEntry: (name: string, line: number) => `${name}（${line} 行目）へ移動`,
@@ -149,6 +151,7 @@ export const STRINGS = {
     goToLine: (line: number) => `${line} 行目へ移動`,
     searchText: (text: string) => `「${text}」をリポジトリ内で検索`,
     lineDetail: (line: number) => `${line} 行目`,
+    openBadge: '開いています',
   },
   bookmarks: {
     title: 'ブックマーク',
