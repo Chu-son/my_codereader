@@ -1,130 +1,44 @@
-import {
-  ChevronLeft,
-  ChevronRight,
-  Columns2,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Rows2,
-  Search,
-  Settings,
-} from 'lucide-react';
-import { useShallow } from 'zustand/react/shallow';
+import { Menu } from 'lucide-react';
 import { useAppStore } from '@/stores/useAppStore';
 import { RepoSwitcher } from '@/features/repository';
-import { BookmarkToggleButton } from '@/features/bookmarks';
 import { STRINGS } from '@/shared/constants/strings';
+import { Breadcrumbs } from './Breadcrumbs';
 
-const ICON_BUTTON = 'touch-target rounded-lg transition-colors hover:bg-[var(--bg-hover)]';
-const ICON_COLOR = 'text-[var(--text-secondary)]';
+interface HeaderProps {
+  /** 縦向き。左端に、レールとパネルを収めた左ドロワーを開くボタンを置く */
+  portrait: boolean;
+}
 
-export function Header() {
-  const {
-    sidebarOpen,
-    isSplitView,
-    splitDirection,
-    navigationIndex,
-    navigationHistory,
-    toggleSidebar,
-    toggleSplitView,
-    setSettingsOpen,
-    setSearchDrawerOpen,
-    navigateBack,
-    navigateForward,
-  } = useAppStore(
-    useShallow((s) => ({
-      sidebarOpen: s.sidebarOpen,
-      isSplitView: s.isSplitView,
-      splitDirection: s.splitDirection,
-      navigationIndex: s.navigationIndex,
-      navigationHistory: s.navigationHistory,
-      toggleSidebar: s.toggleSidebar,
-      toggleSplitView: s.toggleSplitView,
-      setSettingsOpen: s.setSettingsOpen,
-      setSearchDrawerOpen: s.setSearchDrawerOpen,
-      navigateBack: s.navigateBack,
-      navigateForward: s.navigateForward,
-    })),
-  );
-
-  const sidebarLabel = sidebarOpen ? STRINGS.header.sidebarClose : STRINGS.header.sidebarOpen;
-  const splitLabel = isSplitView ? STRINGS.header.splitToggle : STRINGS.header.splitStart;
+/** 上端のバー。リポジトリの切り替えと、表示中のファイルのパンくずだけを置く */
+export function Header({ portrait }: HeaderProps) {
+  const setNavDrawerOpen = useAppStore((s) => s.setNavDrawerOpen);
 
   return (
     <header
       id="app-header"
-      className="flex items-center gap-1 px-2 border-b select-none shrink-0"
+      className="flex items-center gap-3 px-3 border-b select-none shrink-0"
       style={{
         height: 'var(--header-height)',
         backgroundColor: 'var(--header-bg)',
         borderColor: 'var(--border-primary)',
       }}
     >
-      <button
-        id="sidebar-toggle"
-        onClick={toggleSidebar}
-        className={ICON_BUTTON}
-        title={sidebarLabel}
-        aria-label={sidebarLabel}
-      >
-        {sidebarOpen ? (
-          <PanelLeftClose size={18} className={ICON_COLOR} />
-        ) : (
-          <PanelLeftOpen size={18} className={ICON_COLOR} />
-        )}
-      </button>
-
-      <button
-        id="nav-back"
-        onClick={navigateBack}
-        disabled={navigationIndex <= 0}
-        className={`${ICON_BUTTON} disabled:opacity-30`}
-        aria-label={STRINGS.header.back}
-      >
-        <ChevronLeft size={18} className={ICON_COLOR} />
-      </button>
-      <button
-        id="nav-forward"
-        onClick={navigateForward}
-        disabled={navigationIndex >= navigationHistory.length - 1}
-        className={`${ICON_BUTTON} disabled:opacity-30`}
-        aria-label={STRINGS.header.forward}
-      >
-        <ChevronRight size={18} className={ICON_COLOR} />
-      </button>
-
-      <div className="flex-1 min-w-0 mx-2">
+      {/* リポジトリ未選択でも設定などに辿れるよう、ツールバーではなくヘッダーに置く */}
+      {portrait && (
+        <button
+          id="nav-drawer-toggle"
+          onClick={() => setNavDrawerOpen(true)}
+          className="touch-target -ml-2 rounded-lg transition-colors hover:bg-[var(--bg-hover)] text-[var(--text-secondary)]"
+          aria-label={STRINGS.shell.openPanels}
+        >
+          <Menu size={22} />
+        </button>
+      )}
+      <div className={`shrink-0 min-w-0 ${portrait ? 'w-[min(28rem,60%)]' : 'w-[min(28rem,50%)]'}`}>
         <RepoSwitcher />
       </div>
-
-      <div className="flex items-center gap-0.5">
-        <BookmarkToggleButton />
-        <button
-          id="search-toggle"
-          onClick={() => setSearchDrawerOpen(true)}
-          className={ICON_BUTTON}
-          title={STRINGS.common.search}
-          aria-label={STRINGS.common.search}
-        >
-          <Search size={18} className={ICON_COLOR} />
-        </button>
-        <button
-          id="split-toggle"
-          onClick={toggleSplitView}
-          className={`${ICON_BUTTON} ${isSplitView ? 'text-[var(--accent-blue)]' : ICON_COLOR}`}
-          title={splitLabel}
-          aria-label={splitLabel}
-        >
-          {splitDirection === 'vertical' ? <Rows2 size={18} /> : <Columns2 size={18} />}
-        </button>
-        <button
-          id="settings-toggle"
-          onClick={() => setSettingsOpen(true)}
-          className={ICON_BUTTON}
-          title={STRINGS.common.settings}
-          aria-label={STRINGS.common.settings}
-        >
-          <Settings size={18} className={ICON_COLOR} />
-        </button>
+      <div className="flex-1 min-w-0 flex justify-end">
+        <Breadcrumbs />
       </div>
     </header>
   );

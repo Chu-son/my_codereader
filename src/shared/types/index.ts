@@ -18,11 +18,10 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
-/** 開いているファイル */
+/** 取得したファイル本文のキャッシュ（タブの有無とは独立して保持する） */
 export interface OpenedFile {
   path: string;
   content: string;
-  scrollPos: number;
   sha: string;
   loading: boolean;
   error?: string;
@@ -69,9 +68,73 @@ export interface Bookmark {
   text: string;
 }
 
-/** ジャンプターゲット */
+/** 分割表示のペイン。2 ペイン固定（デザイン G が 2 ペインのみのため一般化しない） */
+export type PaneId = 1 | 2;
+
+/** 行ジャンプの依頼。pane を持つことで、同じファイルを開く別ペインを巻き込まない */
 export interface JumpTarget {
   path: string;
   line: number;
+  pane: PaneId;
   timestamp: number;
+}
+
+/** ジャンプ履歴の 1 件。戻ったときに行まで復元する */
+export interface HistoryEntry {
+  path: string;
+  line: number;
+  pane: PaneId;
+}
+
+/** Peek で見ている定義。name はパンくずに出す名前 */
+export interface PeekEntry {
+  path: string;
+  line: number;
+  name: string;
+}
+
+/**
+ * Peek（定義を浮かぶ枠で見る）の状態。枠は同時に 1 枚だけで、定義から定義へたどった道筋を stack に積む。
+ * 閉じても stack は残し、ツールバーから開き直せるようにする
+ */
+export interface PeekState {
+  pane: PaneId;
+  stack: PeekEntry[];
+  visible: boolean;
+}
+
+/**
+ * ペインごと・ファイルごとの表示状態（スクロール位置とカーソル行）。
+ * スクロール位置はピクセルでなく先頭に見えている行で持つ。分割でペインの幅が変わると
+ * 折り返しで高さが変わり、同じピクセル位置が別の行を指すため
+ */
+export interface ViewState {
+  topLine: number;
+  cursorLine: number;
+}
+
+/** シンボル（宣言）の種類。アウトラインのアイコンと、メソッド判定に使う */
+export type SymbolKind =
+  | 'function'
+  | 'method'
+  | 'class'
+  | 'interface'
+  | 'type'
+  | 'enum'
+  | 'variable'
+  | 'property'
+  | 'module';
+
+/** 構文木から取り出した宣言 1 件。アウトライン・定義へ・スコープ表示で共用する */
+export interface DocSymbol {
+  name: string;
+  kind: SymbolKind;
+  /** 名前の開始位置（文書先頭からの文字オフセット） */
+  from: number;
+  /** 名前のある行（1 始まり） */
+  line: number;
+  /** 宣言の最終行（1 始まり）。カーソルがどの宣言の中にあるかの判定に使う */
+  endLine: number;
+  /** 囲んでいる宣言の数（トップレベルは 0） */
+  depth: number;
 }

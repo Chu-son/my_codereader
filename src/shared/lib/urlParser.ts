@@ -57,3 +57,12 @@ export function parseRepoInput(input: string): ParsedRepoInput | null {
     return null;
   }
 }
+
+/**
+ * GitHub 上の行への URL（parseRepoInput の逆）。共有先で同じ場所が開けるよう、ブランチ付きで作る。
+ * パスの各部分は URL エンコードするが、区切りの `/` は残す
+ */
+export function toGitHubLineUrl(repo: string, branch: string, path: string, line: number): string {
+  const encode = (s: string) => s.split('/').map(encodeURIComponent).join('/');
+  return `https://github.com/${repo}/blob/${encode(branch)}/${encode(path)}#L${line}`;
+}

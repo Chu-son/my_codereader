@@ -2,9 +2,11 @@ import { lazy, Suspense } from 'react';
 import { Allotment } from 'allotment';
 import 'allotment/dist/style.css';
 import { useShallow } from 'zustand/react/shallow';
+import type { PaneId } from '@/shared/types';
 import { useAppStore } from '@/stores/useAppStore';
 import { FileTabs } from './FileTabs';
 import { CodeViewer } from './CodeViewer';
+import { PeekView } from './PeekView';
 const MarkdownPreview = lazy(() =>
   import('./MarkdownPreview').then((m) => ({ default: m.MarkdownPreview })),
 );
@@ -13,30 +15,41 @@ import { FileCode, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { STRINGS } from '@/shared/constants/strings';
 
 interface PaneContentProps {
-  pane: 1 | 2;
+  pane: PaneId;
 }
 
 function PaneContent({ pane }: PaneContentProps) {
-  const { openedFiles, activePane1FilePath, activePane2FilePath, retryFile } = useAppStore(
-    useShallow((s) => ({
-      openedFiles: s.openedFiles,
-      activePane1FilePath: s.activePane1FilePath,
-      activePane2FilePath: s.activePane2FilePath,
-      retryFile: s.retryFile,
-    })),
+  const { activeFile, isFocused, isSplitView, focusMode, ensureFile, focusPane } = useAppStore(
+    useShallow((s) => {
+      const path = s.panes[pane].active;
+      return {
+        activeFile: path ? s.files[path] : undefined,
+        isFocused: s.focusedPane === pane,
+        isSplitView: s.isSplitView,
+        focusMode: s.focusMode,
+        ensureFile: s.ensureFile,
+        focusPane: s.focusPane,
+      };
+    }),
   );
 
-  const activeFilePath = pane === 1 ? activePane1FilePath : activePane2FilePath;
-
-  const activeFile = openedFiles.find((f) => f.path === activeFilePath);
-
   return (
-    <div className="flex flex-col h-full" style={{ backgroundColor: 'var(--bg-primary)' }}>
+    <div
+      className="flex flex-col h-full"
+      style={{
+        backgroundColor: 'var(--bg-primary)',
+        // 分割時は、ツリーや検索から開く先（操作中のペイン）が分かるよう上端に線を引く
+        boxShadow: isSplitView && isFocused ? 'inset 0 2px 0 var(--accent-blue)' : undefined,
+      }}
+      onPointerDownCapture={() => {
+        if (!isFocused) focusPane(pane);
+      }}
+    >
       {/* タブバー */}
-      <FileTabs pane={pane} />
+      {!focusMode && <FileTabs pane={pane} />}
 
       {/* コンテンツエリア */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden relative">
         {activeFile ? (
           activeFile.loading ? (
             <LoadingState />
@@ -55,7 +68,7 @@ function PaneContent({ pane }: PaneContentProps) {
                   </h3>
                   <p className="text-xs text-[var(--text-muted)] mb-4">{activeFile.error}</p>
                   <button
-                    onClick={() => retryFile(activeFile.path)}
+                    onClick={() => void ensureFile(activeFile.path)}
                     className="h-9 px-4 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 mx-auto"
                     style={{
                       backgroundColor: 'var(--accent-blue)',
@@ -74,14 +87,17 @@ function PaneContent({ pane }: PaneContentProps) {
             </Suspense>
           ) : (
             <CodeViewer
+              key={activeFile.path}
+              pane={pane}
               filePath={activeFile.path}
               content={activeFile.content}
-              scrollPos={activeFile.scrollPos}
             />
           )
         ) : (
           <EmptyState />
         )}
+        {/* タブを切り替えても残るよう、エディタではなくペインに置く */}
+        <PeekView pane={pane} />
       </div>
     </div>
   );

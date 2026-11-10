@@ -22,6 +22,7 @@ export function MarkdownPreview({ content }: MarkdownPreviewProps) {
         style={{
           fontSize: `${fontSize}px`,
           lineHeight: lineHeight,
+          paddingBottom: 'var(--toolbar-clearance)',
         }}
       >
         <ReactMarkdown
