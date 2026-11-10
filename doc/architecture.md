@@ -37,7 +37,7 @@ src/
 
 - **リポジトリ読込**: `loadRepository(input)` → `parseRepoInput` → `fetchRepoInfo` / `fetchRepoTree` / `fetchBranches` → ツリーを `TreeNode[]` に変換 → `addRecentRepo`。
 - **ファイルを開く・ジャンプ**: ツリー・検索・ブックマーク・URL からの移動はすべて `navigateTo(path, { line?, pane? })` を通る。現在地（操作中のペインのファイルとカーソル行）を履歴に記録 → 移動先を履歴に積む → ペインのタブに追加してアクティブにする → `line` があれば `jumpTarget` を出す → `ensureFile` で本文を取得（バイナリは除外、取得済み・取得中なら何もしない）。
-- **ストアの分担**: `files` スライスは本文のキャッシュ（タブを閉じても破棄しない）。`panes` スライスは 2 ペインのタブ・操作中のペイン・分割・ペインごとの表示状態（`viewState`：スクロール位置とカーソル行）・ジャンプ履歴。履歴の操作は純粋関数 `shared/lib/navigationHistory.ts`。
+- **ストアの分担**: `files` スライスは本文のキャッシュ（タブを閉じても破棄しない）。`panes` スライスは 2 ペインのタブ・操作中のペイン・分割・ペインごとの表示状態（`viewState`：スクロール位置とカーソル行。スクロール位置は幅が変わっても同じ行に戻れるよう、ピクセルでなく先頭の行で持つ）・ジャンプ履歴。履歴の操作は純粋関数 `shared/lib/navigationHistory.ts`。
 - **戻る・進む**: 履歴は 1 本（上限 50 件）で、各項目は `{ path, line, pane }`。戻る前に現在地を記録するので、タブ切替で履歴外にいても元の場所へ帰れる。閉じたタブは開き直す。分割を解除した後の pane 2 の項目は pane 1 に表示する。軌跡バー（`TrailBar`）と履歴パネル（`HistoryList`）は同じ履歴を描き、項目をタップすると `goToHistory(index)` でその位置へ移る（進む側の項目は、履歴外にいても切り捨てない）。
 - **隣のペイン**: `openInOtherPane(path, { line, direction })` は操作中でない側のペインに `navigateTo` で開く（履歴に乗る）。分割していなければ `direction` の向きで分割を始める。`OpenEditors` は分割中はペインごとに分けて並べ、`moveToOtherPane(from, path, direction)` でタブを隣へ移す（履歴には積まない）。`direction` は呼び出し側が `usePreferredSplitDirection()`（縦向きなら上下）で渡す。
 - **シンボル**: `extractSymbols(tree, doc, language)`（`viewer/lib/symbols.ts`）が構文木から宣言の一覧 `DocSymbol[]` を作る。アウトライン・定義へ・クイックオープンの `@`・集中モードのスコープ表示で共用する。言語ごとの宣言ノードは `SPECS` の小さなマップで持つ。`CodeViewer` は構文木が変わるたびに（まとめて 1 回）`ensureSyntaxTree` で末尾まで解析させてから抽出し、`files.symbols[path]` に入れる（CodeMirror は見えている範囲から遅延して解析するため、そのままの木では長いファイルの後半が抜ける）。TypeScript は `.tsx` だけ JSX 込みで解析する（`.ts` の `<T>(x) => x` を JSX と誤読して以降の木が崩れるため）。

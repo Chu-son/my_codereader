@@ -152,11 +152,15 @@ describe('files / panes スライス', () => {
   });
 
   it('表示状態はペインごとに独立する', () => {
-    store().updateScrollTop(1, 'a.ts', 100);
-    store().updateScrollTop(2, 'a.ts', 500);
+    store().updateTopLine(1, 'a.ts', 10);
+    store().updateTopLine(2, 'a.ts', 50);
     store().setCursorLine(1, 'a.ts', 7);
-    expect(store().viewState['1:a.ts']).toEqual({ scrollTop: 100, cursorLine: 7 });
-    expect(store().viewState['2:a.ts']).toEqual({ scrollTop: 500, cursorLine: 1 });
+    expect(store().viewState['1:a.ts']).toEqual({ topLine: 10, cursorLine: 7 });
+    expect(store().viewState['2:a.ts']).toEqual({ topLine: 50, cursorLine: 1 });
+    // 同じ行なら状態を作り直さない（スクロール中の再描画を避ける）
+    const before = store().viewState;
+    store().updateTopLine(1, 'a.ts', 10);
+    expect(store().viewState).toBe(before);
   });
 
   it('行ジャンプはペインを指定し、戻ると直前の行へ戻る', async () => {

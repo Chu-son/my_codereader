@@ -67,7 +67,7 @@ export interface PanesSlice {
   /** preferred は分割を始めるときの向き（縦向きの画面では上下が自然なため、呼び出し側が渡す） */
   toggleSplitView: (preferred?: SplitDirection) => void;
   toggleSplitDirection: () => void;
-  updateScrollTop: (pane: PaneId, path: string, scrollTop: number) => void;
+  updateTopLine: (pane: PaneId, path: string, topLine: number) => void;
   setCursorLine: (pane: PaneId, path: string, line: number) => void;
   clearJumpTarget: () => void;
 }
@@ -295,12 +295,14 @@ export const createPanesSlice: SliceCreator<PanesSlice> = (set, get) => {
       }));
     },
 
-    updateScrollTop: (pane, path, scrollTop) => {
+    updateTopLine: (pane, path, topLine) => {
       const key = viewKey(pane, path);
+      // スクロールのたびに呼ばれるので、行が変わらなければ状態を作り直さない
+      if (get().viewState[key]?.topLine === topLine) return;
       set((s) => ({
         viewState: {
           ...s.viewState,
-          [key]: { cursorLine: s.viewState[key]?.cursorLine ?? 1, scrollTop },
+          [key]: { cursorLine: s.viewState[key]?.cursorLine ?? 1, topLine },
         },
       }));
     },
@@ -310,7 +312,7 @@ export const createPanesSlice: SliceCreator<PanesSlice> = (set, get) => {
       set((s) => ({
         viewState: {
           ...s.viewState,
-          [key]: { scrollTop: s.viewState[key]?.scrollTop ?? 0, cursorLine: line },
+          [key]: { topLine: s.viewState[key]?.topLine ?? 1, cursorLine: line },
         },
       }));
     },

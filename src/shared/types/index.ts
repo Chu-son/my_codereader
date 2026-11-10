@@ -103,9 +103,13 @@ export interface PeekState {
   visible: boolean;
 }
 
-/** ペインごと・ファイルごとの表示状態（スクロール位置とカーソル行） */
+/**
+ * ペインごと・ファイルごとの表示状態（スクロール位置とカーソル行）。
+ * スクロール位置はピクセルでなく先頭に見えている行で持つ。分割でペインの幅が変わると
+ * 折り返しで高さが変わり、同じピクセル位置が別の行を指すため
+ */
 export interface ViewState {
-  scrollTop: number;
+  topLine: number;
   cursorLine: number;
 }
 
