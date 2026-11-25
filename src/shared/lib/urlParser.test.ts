@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseRepoInput, splitRepoFullName } from './urlParser';
+import { parseRepoInput, splitRepoFullName, toGitHubLineUrl } from './urlParser';
 
 describe('parseRepoInput', () => {
   it('owner/repo 形式を解析する', () => {
@@ -65,5 +65,18 @@ describe('splitRepoFullName', () => {
 
   it.each(['', 'vuejs', 'vuejs/', '/core'])('%j は null を返す', (input) => {
     expect(splitRepoFullName(input)).toBeNull();
+  });
+});
+
+describe('toGitHubLineUrl', () => {
+  it('ブランチ付きの行 URL を作り、パスの区切りは残してエンコードする', () => {
+    expect(toGitHubLineUrl('vuejs/core', 'feat/x', 'src/a b.ts', 12)).toBe(
+      'https://github.com/vuejs/core/blob/feat/x/src/a%20b.ts#L12',
+    );
+  });
+
+  it('作った URL は parseRepoInput で元に戻せる', () => {
+    const parsed = parseRepoInput(toGitHubLineUrl('vuejs/core', 'main', 'src/index.ts', 3));
+    expect(parsed).toMatchObject({ owner: 'vuejs', repo: 'core', branch: 'main' });
   });
 });

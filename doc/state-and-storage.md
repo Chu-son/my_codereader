@@ -8,8 +8,8 @@
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
 | ユーザー設定   | `pat`（既定は sessionStorage のみ）, `patRemembered`, `wordWrap`, `showIndentGuides`, `fontSize`(6〜24, 既定 14), `lineHeight`(1.0〜3.0, 既定 1.5)         | する   |
 | ユーザーデータ | `bookmarks`, `recentRepos`（最新 20 件・重複排除）                                                                                                         | する   |
-| サーバー由来   | `treeData`, `branches`, `openedFiles`（本文を含む）, `searchResults`                                                                                       | しない |
-| 一時 UI 状態   | `expandedDirs`, `isSplitView`, `splitDirection`, `sidebarOpen`, `searchDrawerOpen`, `settingsOpen`, `navigationHistory`, `jumpTarget`, `activeCursorLines` | しない |
+| サーバー由来 | `treeData`, `branches`, `files`（本文のキャッシュ）, `symbols`（ファイルごとの宣言の一覧。エディタの構文木から作る派生値）, `searchResults` | しない |
+| 一時 UI 状態 | `expandedDirs`, `panes`（ペインごとのタブ）, `focusedPane`, `isSplitView`, `splitDirection`, `viewState`（ペイン×ファイルのスクロール位置＝先頭に見えている行・カーソル行）, `history` / `historyIndex`, `jumpTarget`, `peek`（Peek の道筋と表示中か）, `activePanel`（開いている左パネル。`history` はジャンプ履歴）, `navDrawerOpen`（縦向きの左ドロワー）, `searchDrawerOpen`, `quickOpenOpen`, `settingsOpen`, `focusMode`（集中モード） | しない |
 
 ## localStorage / sessionStorage
 

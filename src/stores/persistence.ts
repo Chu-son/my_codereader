@@ -17,6 +17,9 @@ export interface PersistedState {
 /** 永続化形式のバージョン。形を変えたら上げて migrate を追加する */
 export const PERSIST_VERSION = 2;
 
+export const MIN_FONT_SIZE = 6;
+export const MAX_FONT_SIZE = 24;
+
 export const DEFAULT_PERSISTED: PersistedState = {
   pat: null,
   patRemembered: false,
@@ -84,7 +87,7 @@ export function migratePersistedState(persisted: unknown): PersistedState {
       typeof persisted.showIndentGuides === 'boolean'
         ? persisted.showIndentGuides
         : d.showIndentGuides,
-    fontSize: numberInRange(persisted.fontSize, 6, 24, d.fontSize),
+    fontSize: numberInRange(persisted.fontSize, MIN_FONT_SIZE, MAX_FONT_SIZE, d.fontSize),
     lineHeight: numberInRange(persisted.lineHeight, 1, 3, d.lineHeight),
   };
 }

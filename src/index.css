@@ -52,7 +52,12 @@
   --header-bg: #181825;
 
   /* Tab bar */
-  --tabbar-height: 42px;
+  --tabbar-height: 44px;
+
+  /* Activity rail / thumb toolbar */
+  --rail-width: 64px;
+  /* 親指ツールバーに最終行が隠れないよう、本文の下に空ける余白 */
+  --toolbar-clearance: 80px;
 
   /* Touch targets */
   --touch-min-size: 44px;
@@ -68,21 +73,38 @@
   --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Z-index layers */
+  /* Peek はペインの中に浮かべ、メニュー（overlay）より下に置く */
+  --z-peek: 30;
   --z-overlay: 40;
-  --z-sidebar: 50;
   --z-drawer: 60;
   --z-dialog: 70;
+}
+
+/* 横向きで軌跡バー（ツールバーの上に重ねる 1 段）が出ている間は、その分も空ける */
+[data-trail] {
+  --toolbar-clearance: 132px;
+}
+
+/* 縦向きはツールバーを本文の外（画面下端）に固定するため、最終行の下に余白を足さなくてよい */
+@media (orientation: portrait) {
+  :root,
+  [data-trail] {
+    --toolbar-clearance: 16px;
+  }
 }
 
 /* ========================================
    Global Resets & Base
    ======================================== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* レイヤー外に置くと Tailwind のユーティリティ（@layer utilities）より強くなり、p-* / m-* が効かなくなる */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html {
@@ -174,6 +196,9 @@ body {
   border-right: 1px solid var(--border-primary) !important;
   color: var(--text-muted) !important;
   min-width: 48px !important;
+  /* 行番号の長押しで行メニューを出すため、iOS のコールアウトと文字選択を抑える */
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .cm-editor .cm-activeLineGutter {
@@ -209,16 +234,18 @@ body {
 
 /* ========================================
    Vaul Drawer overrides
+   （vaul 1.x の属性名は data-vaul-*。旧名の [vaul-drawer] は一致しない）
    ======================================== */
-[vaul-drawer] {
-  background: var(--bg-secondary) !important;
+[data-vaul-drawer][data-vaul-drawer-direction='bottom'] {
   border-top: 1px solid var(--border-primary);
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
 }
 
-[vaul-drawer-overlay] {
-  background: rgba(0, 0, 0, 0.5) !important;
+[data-vaul-drawer][data-vaul-drawer-direction='left'] {
+  border-right: 1px solid var(--border-primary);
+}
+
+[data-vaul-overlay] {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* ========================================

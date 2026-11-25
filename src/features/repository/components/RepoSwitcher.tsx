@@ -40,7 +40,7 @@ export function RepoSwitcher() {
 
   if (showRepoInput || !currentRepo) {
     return (
-      <form onSubmit={handleSubmit} className="flex gap-2 w-full">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full">
         <div className="relative flex-1">
           <input
             id="repo-input"
@@ -49,7 +49,7 @@ export function RepoSwitcher() {
             onChange={(e) => setRepoInput(e.target.value)}
             placeholder={STRINGS.repository.inputPlaceholder}
             aria-label={STRINGS.repository.inputLabel}
-            className="w-full h-8 pl-3 pr-8 text-sm rounded-md border outline-none transition-colors"
+            className="w-full h-10 pl-3 pr-8 text-sm rounded-md border outline-none transition-colors"
             style={{
               backgroundColor: 'var(--bg-surface)',
               borderColor: 'var(--border-primary)',

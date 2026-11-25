@@ -1,5 +1,5 @@
-import type { SearchResult } from '@/shared/types';
-import { searchCode } from '@/shared/lib/github';
+import type { OpenedFile, SearchResult } from '@/shared/types';
+import { searchCode, type CodeSearchItem } from '@/shared/lib/github';
 import {
   MAX_SEARCH_RESULTS,
   convertGitHubSearchResults,
@@ -9,26 +9,48 @@ import {
 import { isAbortError } from '@/shared/lib/githubError';
 import { splitRepoFullName } from '@/shared/lib/urlParser';
 import { currentRepoSignal } from '../repoController';
-import type { SliceCreator } from '../types';
+import type { AppState, SliceCreator } from '../types';
+import { selectOpenPaths } from './panes';
 import { STRINGS } from '@/shared/constants/strings';
+
+export const initialSearchState = (): Pick<
+  SearchSlice,
+  'searchQuery' | 'searchResults' | 'searchLoading'
+> => ({ searchQuery: '', searchResults: [], searchLoading: false });
+
+/** 検索対象のキャッシュ。タブを閉じたファイルは含めない（「開いているファイル内」の意味を保つ） */
+function openFiles(s: AppState): OpenedFile[] {
+  return selectOpenPaths(s).flatMap((path) => {
+    const file = s.files[path];
+    return file ? [file] : [];
+  });
+}
 
 export interface SearchSlice {
   searchQuery: string;
   searchResults: SearchResult[];
   searchLoading: boolean;
   searchInRepo: (query: string) => Promise<void>;
+  /** 単語の候補を探すコード検索。結果は呼び出し元が持ち、検索ドロワーの状態には触らない */
+  searchWordInRepo: (word: string, signal: AbortSignal) => Promise<CodeSearchItem[]>;
 }
+
+/**
+ * 候補の検索結果を覚えておく語数。/search/code は 10 回/分と厳しく、候補を開いて戻り、
+ * 別の候補を見る動きで同じ語を検索し直さないため（メモリのみで永続化しない）
+ */
+const WORD_CACHE_SIZE = 20;
+const wordCache = new Map<string, CodeSearchItem[]>();
 
 /** 進行中の検索。新しい検索を始めたら中断する */
 let searchController = new AbortController();
 
 export const createSearchSlice: SliceCreator<SearchSlice> = (set, get) => ({
-  searchQuery: '',
-  searchResults: [],
-  searchLoading: false,
+  ...initialSearchState(),
 
   searchInRepo: async (query) => {
-    const { pat, currentRepo, openedFiles, treeData } = get();
+    const { pat, currentRepo, treeData } = get();
+    const openedFiles = openFiles(get());
     searchController.abort();
     const own = new AbortController();
     searchController = own;
@@ -69,5 +91,25 @@ export const createSearchSlice: SliceCreator<SearchSlice> = (set, get) => ({
       console.error('Search error:', error);
       set({ searchLoading: false });
     }
+  },
+
+  searchWordInRepo: async (word, signal) => {
+    const { pat, currentRepo } = get();
+    const repoParts = currentRepo ? splitRepoFullName(currentRepo) : null;
+    if (!pat || !repoParts) return [];
+    const key = `${currentRepo}\0${word}`;
+    const cached = wordCache.get(key);
+    if (cached) return cached;
+    const items = await searchCode(
+      repoParts.owner,
+      repoParts.repo,
+      word,
+      pat,
+      AbortSignal.any([signal, currentRepoSignal()]),
+    );
+    wordCache.set(key, items);
+    const oldest = wordCache.keys().next().value;
+    if (wordCache.size > WORD_CACHE_SIZE && oldest !== undefined) wordCache.delete(oldest);
+    return items;
   },
 });

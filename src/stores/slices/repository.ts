@@ -4,11 +4,16 @@ import { isAbortError, toErrorMessage } from '@/shared/lib/githubError';
 import { parseRepoInput, splitRepoFullName } from '@/shared/lib/urlParser';
 import { renewRepoSignal } from '../repoController';
 import type { SliceCreator } from '../types';
+import { initialFilesState } from './files';
+import { initialPanesState } from './panes';
+import { initialSearchState } from './search';
 import { STRINGS } from '@/shared/constants/strings';
 
 export interface RepositorySlice {
   currentRepo: string | null;
   currentBranch: string | null;
+  /** コード検索の索引はこのブランチだけなので、別ブランチの閲覧中は結果に注記する */
+  defaultBranch: string | null;
   repoDescription: string | null;
   branches: BranchInfo[];
   branchesLoading: boolean;
@@ -30,6 +35,7 @@ export interface RepositorySlice {
 export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) => ({
   currentRepo: null,
   currentBranch: null,
+  defaultBranch: null,
   repoDescription: null,
   branches: [],
   branchesLoading: false,
@@ -58,12 +64,9 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
       treeError: null,
       treeTruncated: false,
       treeData: [],
-      openedFiles: [],
-      activePane1FilePath: null,
-      activePane2FilePath: null,
       expandedDirs: [],
-      navigationHistory: [],
-      navigationIndex: -1,
+      ...initialFilesState(),
+      ...initialPanesState(),
     });
 
     try {
@@ -74,6 +77,7 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
       set({
         currentRepo: `${owner}/${repo}`,
         currentBranch: branch,
+        defaultBranch: repoInfo.defaultBranch,
         repoDescription: repoInfo.description ?? null,
         treeData: tree,
         treeTruncated: truncated,
@@ -96,7 +100,7 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
 
       // URLにファイルパスが含まれる場合は自動で開く
       if (filePath) {
-        get().openFile(filePath);
+        void get().navigateTo(filePath);
       }
     } catch (error) {
       if (isAbortError(error)) return;
@@ -112,21 +116,17 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
     set({
       currentRepo: null,
       currentBranch: null,
+      defaultBranch: null,
       repoDescription: null,
       treeData: [],
       treeLoading: false,
       treeError: null,
       treeTruncated: false,
       expandedDirs: [],
-      openedFiles: [],
-      activePane1FilePath: null,
-      activePane2FilePath: null,
-      isSplitView: false,
-      searchQuery: '',
-      searchResults: [],
+      ...initialFilesState(),
+      ...initialPanesState(),
+      ...initialSearchState(),
       searchDrawerOpen: false,
-      navigationHistory: [],
-      navigationIndex: -1,
     });
   },
 
@@ -140,9 +140,11 @@ export const createRepositorySlice: SliceCreator<RepositorySlice> = (set, get) =
       treeLoading: true,
       treeError: null,
       treeTruncated: false,
-      openedFiles: [],
-      activePane1FilePath: null,
-      activePane2FilePath: null,
+      ...initialFilesState(),
+      // 別ブランチの本文・履歴は使えないので捨てる。分割のレイアウトだけは保つ
+      ...initialPanesState(),
+      isSplitView: get().isSplitView,
+      splitDirection: get().splitDirection,
     });
 
     try {

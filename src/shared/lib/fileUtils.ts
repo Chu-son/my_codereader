@@ -1,3 +1,5 @@
+import type { TreeNode } from '@/shared/types';
+
 import {
   FileText,
   FileCode,
@@ -246,4 +248,22 @@ export function formatFileSize(bytes: number): string {
 /** ファイル名を取得 */
 export function getFileName(path: string): string {
   return path.split('/').pop() ?? path;
+}
+
+const pathSets = new WeakMap<TreeNode[], ReadonlySet<string>>();
+
+/** ツリーのファイルのパスの集合。ツリーは読み込み単位で作り直されるので、配列ごとに覚えておく */
+export function blobPaths(tree: TreeNode[]): ReadonlySet<string> {
+  const cached = pathSets.get(tree);
+  if (cached) return cached;
+  const paths = new Set<string>();
+  const walk = (nodes: TreeNode[]) => {
+    for (const node of nodes) {
+      if (node.type === 'blob') paths.add(node.path);
+      else walk(node.children);
+    }
+  };
+  walk(tree);
+  pathSets.set(tree, paths);
+  return paths;
 }

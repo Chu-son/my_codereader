@@ -55,7 +55,6 @@ describe('searchInCachedFiles', () => {
   const file = (over: Partial<OpenedFile>): OpenedFile => ({
     path: 'a.ts',
     content: '',
-    scrollPos: 0,
     sha: 'sha',
     loading: false,
     ...over,

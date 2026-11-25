@@ -35,7 +35,7 @@ describe('useAppStore の永続化', () => {
       pat: 'ghp_x',
       fontSize: 16,
       treeData: [{ path: 'a', name: 'a', type: 'blob', sha: 's', children: [] }],
-      openedFiles: [{ path: 'a.ts', content: 'body', scrollPos: 0, sha: 's', loading: false }],
+      files: { 'a.ts': { path: 'a.ts', content: 'body', sha: 's', loading: false } },
       searchResults: [{ path: 'a', lineNumber: 1, lineContent: 'x', matchStart: 0, matchEnd: 1 }],
     });
     const raw = localStorage.getItem('codereader:app');
@@ -44,7 +44,9 @@ describe('useAppStore の永続化', () => {
     expect(saved.version).toBe(2);
     expect(saved.state.fontSize).toBe(16);
     expect(saved.state).not.toHaveProperty('treeData');
-    expect(saved.state).not.toHaveProperty('openedFiles');
+    expect(saved.state).not.toHaveProperty('files');
+    expect(saved.state).not.toHaveProperty('panes');
+    expect(saved.state).not.toHaveProperty('history');
     expect(saved.state).not.toHaveProperty('searchResults');
   });
 
@@ -59,7 +61,7 @@ describe('useAppStore の永続化', () => {
     await useAppStore.persist.rehydrate();
     const s = useAppStore.getState();
     expect(s.fontSize).toBe(20);
-    expect(s.openedFiles).toEqual([]);
+    expect(s.files).toEqual({});
     expect(s.treeData).toEqual([]);
   });
 

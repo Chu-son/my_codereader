@@ -8,7 +8,8 @@ export function PwaInstallPrompt() {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-zinc-800 text-zinc-200 px-4 py-3 rounded-xl shadow-lg border border-zinc-700/50 max-w-[90vw] animate-in slide-in-from-bottom-5 fade-in duration-300">
+    // 下中央は親指ツールバーが使うため、ヘッダーの下に出す
+    <div className="fixed top-[calc(var(--header-height)+12px+env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-zinc-800 text-zinc-200 px-4 py-3 rounded-xl shadow-lg border border-zinc-700/50 max-w-[90vw] animate-in slide-in-from-bottom-5 fade-in duration-300">
       <div className="flex-1 text-sm flex flex-col gap-1">
         <p className="font-semibold text-zinc-100">{STRINGS.pwa.installTitle}</p>
         <p className="text-zinc-400 text-xs flex items-center gap-1 flex-wrap">
